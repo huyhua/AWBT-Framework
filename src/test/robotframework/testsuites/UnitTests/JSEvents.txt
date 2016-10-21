@@ -1,7 +1,7 @@
 *** Settings ***
 Suite Setup       Open Page
 Suite Teardown    Close All Browsers
-Library           Selenium2Library
+Library           ABTLibrary
 
 *** Variables ***
 ${URL Application}     http://fiddle.jshell.net/ShPVX/show/

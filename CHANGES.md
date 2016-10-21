@@ -241,7 +241,7 @@ Unreleased
 1.1.0.2
 -------
 
-* Extended com.github.markusbernhardt.selenium2library.keywords.Waiting.waitUntil
+* Extended abtlibrary.keywords.Waiting.waitUntil
   to keep waiting, when a Throwable is thrown.
 * Added the following keyword:
   * Wait Until Element Is Successfully Clicked

@@ -1,7 +1,7 @@
 *** Settings ***
 Suite Setup       Open Page
 Suite Teardown    Close Browser
-Library           Selenium2Library
+Library           ABTLibrary
 
 *** Variables ***
 ${URL Application}     http://dev.sencha.com/deploy/ext-4.0.0/examples/writer/writer.html

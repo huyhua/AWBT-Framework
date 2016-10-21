@@ -1,6 +1,6 @@
 *** Settings ***
 Suite Teardown    Close All Browsers
-Library           Selenium2Library
+Library           ABTLibrary
 
 *** Variables ***
 ${URL Application}    http://www.w3schools.com
