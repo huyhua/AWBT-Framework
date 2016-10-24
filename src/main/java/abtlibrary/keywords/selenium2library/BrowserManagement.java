@@ -50,7 +50,7 @@ import com.opera.core.systems.OperaDriver;
 
 import abtlibrary.RunOnFailureKeywordsAdapter;
 import abtlibrary.ABTLibraryFatalException;
-import abtlibrary.ABTNonFatalException;
+import abtlibrary.ABTLibraryNonFatalException;
 import abtlibrary.locators.ElementFinder;
 import abtlibrary.locators.WindowManager;
 import abtlibrary.utils.Robotframework;
@@ -858,7 +858,7 @@ public class BrowserManagement extends RunOnFailureKeywordsAdapter {
 	public void locationShouldBe(String url) {
 		String actual = getLocation();
 		if (!actual.equals(url)) {
-			throw new ABTNonFatalException(String.format("Location should have been '%s', but was '%s'",
+			throw new ABTLibraryNonFatalException(String.format("Location should have been '%s', but was '%s'",
 					url, actual));
 		}
 		logging.info(String.format("Current location is '%s'.", url));
@@ -877,7 +877,7 @@ public class BrowserManagement extends RunOnFailureKeywordsAdapter {
 	public void locationShouldContain(String url) {
 		String actual = getLocation();
 		if (!actual.contains(url)) {
-			throw new ABTNonFatalException(String.format(
+			throw new ABTLibraryNonFatalException(String.format(
 					"Location should have contained '%s', but was '%s'", url, actual));
 		}
 		logging.info(String.format("Current location is '%s'.", url));
@@ -898,7 +898,7 @@ public class BrowserManagement extends RunOnFailureKeywordsAdapter {
 	public void titleShouldBe(String title) {
 		String actual = getTitle();
 		if (!actual.equals(title)) {
-			throw new ABTNonFatalException(String.format("Title should have been '%s', but was '%s'",
+			throw new ABTLibraryNonFatalException(String.format("Title should have been '%s', but was '%s'",
 					title, actual));
 		}
 		logging.info(String.format("Page title is '%s'.", title));
@@ -919,7 +919,7 @@ public class BrowserManagement extends RunOnFailureKeywordsAdapter {
 	public void titleShouldNotBe(String title) {
 		String actual = getTitle();
 		if (actual.equals(title)) {
-			throw new ABTNonFatalException(String.format("Title should not have been '%s', but was '%s'",
+			throw new ABTLibraryNonFatalException(String.format("Title should not have been '%s', but was '%s'",
 					title, actual));
 		}
 		logging.info(String.format("Page title is '%s'.", title));
@@ -940,7 +940,7 @@ public class BrowserManagement extends RunOnFailureKeywordsAdapter {
 	public void titleShouldContain(String title) {
 		String actual = getTitle();
 		if (!actual.contains(title)) {
-			throw new ABTNonFatalException(String.format("Title should have contained '%s', but was '%s'",
+			throw new ABTLibraryNonFatalException(String.format("Title should have contained '%s', but was '%s'",
 					title, actual));
 		}
 		logging.info(String.format("Page title is '%s'.", title));
@@ -961,7 +961,7 @@ public class BrowserManagement extends RunOnFailureKeywordsAdapter {
 	public void titleShouldNotContain(String title) {
 		String actual = getTitle();
 		if (actual.contains(title)) {
-			throw new ABTNonFatalException(String.format(
+			throw new ABTLibraryNonFatalException(String.format(
 					"Title should not have contained '%s', but was '%s'", title, actual));
 		}
 		logging.info(String.format("Page title is '%s'.", title));
@@ -1277,7 +1277,7 @@ public class BrowserManagement extends RunOnFailureKeywordsAdapter {
 				}
 			}
 		} catch (MalformedURLException e) {
-			throw new ABTNonFatalException(e.getMessage());
+			throw new ABTLibraryNonFatalException(e.getMessage());
 		}
 
 		if (username.length() == 0) {

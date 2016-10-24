@@ -5,26 +5,26 @@ package abtlibrary;
  * all test executions.
  */
 @SuppressWarnings("serial")
-public class ABTNonFatalException extends RuntimeException {
+public class ABTLibraryNonFatalException extends RuntimeException {
 
 	/**
 	 * Mark this exception as non fatal
 	 */
 	public static final boolean ROBOT_EXIT_ON_FAILURE = false;
 
-	public ABTNonFatalException() {
+	public ABTLibraryNonFatalException() {
 		super();
 	}
 
-	public ABTNonFatalException(String string) {
+	public ABTLibraryNonFatalException(String string) {
 		super(string);
 	}
 
-	public ABTNonFatalException(Throwable t) {
+	public ABTLibraryNonFatalException(Throwable t) {
 		super(t);
 	}
 
-	public ABTNonFatalException(String string, Throwable t) {
+	public ABTLibraryNonFatalException(String string, Throwable t) {
 		super(string, t);
 	}
 }

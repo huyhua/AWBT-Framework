@@ -16,7 +16,7 @@ import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
 import abtlibrary.RunOnFailureKeywordsAdapter;
-import abtlibrary.ABTNonFatalException;
+import abtlibrary.ABTLibraryNonFatalException;
 
 @RobotKeywords
 public class Logging extends RunOnFailureKeywordsAdapter {
@@ -323,7 +323,7 @@ public class Logging extends RunOnFailureKeywordsAdapter {
 		log(msg, "html");
 	}
 
-	protected void warn(String msg) {
+	public void warn(String msg) {
 		log(msg, "warn");
 	}
 
@@ -332,7 +332,7 @@ public class Logging extends RunOnFailureKeywordsAdapter {
 		if (methodParameters != null) {
 			log0(msg, methodParameters[0], methodParameters[1]);
 		} else {
-			throw new ABTNonFatalException(String.format("Given log level %s is invalid.", logLevel));
+			throw new ABTLibraryNonFatalException(String.format("Given log level %s is invalid.", logLevel));
 		}
 	}
 
@@ -356,7 +356,7 @@ public class Logging extends RunOnFailureKeywordsAdapter {
 								methodArguments));
 
 			} catch (IOException e) {
-				throw new ABTNonFatalException("Error in handling temp file for long log message.", e);
+				throw new ABTLibraryNonFatalException("Error in handling temp file for long log message.", e);
 			}
 		} else {
 			// Message is small enough to get parsed by Jython

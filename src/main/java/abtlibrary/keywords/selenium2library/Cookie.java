@@ -9,7 +9,7 @@ import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
 import abtlibrary.RunOnFailureKeywordsAdapter;
-import abtlibrary.ABTNonFatalException;
+import abtlibrary.ABTLibraryNonFatalException;
 
 @RobotKeywords
 public class Cookie extends RunOnFailureKeywordsAdapter {
@@ -84,7 +84,7 @@ public class Cookie extends RunOnFailureKeywordsAdapter {
 		if (cookie != null) {
 			return cookie.getValue();
 		} else {
-			throw new ABTNonFatalException(String.format("Cookie with name %s not found.", name));
+			throw new ABTLibraryNonFatalException(String.format("Cookie with name %s not found.", name));
 		}
 	}
 

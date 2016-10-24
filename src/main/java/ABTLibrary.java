@@ -19,10 +19,11 @@ public class ABTLibrary extends abtlibrary.ABTLibrary {
 	}
 
 	public static void main(String[] args) throws Exception {
+		int port = Integer.parseInt(args[0]);
 		RemoteServer.configureLogging();
 		RemoteServer server = new RemoteServer();
 		server.putLibrary("/RPC2",new ABTLibrary());
-		server.setPort(8270);
+		server.setPort(port);
 		server.start();
 	}
 }

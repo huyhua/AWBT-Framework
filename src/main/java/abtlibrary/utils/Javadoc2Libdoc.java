@@ -59,7 +59,7 @@ public class Javadoc2Libdoc {
 					for (AnnotationInstance annotationInstanceNode : methodNode.getAnnotation()) {
 						if (annotationInstanceNode.getName().equals("RobotKeyword")) {
 							keywordDocumentation.put(methodNode.getName(), formatComment(methodNode));
-							break;
+							break;	
 						}
 					}
 				}

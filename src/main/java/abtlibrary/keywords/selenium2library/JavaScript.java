@@ -18,7 +18,7 @@ import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
 import abtlibrary.RunOnFailureKeywordsAdapter;
-import abtlibrary.ABTNonFatalException;
+import abtlibrary.ABTLibraryNonFatalException;
 import abtlibrary.utils.Python;
 
 @RobotKeywords
@@ -66,7 +66,7 @@ public class JavaScript extends RunOnFailureKeywordsAdapter {
 	public void alertShouldBePresent(String text) {
 		String alertText = confirmAction();
 		if (text != null && !alertText.equals(text)) {
-			throw new ABTNonFatalException(String.format("Alert text should have been '%s' but was '%s'",
+			throw new ABTLibraryNonFatalException(String.format("Alert text should have been '%s' but was '%s'",
 					text, alertText));
 		}
 	}
@@ -185,7 +185,7 @@ public class JavaScript extends RunOnFailureKeywordsAdapter {
 			acceptOnNextConfirmation = acceptOnNextConfirmationDefault;
 			return text;
 		} catch (WebDriverException wde) {
-			throw new ABTNonFatalException("There were no alerts");
+			throw new ABTLibraryNonFatalException("There were no alerts");
 		}
 	}
 
@@ -291,7 +291,7 @@ public class JavaScript extends RunOnFailureKeywordsAdapter {
 			String text = alert.getText().replace("\n", "");
 			return text;
 		} catch (WebDriverException wde) {
-			throw new ABTNonFatalException("There were no alerts");
+			throw new ABTLibraryNonFatalException("There were no alerts");
 		}
 	}
 
@@ -321,7 +321,7 @@ public class JavaScript extends RunOnFailureKeywordsAdapter {
 		try {
 			return readFile(codepath);
 		} catch (IOException e) {
-			throw new ABTNonFatalException("Cannot read JavaScript file: " + codepath);
+			throw new ABTLibraryNonFatalException("Cannot read JavaScript file: " + codepath);
 		}
 	}
 

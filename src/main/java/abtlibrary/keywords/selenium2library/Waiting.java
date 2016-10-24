@@ -8,7 +8,7 @@ import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
 import abtlibrary.RunOnFailureKeywordsAdapter;
-import abtlibrary.ABTNonFatalException;
+import abtlibrary.ABTLibraryNonFatalException;
 import abtlibrary.utils.Robotframework;
 
 @RobotKeywords
@@ -745,7 +745,7 @@ public class Waiting extends RunOnFailureKeywordsAdapter {
 			} catch (Throwable t) {
 			}
 			if (System.currentTimeMillis() > maxtime) {
-				throw new ABTNonFatalException(message);
+				throw new ABTLibraryNonFatalException(message);
 			}
 			try {
 				Thread.sleep(200);

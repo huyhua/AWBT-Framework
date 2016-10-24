@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
-import abtlibrary.ABTNonFatalException;
+import abtlibrary.ABTLibraryNonFatalException;
 
 public abstract class Robotframework {
 
@@ -41,7 +41,7 @@ public abstract class Robotframework {
 
 			return sb.toString();
 		} catch (UnsupportedEncodingException uee) {
-			throw new ABTNonFatalException(uee);
+			throw new ABTLibraryNonFatalException(uee);
 		}
 	}
 
@@ -103,7 +103,7 @@ public abstract class Robotframework {
 	public static double timestrToSecs(String timestr) {
 		timestr = normalizeTimestr(timestr);
 		if (timestr.length() == 0) {
-			throw new ABTNonFatalException("Invalid timestr: " + timestr);
+			throw new ABTLibraryNonFatalException("Invalid timestr: " + timestr);
 		}
 
 		try {
@@ -153,7 +153,7 @@ public abstract class Robotframework {
 			}
 		}
 		if (stringBuilder.length() != 0) {
-			throw new ABTNonFatalException("Invalid timestr: " + timestr);
+			throw new ABTLibraryNonFatalException("Invalid timestr: " + timestr);
 		}
 		return sign * (millis / 1000 + secs + mins * 60 + hours * 60 * 60 + days * 60 * 60 * 24);
 	}
