@@ -10,6 +10,7 @@ import javax.script.ScriptException;
 import org.robotframework.javalib.annotation.Autowired;
 import org.robotframework.javalib.library.AnnotationLibrary;
 
+import abtlibrary.keywords.appiumlibrary.ApplicationManagement;
 import abtlibrary.keywords.selenium2library.BrowserManagement;
 import abtlibrary.keywords.selenium2library.Cookie;
 import abtlibrary.keywords.selenium2library.Element;
@@ -441,6 +442,12 @@ public class ABTLibrary extends AnnotationLibrary {
 	 */
 	@Autowired
 	protected Waiting waiting;
+	
+	/**
+	 * Instantiated ApplicationManagement keyword bean
+	 */
+	@Autowired
+	protected ApplicationManagement applicationManagement;
 
 	// ##############################
 	// Getter / Setter
@@ -488,6 +495,10 @@ public class ABTLibrary extends AnnotationLibrary {
 
 	public Waiting getWaiting() {
 		return waiting;
+	}
+	
+	public ApplicationManagement getApplicationManagement() {
+		return applicationManagement;
 	}
 
 	// ##############################

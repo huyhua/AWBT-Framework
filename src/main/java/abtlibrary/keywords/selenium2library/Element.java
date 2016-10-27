@@ -19,6 +19,7 @@ import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
 import abtlibrary.RunOnFailureKeywordsAdapter;
+import abtlibrary.keywords.frameworklibrary.InterfaceManagement;
 import abtlibrary.ABTLibraryNonFatalException;
 import abtlibrary.locators.ElementFinder;
 import abtlibrary.utils.Python;
@@ -31,6 +32,11 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 */
 	@Autowired
 	protected BrowserManagement browserManagement;
+
+	/**
+	 * Instantiated InterfaceManagement keyword bean
+	 */
+	protected InterfaceManagement interfaceManagement = new InterfaceManagement();
 
 	/**
 	 * Instantiated FormElement keyword bean
@@ -47,6 +53,42 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	// ##############################
 	// Keywords - Element Lookups
 	// ##############################
+
+	/**
+	 * Returns the first Web Element identified by <b>locator</b>.<br>
+	 * <br>
+	 * Fails if there is no element matched with <b>locator</b>.<br>
+	 * <br>
+	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * for details about locators.<br>
+	 * 
+	 * @param locator
+	 *            The locator to locate the select list.
+	 * @return the Web Element
+	 */
+	@RobotKeyword
+	@ArgumentNames({ "locator" })
+	public WebElement getWebElement(String locator) {
+
+		return elementFind(locator, true, true).get(0);
+	}
+
+	/**
+	 * Returns list of Web Elements identified by <b>locator</b>.<br>
+	 * <br>
+	 * Fails if there is no element matched with <b>locator</b>.<br>
+	 * <br>
+	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * for details about locators.<br>
+	 * 
+	 * @param locator
+	 *            The locator to locate the select list.
+	 * @return the of Web Elements
+	 */
+	public List<WebElement> getWebElements(String locator) {
+
+		return elementFind(locator, false, true);
+	}
 
 	@RobotKeywordOverload
 	@ArgumentNames({ "text" })
@@ -104,8 +146,8 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void elementShouldContain(String locator, String text) {
-		elementShouldContain(locator, text, "");
+	public void checkElementContains(String locator, String text) {
+		checkElementContains(locator, text, "");
 	}
 
 	/**
@@ -122,21 +164,21 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "locator", "text", "message=NONE" })
-	public void elementShouldContain(String locator, String text, String message) {
+	public void checkElementContains(String locator, String text, String message) {
 		String actual = getText(locator);
 
 		if (!actual.toLowerCase().contains(text.toLowerCase())) {
 			logging.info(String.format("Element Should Contain: %s => FAILED", text));
 			throw new ABTLibraryNonFatalException(
-					String.format("Element should have contained text '%s', but its text was %s.", text, actual));
+					String.format("Element should have contained text '%s', but its text was '%s'.", text, actual));
 		} else {
 			logging.info(String.format("Element Should Contain: %s => OK", text));
 		}
 	}
 
 	@RobotKeywordOverload
-	public void elementShouldNotContain(String locator, String text) {
-		elementShouldNotContain(locator, text, "");
+	public void checkElementDoesNotContain(String locator, String text) {
+		checkElementDoesNotContain(locator, text, "");
 	}
 
 	/**
@@ -154,7 +196,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "locator", "text", "message=NONE" })
-	public void elementShouldNotContain(String locator, String text, String message) {
+	public void checkElementDoesNotContain(String locator, String text, String message) {
 		String actual = getText(locator);
 
 		if (actual.toLowerCase().contains(text.toLowerCase())) {
@@ -411,7 +453,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "locator" })
-	public void elementShouldBeEnabled(String locator) {
+	public void checkElementIsEnabled(String locator) {
 		if (!isEnabled(locator)) {
 			throw new ABTLibraryNonFatalException(String.format("Element %s is disabled.", locator));
 		}
@@ -428,15 +470,15 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "locator" })
-	public void elementShouldBeDisabled(String locator) {
+	public void checkElementIsDisabled(String locator) {
 		if (isEnabled(locator)) {
 			throw new ABTLibraryNonFatalException(String.format("Element %s is enabled.", locator));
 		}
 	}
 
 	@RobotKeywordOverload
-	public void elementShouldBeSelected(String locator) {
-		elementShouldBeSelected(locator, "");
+	public void checkElementIsSelected(String locator) {
+		checkElementIsSelected(locator, "");
 	}
 
 	/**
@@ -452,7 +494,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "locator", "message=NONE" })
-	public void elementShouldBeSelected(String locator, String message) {
+	public void checkElementIsSelected(String locator, String message) {
 		logging.info(String.format("Verifying element '%s' is selected.", locator));
 		boolean selected = isSelected(locator);
 
@@ -465,8 +507,8 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void elementShouldNotBeSelected(String locator) {
-		elementShouldNotBeSelected(locator, "");
+	public void checkElementIsNotSelected(String locator) {
+		checkElementIsNotSelected(locator, "");
 	}
 
 	/**
@@ -482,7 +524,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "locator", "message=NONE" })
-	public void elementShouldNotBeSelected(String locator, String message) {
+	public void checkElementIsNotSelected(String locator, String message) {
 		logging.info(String.format("Verifying element '%s' is not selected.", locator));
 		boolean selected = isSelected(locator);
 
@@ -495,8 +537,8 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void elementShouldBeVisible(String locator) {
-		elementShouldBeVisible(locator, "");
+	public void checkElementIsVisible(String locator) {
+		checkElementIsVisible(locator, "");
 	}
 
 	/**
@@ -517,7 +559,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "locator", "message=NONE" })
-	public void elementShouldBeVisible(String locator, String message) {
+	public void checkElementIsVisible(String locator, String message) {
 		logging.info(String.format("Verifying element '%s' is visible.", locator));
 		boolean visible = isVisible(locator);
 
@@ -530,8 +572,8 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void elementShouldNotBeVisible(String locator) {
-		elementShouldNotBeVisible(locator, "");
+	public void checkElementIsNotVisible(String locator) {
+		checkElementIsNotVisible(locator, "");
 	}
 
 	/**
@@ -552,7 +594,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "locator", "message=NONE" })
-	public void elementShouldNotBeVisible(String locator, String message) {
+	public void checkElementIsNotVisible(String locator, String message) {
 		logging.info(String.format("Verifying element '%s' is not visible.", locator));
 		boolean visible = isVisible(locator);
 
@@ -565,8 +607,8 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void elementShouldBeClickable(String locator) {
-		elementShouldBeClickable(locator, "");
+	public void checkElementIsClickable(String locator) {
+		checkElementIsClickable(locator, "");
 	}
 
 	/**
@@ -582,7 +624,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "locator", "message=NONE" })
-	public void elementShouldBeClickable(String locator, String message) {
+	public void checkElementIsClickable(String locator, String message) {
 		logging.info(String.format("Verifying element '%s' is clickable.", locator));
 		boolean clickable = isClickable(locator);
 
@@ -595,8 +637,8 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void elementShouldNotBeClickable(String locator) {
-		elementShouldNotBeClickable(locator, "");
+	public void checkElementIsNotClickable(String locator) {
+		checkElementIsNotClickable(locator, "");
 	}
 
 	/**
@@ -612,7 +654,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "locator", "message=NONE" })
-	public void elementShouldNotBeClickable(String locator, String message) {
+	public void checkElementIsNotClickable(String locator, String message) {
 		logging.info(String.format("Verifying element '%s' is not clickable.", locator));
 		boolean clickable = isClickable(locator);
 
@@ -625,8 +667,8 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void elementTextShouldBe(String locator, String expected) {
-		elementTextShouldBe(locator, expected, "");
+	public void checkTextInElement(String locator, String expected) {
+		checkTextInElement(locator, expected, "");
 	}
 
 	/**
@@ -649,7 +691,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "locator", "text", "message=NONE" })
-	public void elementTextShouldBe(String locator, String text, String message) {
+	public void checkTextInElement(String locator, String text, String message) {
 		List<WebElement> elements = elementFind(locator, true, true);
 		String actual = elements.get(0).getText();
 
@@ -663,8 +705,8 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void elementTextShouldNotBe(String locator, String expected) {
-		elementTextShouldNotBe(locator, expected, "");
+	public void checkTextIsNotInElement(String locator, String expected) {
+		checkTextIsNotInElement(locator, expected, "");
 	}
 
 	/**
@@ -687,7 +729,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "locator", "text", "message=NONE" })
-	public void elementTextShouldNotBe(String locator, String text, String message) {
+	public void checkTextIsNotInElement(String locator, String text, String message) {
 		List<WebElement> elements = elementFind(locator, true, true);
 		String actual = elements.get(0).getText();
 
@@ -1567,13 +1609,34 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	// Internal Methods
 	// ##############################
 
-	protected List<WebElement> elementFind(String locator, boolean firstOnly, boolean required) {
+	public List<WebElement> elementFind(String locator, boolean firstOnly, boolean required) {
 		return elementFind(locator, firstOnly, required, null);
 	}
 
 	protected List<WebElement> elementFind(String locator, boolean firstOnly, boolean required, String tag) {
-		List<WebElement> elements = ElementFinder.find(browserManagement.getCurrentWebDriver(), locator, tag);
-
+		List<WebElement> elements = new ArrayList<WebElement>();
+		/**
+		 * Updated by Khoi Date: Sep 05, 2016
+		 */
+		String orgImplicitWait = "";
+		// Check if input user data for locator is name of defined elements.
+		List<String> tempLocators = interfaceManagement.getLocators(locator);
+		
+		for (String tempLocator : tempLocators) {
+			elements.addAll(ElementFinder.find(browserManagement.getCurrentWebDriver(), tempLocator, tag));
+			if (elements.size() > 0) {
+				break;
+			} else {
+				/**
+				 * Decrease wait time to find elements faster.
+				 */
+				orgImplicitWait = browserManagement.setSeleniumImplicitWait("0.0");
+			}
+		}
+		// If there is no element defined with name matched input locator. 
+		if (elements.size() == 0) {
+			elements.addAll(ElementFinder.find(browserManagement.getCurrentWebDriver(), locator, tag));
+		}
 		if (required && elements.size() == 0) {
 			throw new ABTLibraryNonFatalException(
 					String.format("Element locator '%s' did not match any elements.", locator));
@@ -1587,6 +1650,9 @@ public class Element extends RunOnFailureKeywordsAdapter {
 			}
 		}
 
+		if(!orgImplicitWait.equals("")){
+			browserManagement.setSeleniumImplicitWait(orgImplicitWait);
+		}
 		return elements;
 	}
 

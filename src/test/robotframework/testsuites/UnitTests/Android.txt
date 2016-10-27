@@ -1,0 +1,6 @@
+*** Settings ***
+Library	ABTLibrary
+
+*** Test Cases ***
+Verify android
+	Open Application	http://localhost:4723/wd/hub	MyAndroidApp	/Users/khoivo/Desktop/APK/anibis-alpha-v4.0.1_522616.apk	cde1aff6	5.0

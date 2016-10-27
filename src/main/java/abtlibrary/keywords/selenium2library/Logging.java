@@ -311,7 +311,7 @@ public class Logging extends RunOnFailureKeywordsAdapter {
 		log(msg, "trace");
 	}
 
-	protected void debug(String msg) {
+	public void debug(String msg) {
 		log(msg, "debug");
 	}
 

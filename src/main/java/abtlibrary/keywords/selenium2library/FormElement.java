@@ -11,6 +11,7 @@ import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
 import abtlibrary.RunOnFailureKeywordsAdapter;
+import io.appium.java_client.AppiumDriver;
 import abtlibrary.ABTLibraryNonFatalException;
 
 @RobotKeywords
@@ -40,7 +41,8 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	/**
 	 * Submit the form identified by <b>locator</b>.<br>
 	 * <br>
-	 * If the locator is empty, the first form in the page will be submitted.<br>
+	 * If the locator is empty, the first form in the page will be
+	 * submitted.<br>
 	 * <br>
 	 * Key attributes for forms are id and name. See `Introduction` for details
 	 * about locators.<br>
@@ -74,13 +76,13 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 		logging.info(String.format("Verifying checkbox '%s' is selected.", locator));
 		WebElement element = getCheckbox(locator);
 		if (!element.isSelected()) {
-			throw new ABTLibraryNonFatalException(String.format("Checkbox '%s' should have been selected.",
-					locator));
+			throw new ABTLibraryNonFatalException(String.format("Checkbox '%s' should have been selected.", locator));
 		}
 	}
 
 	/**
-	 * Verify the checkbox identified by <b>locator</b> is not selected/checked.<br>
+	 * Verify the checkbox identified by <b>locator</b> is not
+	 * selected/checked.<br>
 	 * <br>
 	 * Key attributes for checkboxes are id and name. See `Introduction` for
 	 * details about locators.<br>
@@ -94,8 +96,8 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 		logging.info(String.format("Verifying checkbox '%s' is selected.", locator));
 		WebElement element = getCheckbox(locator);
 		if (element.isSelected()) {
-			throw new ABTLibraryNonFatalException(String.format("Checkbox '%s' should not have been selected.",
-					locator));
+			throw new ABTLibraryNonFatalException(
+					String.format("Checkbox '%s' should not have been selected.", locator));
 		}
 	}
 
@@ -279,8 +281,9 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 		List<WebElement> elements = getRadioButtons(groupName);
 		String actualValue = getValueFromRadioButtons(elements);
 		if (actualValue == null || !actualValue.equals(value)) {
-			throw new ABTLibraryNonFatalException(String.format(
-					"Selection of radio button '%s' should have been '%s' but was '%s'", groupName, value, actualValue));
+			throw new ABTLibraryNonFatalException(
+					String.format("Selection of radio button '%s' should have been '%s' but was '%s'", groupName, value,
+							actualValue));
 		}
 	}
 
@@ -300,9 +303,9 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 		List<WebElement> elements = getRadioButtons(groupName);
 		String actualValue = getValueFromRadioButtons(elements);
 		if (actualValue != null) {
-			throw new ABTLibraryNonFatalException(String.format(
-					"Radio button group '%s' should not have had selection, but '%s' was selected", groupName,
-					actualValue));
+			throw new ABTLibraryNonFatalException(
+					String.format("Radio button group '%s' should not have had selection, but '%s' was selected",
+							groupName, actualValue));
 		}
 	}
 
@@ -554,7 +557,8 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Verify the text field identified by <b>locator</b> contains <b>text</b>.<br>
+	 * Verify the text field identified by <b>locator</b> contains
+	 * <b>text</b>.<br>
 	 * <br>
 	 * Key attributes for text field are id and name. See `Introduction` for
 	 * details about log levels and locators.<br>
@@ -627,7 +631,8 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Verify the text area identified by <b>locator</b> contains <b>text</b>.<br>
+	 * Verify the text area identified by <b>locator</b> contains
+	 * <b>text</b>.<br>
 	 * <br>
 	 * Key attributes for text areas are id and name. See `Introduction` for
 	 * details about log levels and locators.<br>
@@ -663,7 +668,8 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Verify the text area identified by <b>locator</b> does not contain <b>text</b>.<br>
+	 * Verify the text area identified by <b>locator</b> does not contain
+	 * <b>text</b>.<br>
 	 * <br>
 	 * Key attributes for text areas are id and name. See `Introduction` for
 	 * details about log levels and locators.<br>
@@ -685,8 +691,8 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 		String actual = element.getValue(locator, "text area");
 		if (!actual.contains(text)) {
 			if (message == null) {
-				message = String.format("Text area '%s' should not have contained text '%s', but was '%s'", locator, text,
-						actual);
+				message = String.format("Text area '%s' should not have contained text '%s', but was '%s'", locator,
+						text, actual);
 			}
 			throw new ABTLibraryNonFatalException(message);
 		}
@@ -759,8 +765,8 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 		String actual = element.getValue(locator, "text area");
 		if (actual.contains(text)) {
 			if (message == null) {
-				message = String.format("Value of text area '%s' should not have been '%s' but was '%s'", locator,
-						text, actual);
+				message = String.format("Value of text area '%s' should not have been '%s' but was '%s'", locator, text,
+						actual);
 			}
 			throw new ABTLibraryNonFatalException(message);
 		}
@@ -886,6 +892,11 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 		WebElement webElement = element.elementFind(locator, true, true).get(0);
 		webElement.clear();
 		webElement.sendKeys(text);
+		try {
+			((AppiumDriver<?>) element.browserManagement.getCurrentWebDriver()).hideKeyboard();
+		} catch (Exception e) {
+
+		}
 	}
 
 	protected boolean isFormElement(WebElement element) {
@@ -893,7 +904,8 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 			return false;
 		}
 		String tag = element.getTagName().toLowerCase();
-		return "input".equals(tag) || "select".equals(tag) || "textarea".equals(tag) || "button".equals(tag) || "option".equals(tag);
+		return "input".equals(tag) || "select".equals(tag) || "textarea".equals(tag) || "button".equals(tag)
+				|| "option".equals(tag);
 	}
 
 }

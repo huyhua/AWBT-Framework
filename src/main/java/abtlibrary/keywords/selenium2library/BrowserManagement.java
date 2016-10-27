@@ -71,7 +71,7 @@ public class BrowserManagement extends RunOnFailureKeywordsAdapter {
 	/**
 	 * Cache for all open browsers.
 	 */
-	protected WebDriverCache webDriverCache = new WebDriverCache();
+	public WebDriverCache webDriverCache = new WebDriverCache();
 
 	/**
 	 * Timeout in milliseconds
@@ -81,7 +81,7 @@ public class BrowserManagement extends RunOnFailureKeywordsAdapter {
 	/**
 	 * Implicit wait in milliseconds
 	 */
-	protected double implicitWait = 0;
+	public double implicitWait = 10;
 
 	/**
 	 * Instantiated Logging keyword bean

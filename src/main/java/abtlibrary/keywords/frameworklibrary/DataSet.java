@@ -9,11 +9,11 @@ import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
+import abtlibrary.ABTLibraryNonFatalException;
 import abtlibrary.Constant;
 import abtlibrary.RunOnFailureKeywordsAdapter;
 import abtlibrary.keywords.operatinglibrary.OperatingSystem;
 import abtlibrary.keywords.selenium2library.Logging;
-import abtlibrary.ABTLibraryNonFatalException;
 import abtlibrary.utils.Excel;
 
 /**
@@ -45,9 +45,13 @@ public class DataSet extends RunOnFailureKeywordsAdapter {
 	// Keywords
 	// ##############################
 
+	public static void main (String[] args){
+		DataSet ds = new DataSet();
+		ds.getCurrentDirectory();
+	}
 	@RobotKeyword
-	public String getCurrentDirectory(){
-		return Constant.projectDir;
+	public void getCurrentDirectory(){
+		System.out.println(System.getProperty("user.dir"));
 	}
 	@RobotKeywordOverload
 	public List<String[]> getDataSet(String dataSet) {

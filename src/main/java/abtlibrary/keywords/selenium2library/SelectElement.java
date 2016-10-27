@@ -629,7 +629,7 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	// Internal Methods
 	// ##############################
 
-	protected List<String> getLabelsForOptions(List<WebElement> options) {
+	public List<String> getLabelsForOptions(List<WebElement> options) {
 		List<String> labels = new ArrayList<String>();
 
 		for (WebElement option : options) {
