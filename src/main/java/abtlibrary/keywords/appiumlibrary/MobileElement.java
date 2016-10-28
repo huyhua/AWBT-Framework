@@ -10,12 +10,20 @@ import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
 import abtlibrary.ABTLibraryNonFatalException;
+import abtlibrary.keywords.selenium2library.BrowserManagement;
 import abtlibrary.keywords.selenium2library.Element;
 import abtlibrary.keywords.selenium2library.Logging;
 import abtlibrary.keywords.selenium2library.SelectElement;
+import io.appium.java_client.AppiumDriver;
 
 @RobotKeywords
 public class MobileElement {
+	/**
+	 * Instantiated BrowserManagement keyword bean
+	 */
+	@Autowired
+	protected BrowserManagement browserManagement;
+
 	/**
 	 * Instantiated Element keyword bean
 	 */
@@ -145,6 +153,30 @@ public class MobileElement {
 		}
 
 		childElements.get(Integer.parseInt(index)).click();
+	}
+
+	/**
+	 * Scroll screen to the specified text.
+	 * 
+	 * @param text
+	 *            specified text.
+	 */
+	@RobotKeyword
+	@ArgumentNames({"text"})
+	public void scrollTo(String text) {
+		((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).scrollTo(text);
+	}
+
+	/**
+	 * Scroll screen to the specified text.
+	 * 
+	 * @param text
+	 *            specified text.
+	 */
+	@RobotKeyword
+	@ArgumentNames({"text"})
+	public void scrollToExact(String text) {
+		((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).scrollToExact(text);
 	}
 
 	// ##############################

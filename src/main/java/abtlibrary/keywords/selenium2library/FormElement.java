@@ -894,6 +894,8 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 		webElement.sendKeys(text);
 		try {
 			((AppiumDriver<?>) element.browserManagement.getCurrentWebDriver()).hideKeyboard();
+			
+			
 		} catch (Exception e) {
 
 		}
