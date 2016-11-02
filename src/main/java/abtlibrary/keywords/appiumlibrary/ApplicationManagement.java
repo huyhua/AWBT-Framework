@@ -14,6 +14,7 @@ import abtlibrary.ABTLibraryFatalException;
 import abtlibrary.RunOnFailureKeywordsAdapter;
 import abtlibrary.keywords.selenium2library.BrowserManagement;
 import abtlibrary.keywords.selenium2library.Logging;
+import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 
@@ -157,6 +158,30 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 		}
 	}
 
+	/**
+	 * Scroll screen to the specified text.
+	 * 
+	 * @param text
+	 *            specified text.
+	 */
+	@RobotKeyword
+	@ArgumentNames({"text"})
+	public void scrollTo(String text) {
+		((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).scrollTo(text);
+	}
+
+	/**
+	 * Scroll screen to the specified text.
+	 * 
+	 * @param text
+	 *            specified text.
+	 */
+	@RobotKeyword
+	@ArgumentNames({"text"})
+	public void scrollToExact(String text) {
+		((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).scrollToExact(text);
+	}
+	
 	// ##############################
 	// Internal Methods
 	// ##############################

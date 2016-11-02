@@ -8,6 +8,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -187,9 +189,25 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 		}
 	}
 
+	/**
+	 * Gets time stamp in millisecond.
+	 * @return the timstamp string in milliseconds.
+	 */
+	@RobotKeyword
 	public String getTimeStamp() {
 		Calendar calendar = Calendar.getInstance();
 		return calendar.getTimeInMillis() + "";
+	}
+	
+	/**
+	 * Generates unique string from original text.
+	 * @param originalText	
+	 * @return
+	 */
+	public String generateUniqueString(String originalText){
+		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		Calendar calendar = Calendar.getInstance();
+		return originalText + " - " + dateFormat.format(calendar.getTime());
 	}
 
 	public NodeList getXMLNodes(String xmlFile) {

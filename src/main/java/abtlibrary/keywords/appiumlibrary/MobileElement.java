@@ -10,19 +10,17 @@ import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
 import abtlibrary.ABTLibraryNonFatalException;
-import abtlibrary.keywords.selenium2library.BrowserManagement;
 import abtlibrary.keywords.selenium2library.Element;
 import abtlibrary.keywords.selenium2library.Logging;
 import abtlibrary.keywords.selenium2library.SelectElement;
-import io.appium.java_client.AppiumDriver;
 
 @RobotKeywords
 public class MobileElement {
 	/**
-	 * Instantiated BrowserManagement keyword bean
+	 * Instantiated ApplicationManagement keyword bean
 	 */
 	@Autowired
-	protected BrowserManagement browserManagement;
+	protected ApplicationManagement applicationManagement;
 
 	/**
 	 * Instantiated Element keyword bean
@@ -61,7 +59,7 @@ public class MobileElement {
 	@ArgumentNames({ "locator" })
 	public List<String> getListViewLabels(String locator) {
 		WebElement listView = element.elementFind(locator, true, true).get(0);
-		List<WebElement> options = listView.findElements(By.xpath("//*"));
+		List<WebElement> options = listView.findElements(By.xpath("//android.widget.TextView"));
 
 		if (options.size() == 0) {
 			throw new ABTLibraryNonFatalException(String.format("Listview '%s' does not have any options", locator));
@@ -90,7 +88,7 @@ public class MobileElement {
 	@ArgumentNames({ "locator", "index" })
 	public void selectFromListViewByIndex(String locator, String index) {
 		WebElement listView = element.elementFind(locator, true, true).get(0);
-		List<WebElement> options = listView.findElements(By.xpath("//*"));
+		List<WebElement> options = listView.findElements(By.xpath("//android.widget.TextView"));
 
 		if (options.size() == 0) {
 			throw new ABTLibraryNonFatalException(String.format("Listview '%s' does not have any options", locator));
@@ -156,27 +154,17 @@ public class MobileElement {
 	}
 
 	/**
-	 * Scroll screen to the specified text.
+	 * Select item identified by <b>text</b> in list.
 	 * 
 	 * @param text
-	 *            specified text.
+	 *            displayed text of selected item.
 	 */
 	@RobotKeyword
 	@ArgumentNames({"text"})
-	public void scrollTo(String text) {
-		((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).scrollTo(text);
-	}
-
-	/**
-	 * Scroll screen to the specified text.
-	 * 
-	 * @param text
-	 *            specified text.
-	 */
-	@RobotKeyword
-	@ArgumentNames({"text"})
-	public void scrollToExact(String text) {
-		((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).scrollToExact(text);
+	public void selectItemByText(String text) {
+		applicationManagement.scrollTo(text);
+		WebElement item = element.elementFind("//*[@text='" + text + "']", true, true).get(0);
+		item.click();
 	}
 
 	// ##############################
