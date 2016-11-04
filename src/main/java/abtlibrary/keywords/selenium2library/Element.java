@@ -1623,7 +1623,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 		List<String> tempLocators = interfaceManagement.getLocators(locator);
 		
 		for (String tempLocator : tempLocators) {
-			elements.addAll(ElementFinder.find(browserManagement.getCurrentWebDriver(), tempLocator, tag));
+			elements.addAll(ElementFinder.find(browserManagement, tempLocator, tag));
 			if (elements.size() > 0) {
 				break;
 			} else {
@@ -1635,7 +1635,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 		}
 		// If there is no element defined with name matched input locator. 
 		if (elements.size() == 0) {
-			elements.addAll(ElementFinder.find(browserManagement.getCurrentWebDriver(), locator, tag));
+			elements.addAll(ElementFinder.find(browserManagement, locator, tag));
 		}
 		if (required && elements.size() == 0) {
 			throw new ABTLibraryNonFatalException(

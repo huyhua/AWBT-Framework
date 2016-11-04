@@ -144,10 +144,11 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 		try {
 			if (platformName.equals("Android")) {
 				driver = new AndroidDriver<>(new URL(remoteUrl), cap);
+				
 			} else
 				driver = new IOSDriver<>(new URL(remoteUrl), cap);
 
-			String sessionId = browserManagement.webDriverCache.register(driver, alias);
+			String sessionId = browserManagement.webDriverCache.register(driver, alias, platformName);
 			logging.debug(String.format("Openning '%s' driver to base application '%s'", platformName, appPath));
 			driver.manage().timeouts().implicitlyWait((int) (browserManagement.implicitWait * 1000.0),
 					TimeUnit.MILLISECONDS);

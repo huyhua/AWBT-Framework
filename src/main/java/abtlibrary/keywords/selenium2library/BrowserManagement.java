@@ -67,6 +67,7 @@ public class BrowserManagement extends RunOnFailureKeywordsAdapter {
 	public String remoteWebDriverProxyPassword = "";
 	public String remoteWebDriverProxyDomain = "";
 	public String remoteWebDriverProxyWorkstation = "";
+	public String platform = "web";
 
 	/**
 	 * Cache for all open browsers.
@@ -105,6 +106,10 @@ public class BrowserManagement extends RunOnFailureKeywordsAdapter {
 
 	public WebDriver getCurrentWebDriver() {
 		return webDriverCache.getCurrent();
+	}
+	
+	public String getCurrentPlatform() {
+		return webDriverCache.getCurrentPlatform();
 	}
 
 	public double getTimeout() {
@@ -393,7 +398,7 @@ public class BrowserManagement extends RunOnFailureKeywordsAdapter {
 
 			WebDriver webDriver = createWebDriver(browserName, desiredCapabilities, remoteUrl, browserOptions);
 			webDriver.get(url);
-			String sessionId = webDriverCache.register(webDriver, alias);
+			String sessionId = webDriverCache.register(webDriver, alias, "web");
 			logging.debug(String.format("Opened browser with session id %s", sessionId));
 			return sessionId;
 		} catch (Throwable t) {

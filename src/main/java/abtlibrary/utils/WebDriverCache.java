@@ -41,11 +41,12 @@ public class WebDriverCache {
 	 */
 	Map<String, SessionIdAliasWebDriverTuple> tupleByAlias = new TreeMap<String, SessionIdAliasWebDriverTuple>();
 
-	public String register(WebDriver webDriver, String alias) {
+	public String register(WebDriver webDriver, String alias, String platform) {
 		// create the new tuple
 		currentSessionIdAliasWebDriverTuple = new SessionIdAliasWebDriverTuple();
 		currentSessionIdAliasWebDriverTuple.alias = alias;
 		currentSessionIdAliasWebDriverTuple.webDriver = webDriver;
+		currentSessionIdAliasWebDriverTuple.platform = platform;
 		if (closedSessionIds.size() == 0) {
 			// no closed id
 			maxAssignedSessionId++;
@@ -67,6 +68,13 @@ public class WebDriverCache {
 	public WebDriver getCurrent() {
 		if (currentSessionIdAliasWebDriverTuple != null) {
 			return currentSessionIdAliasWebDriverTuple.webDriver;
+		}
+		return null;
+	}
+	
+	public String getCurrentPlatform() {
+		if (currentSessionIdAliasWebDriverTuple != null) {
+			return currentSessionIdAliasWebDriverTuple.platform;
 		}
 		return null;
 	}
@@ -136,6 +144,7 @@ public class WebDriverCache {
 	public static class SessionIdAliasWebDriverTuple {
 		public String id;
 		public String alias;
+		public String platform;
 		public WebDriver webDriver;
 	}
 }

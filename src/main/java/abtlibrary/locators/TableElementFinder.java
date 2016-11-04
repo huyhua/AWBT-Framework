@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import abtlibrary.keywords.selenium2library.BrowserManagement;
 
 public class TableElementFinder {
 
@@ -36,42 +37,42 @@ public class TableElementFinder {
 		addLocatorSuffix(locatorSuffixesMap, "xpath.col", "//tr//*[self::td or self::th][%s]");
 	}
 
-	public static WebElement find(WebDriver webDriver, String tableLocator) {
+	public static WebElement find(BrowserManagement browserManagement, String tableLocator) {
 		List<String> locators = parseTableLocator(tableLocator, "default");
-		return searchInLocators(webDriver, locators, null);
+		return searchInLocators(browserManagement, locators, null);
 	}
 
-	public static WebElement findByContent(WebDriver webDriver, String tableLocator, String content) {
+	public static WebElement findByContent(BrowserManagement browserManagement, String tableLocator, String content) {
 		List<String> locators = parseTableLocator(tableLocator, "content");
-		return searchInLocators(webDriver, locators, content);
+		return searchInLocators(browserManagement, locators, content);
 	}
 
-	public static WebElement findByHeader(WebDriver webDriver, String tableLocator, String content) {
+	public static WebElement findByHeader(BrowserManagement browserManagement, String tableLocator, String content) {
 		List<String> locators = parseTableLocator(tableLocator, "header");
-		return searchInLocators(webDriver, locators, content);
+		return searchInLocators(browserManagement, locators, content);
 	}
 
-	public static WebElement findByFooter(WebDriver webDriver, String tableLocator, String content) {
+	public static WebElement findByFooter(BrowserManagement browserManagement, String tableLocator, String content) {
 		List<String> locators = parseTableLocator(tableLocator, "footer");
-		return searchInLocators(webDriver, locators, content);
+		return searchInLocators(browserManagement, locators, content);
 	}
 
-	public static WebElement findByRow(WebDriver webDriver, String tableLocator, int row, String content) {
+	public static WebElement findByRow(BrowserManagement browserManagement, String tableLocator, int row, String content) {
 		List<String> locators = parseTableLocator(tableLocator, "row");
 		List<String> formattedLocators = new ArrayList<String>();
 		for (String locator : locators) {
 			formattedLocators.add(String.format(locator, Integer.toString(row)));
 		}
-		return searchInLocators(webDriver, formattedLocators, content);
+		return searchInLocators(browserManagement, formattedLocators, content);
 	}
 
-	public static WebElement findByCol(WebDriver webDriver, String tableLocator, int col, String content) {
+	public static WebElement findByCol(BrowserManagement browserManagement, String tableLocator, int col, String content) {
 		List<String> locators = parseTableLocator(tableLocator, "col");
 		List<String> formattedLocators = new ArrayList<String>();
 		for (String locator : locators) {
 			formattedLocators.add(String.format(locator, Integer.toString(col)));
 		}
-		return searchInLocators(webDriver, formattedLocators, content);
+		return searchInLocators(browserManagement, formattedLocators, content);
 	}
 
 	protected static void addLocatorSuffix(Map<String, List<String>> locatorSuffixesMap, String key, String... values) {
@@ -105,9 +106,9 @@ public class TableElementFinder {
 		return parsedTabeLocators;
 	}
 
-	protected static WebElement searchInLocators(WebDriver webDriver, List<String> locators, String content) {
+	protected static WebElement searchInLocators(BrowserManagement browserManagement, List<String> locators, String content) {
 		for (String locator : locators) {
-			List<WebElement> elements = ElementFinder.find(webDriver, locator);
+			List<WebElement> elements = ElementFinder.find(browserManagement, locator);
 			for (WebElement element : elements) {
 				if (content == null) {
 					return element;

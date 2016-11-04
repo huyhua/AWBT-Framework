@@ -40,7 +40,7 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	 * @return : returned value.
 	 */
 	@RobotKeyword
-	@ArgumentNames({"filename","key"})
+	@ArgumentNames({ "filename", "key" })
 	public String getPropertyFromFile(String filename, String key) {
 		Properties prop = new Properties();
 		InputStream input = null;
@@ -81,7 +81,7 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	 * @return return value of keyword.
 	 */
 	@RobotKeyword
-	@ArgumentNames({"key"})
+	@ArgumentNames({ "key" })
 	public String getConfiguration(String key) {
 		String filename = "";
 		if (System.getProperty("os.name").contains("Mac")) {
@@ -191,6 +191,7 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 
 	/**
 	 * Gets time stamp in millisecond.
+	 * 
 	 * @return the timstamp string in milliseconds.
 	 */
 	@RobotKeyword
@@ -198,13 +199,16 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 		Calendar calendar = Calendar.getInstance();
 		return calendar.getTimeInMillis() + "";
 	}
-	
+
 	/**
-	 * Generates unique string from original text.
-	 * @param originalText	
-	 * @return
+	 * Generates unique string from original text by adding date time at the end
+	 * of original text.
+	 * 
+	 * @param originalText
+	 *            The original text.
+	 * @return the unique text
 	 */
-	public String generateUniqueString(String originalText){
+	public String generateUniqueString(String originalText) {
 		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 		Calendar calendar = Calendar.getInstance();
 		return originalText + " - " + dateFormat.format(calendar.getTime());
