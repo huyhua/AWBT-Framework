@@ -1,6 +1,8 @@
 package abtlibrary.keywords.appiumlibrary;
 
+import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.WebDriver;
@@ -17,9 +19,14 @@ import abtlibrary.keywords.selenium2library.Logging;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.service.local.AppiumDriverLocalService;
+import io.appium.java_client.service.local.AppiumServiceBuilder;
+import io.appium.java_client.service.local.flags.GeneralServerFlag;
 
 @RobotKeywords
 public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
+	
+	private static AppiumDriverLocalService server;
 
 	/**
 	 * Instantiated BrowserManagement keyword bean
@@ -205,4 +212,29 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	 * logging.warn("Invalid desiredCapabilities: " +
 	 * desiredCapabilitiesString); } } } } return desiredCapabilities; }
 	 */
+	
+	@RobotKeyword
+	@ArgumentNames({"androidHome","node","appiumDir"})
+	public void startServer(String androidHome, String nodeExecutable, String appiumDir) {
+		HashMap<String, String> env = new HashMap<>();
+		env.put("ANDROID_HOME", androidHome);
+		AppiumServiceBuilder builder = new AppiumServiceBuilder()
+				.usingAnyFreePort()
+				.withArgument(GeneralServerFlag.LOG_LEVEL, "error")
+				.withArgument(GeneralServerFlag.SESSION_OVERRIDE)
+				// .withArgument(GeneralServerFlag.NO_RESET)
+				.withEnvironment(env)
+				.usingDriverExecutable(new File(nodeExecutable))
+				.withAppiumJS(new File(appiumDir))
+				.withLogFile(
+						new File(System.getProperty("user.dir") + "/log.txt"));
+		server = AppiumDriverLocalService.buildService(builder);
+	}
+	
+	@RobotKeyword
+	public void stopServer(){
+		if(server != null){
+			server.stop();
+		}
+	}
 }
