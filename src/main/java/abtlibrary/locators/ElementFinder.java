@@ -18,6 +18,7 @@ import abtlibrary.ABTLibraryNonFatalException;
 import abtlibrary.keywords.selenium2library.BrowserManagement;
 import abtlibrary.keywords.selenium2library.Element;
 import abtlibrary.utils.Python;
+import io.appium.java_client.android.AndroidDriver;
 
 public class ElementFinder {
 
@@ -26,7 +27,7 @@ public class ElementFinder {
 	protected enum KeyAttrs {
 		DEFAULT("@id,@name"), A("@id,@name,@href,normalize-space(descendant-or-self::text())"), IMG(
 				"@id,@name,@src,@alt"), INPUT("@id,@name,@value,@src"), BUTTON(
-				"@id,@name,@value,normalize-space(descendant-or-self::text())");
+						"@id,@name,@value,normalize-space(descendant-or-self::text())");
 
 		protected String[] keyAttrs;
 
@@ -40,7 +41,7 @@ public class ElementFinder {
 	}
 
 	protected interface Strategy {
-		List<WebElement> findBy(BrowserManagement browserManagement , FindByCoordinates findByCoordinates);
+		List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates);
 
 	};
 
@@ -57,10 +58,20 @@ public class ElementFinder {
 		},
 		IDENTIFIER {
 
+			@SuppressWarnings("unchecked")
 			@Override
 			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
-				List<WebElement> elements = browserManagement.getCurrentWebDriver().findElements(By.id(findByCoordinates.criteria));
-				elements.addAll(browserManagement.getCurrentWebDriver().findElements(By.name(findByCoordinates.criteria)));
+				List<WebElement> elements = browserManagement.getCurrentWebDriver()
+						.findElements(By.id(findByCoordinates.criteria));
+				elements.addAll(
+						browserManagement.getCurrentWebDriver().findElements(By.name(findByCoordinates.criteria)));
+				if (browserManagement.getCurrentPlatform().equalsIgnoreCase("Android")) {
+					elements.addAll(((AndroidDriver<WebElement>) browserManagement.getCurrentWebDriver())
+							.findElementsByAndroidUIAutomator(
+									"new UiScrollable(new UiSelector().scrollable(True)).scrollIntoView(new UiSelector().resourceId(\""
+											+ findByCoordinates.criteria + "\"))"));
+				}
+
 				return filterElements(elements, findByCoordinates);
 			}
 		},
@@ -68,26 +79,35 @@ public class ElementFinder {
 
 			@Override
 			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
-				return filterElements(browserManagement.getCurrentWebDriver().findElements(By.id(findByCoordinates.criteria)), findByCoordinates);
+				return filterElements(
+						browserManagement.getCurrentWebDriver().findElements(By.id(findByCoordinates.criteria)),
+						findByCoordinates);
 			}
 		},
 		NAME {
 
 			@Override
 			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
-				return filterElements(browserManagement.getCurrentWebDriver().findElements(By.name(findByCoordinates.criteria)), findByCoordinates);
+				return filterElements(
+						browserManagement.getCurrentWebDriver().findElements(By.name(findByCoordinates.criteria)),
+						findByCoordinates);
 			}
 		},
 		XPATH {
 
 			@Override
 			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
-				List<WebElement> elements = null;
-				if(browserManagement.getCurrentPlatform().equalsIgnoreCase("Android")){
-					
-				} else{
-					elements= browserManagement.getCurrentWebDriver().findElements(By.xpath(findByCoordinates.criteria));
+				List<WebElement> elements = new ArrayList<WebElement>();
+				if (browserManagement.getCurrentPlatform().equalsIgnoreCase("Android")) {
+					if (findByUiSelector(browserManagement.getCurrentWebDriver(), findByCoordinates) != null) {
+						elements = findByUiSelector(browserManagement.getCurrentWebDriver(), findByCoordinates);
+					}
+				} else {
+					elements = browserManagement.getCurrentWebDriver()
+							.findElements(By.xpath(findByCoordinates.criteria));
 				}
+				elements.addAll(browserManagement.getCurrentWebDriver()
+						.findElements(By.xpath(findByCoordinates.criteria)));
 				return filterElements(elements, findByCoordinates);
 			}
 		},
@@ -95,8 +115,8 @@ public class ElementFinder {
 
 			@Override
 			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
-				Object result = ((JavascriptExecutor) browserManagement.getCurrentWebDriver()).executeScript(String.format("return %s;",
-						findByCoordinates.criteria));
+				Object result = ((JavascriptExecutor) browserManagement.getCurrentWebDriver())
+						.executeScript(String.format("return %s;", findByCoordinates.criteria));
 				return filterElements(toList(result), findByCoordinates);
 			}
 		},
@@ -104,7 +124,8 @@ public class ElementFinder {
 
 			@Override
 			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
-				return filterElements(browserManagement.getCurrentWebDriver().findElements(By.linkText(findByCoordinates.criteria)),
+				return filterElements(
+						browserManagement.getCurrentWebDriver().findElements(By.linkText(findByCoordinates.criteria)),
 						findByCoordinates);
 			}
 		},
@@ -112,15 +133,17 @@ public class ElementFinder {
 
 			@Override
 			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
-				return filterElements(browserManagement.getCurrentWebDriver().findElements(By.cssSelector(findByCoordinates.criteria)),
-						findByCoordinates);
+				return filterElements(browserManagement.getCurrentWebDriver()
+						.findElements(By.cssSelector(findByCoordinates.criteria)), findByCoordinates);
 			}
 		},
 		TAG {
 
 			@Override
 			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
-				return filterElements(browserManagement.getCurrentWebDriver().findElements(By.tagName(findByCoordinates.criteria)), findByCoordinates);
+				return filterElements(
+						browserManagement.getCurrentWebDriver().findElements(By.tagName(findByCoordinates.criteria)),
+						findByCoordinates);
 			}
 		},
 		JQUERY {
@@ -128,7 +151,7 @@ public class ElementFinder {
 			@Override
 			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
 
-				return findByJQuerySizzle(browserManagement, findByCoordinates);
+				return findByJQuerySizzle(browserManagement.getCurrentWebDriver(), findByCoordinates);
 			}
 
 		},
@@ -137,17 +160,17 @@ public class ElementFinder {
 			@Override
 			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
 
-				return findByJQuerySizzle(browserManagement, findByCoordinates);
+				return findByJQuerySizzle(browserManagement.getCurrentWebDriver(), findByCoordinates);
 			}
 
 		};
 
 	}
 
-	protected static List<WebElement> findByJQuerySizzle(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
+	protected static List<WebElement> findByJQuerySizzle(WebDriver webDriver, FindByCoordinates findByCoordinates) {
 		String js = String.format("return jQuery('%s').get();", findByCoordinates.criteria.replace("'", "\\'"));
 
-		Object o = ((JavascriptExecutor) browserManagement.getCurrentWebDriver()).executeScript(js);
+		Object o = ((JavascriptExecutor) webDriver).executeScript(js);
 		List<WebElement> list = toList(o);
 		return filterElements(list, findByCoordinates);
 	}
@@ -207,8 +230,9 @@ public class ElementFinder {
 			xpathSearchers.add(String.format("%s=%s", attr, xpathCriteria));
 		}
 		xpathSearchers.addAll(getAttrsWithUrl(webDriver, keyAttrs, findByCoordinates.criteria));
-		String xpath = String.format("//%s[%s(%s)]", xpathTag, Python.join(" and ", xpathConstraints)
-				+ (xpathConstraints.size() > 0 ? " and " : ""), Python.join(" or ", xpathSearchers));
+		String xpath = String.format("//%s[%s(%s)]", xpathTag,
+				Python.join(" and ", xpathConstraints) + (xpathConstraints.size() > 0 ? " and " : ""),
+				Python.join(" or ", xpathSearchers));
 
 		return webDriver.findElements(By.xpath(xpath));
 	}
@@ -232,10 +256,46 @@ public class ElementFinder {
 		return attrs;
 	}
 
-	protected static List<WebElement> findByUiSelector(){
-		
-		return null;
+	@SuppressWarnings("unchecked")
+	protected static List<WebElement> findByUiSelector(WebDriver webDriver, FindByCoordinates findByCoordinates) {
+		String[] androidAttr = { "@resource-id", "@content-desc", "@text" };
+		String xpathCriteria = Element.escapeXpathValue(findByCoordinates.criteria);
+		List<String> selectors = new ArrayList<String>();
+		for (String attr : androidAttr) {
+			String[] locatorParts = xpathCriteria.split("=");
+			int indexValue = -1;
+			for (int i = 0; i < locatorParts.length; i++) {
+				if (locatorParts[i].contains(attr)) {
+					indexValue = i + 1;
+					break;
+				}
+			}
+			if (indexValue > -1) {
+				String value = locatorParts[indexValue].split("'")[1];
+				if (value != null) {
+					if (attr.equals("@resource-id")) {
+						selectors.add("resourceId(\"" + value + "\")");
+					} else if (attr.equals("@content-desc")) {
+						selectors.add("descriptionContains(\"" + value + "\")");
+					} else {
+						selectors.add("text(\"" + value + "\")");
+					}
+				}
+
+			}
+		}
+
+		String uiSelector = String.format(
+				"new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().%s)",
+				Python.join(".", selectors));
+
+		try {
+			return ((AndroidDriver<WebElement>) webDriver).findElementsByAndroidUIAutomator(uiSelector);
+		} catch (Exception e) {
+			return null;
+		}
 	}
+
 	protected static String getBaseUrl(WebDriver webDriver) {
 		String url = webDriver.getCurrentUrl();
 		int lastIndex = url.lastIndexOf('/');
@@ -278,8 +338,8 @@ public class ElementFinder {
 	};
 
 	protected static void warn(String msg) {
-		loggingPythonInterpreter.get().exec(
-				String.format("logger.warn('%s');", msg.replace("'", "\\'").replace("\n", "\\n")));
+		loggingPythonInterpreter.get()
+				.exec(String.format("logger.warn('%s');", msg.replace("'", "\\'").replace("\n", "\\n")));
 	}
 
 	protected static Strategy parseLocator(FindByCoordinates findByCoordinates, String locator) {
@@ -372,7 +432,8 @@ public class ElementFinder {
 		}
 
 		@Override
-		public List<WebElement> findBy(final BrowserManagement browserManagement, final FindByCoordinates findByCoordinates) {
+		public List<WebElement> findBy(final BrowserManagement browserManagement,
+				final FindByCoordinates findByCoordinates) {
 			return filterElements(browserManagement.getCurrentWebDriver().findElements(new By() {
 
 				@Override
@@ -388,7 +449,8 @@ public class ElementFinder {
 							arguments[i] = splittedCriteria[i];
 						}
 					}
-					Object o = ((JavascriptExecutor) browserManagement.getCurrentWebDriver()).executeScript(functionDefinition, arguments);
+					Object o = ((JavascriptExecutor) browserManagement.getCurrentWebDriver())
+							.executeScript(functionDefinition, arguments);
 					return toList(o);
 				}
 
