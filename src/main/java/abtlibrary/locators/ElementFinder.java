@@ -284,9 +284,11 @@ public class ElementFinder {
 
 			}
 		}
+		
+		List<WebElement> scroll = ((AndroidDriver<WebElement>) webDriver).findElementsByAndroidUIAutomator(".scrollable(true)");
 
 		String uiSelector = String.format(
-				"new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().%s)",
+				"new UiScrollable(new UiSelector().scrollable(true).instance("+(scroll.size()-1)+").scrollIntoView(new UiSelector().%s)",
 				Python.join(".", selectors));
 
 		try {
