@@ -26,7 +26,7 @@ import io.appium.java_client.service.local.flags.GeneralServerFlag;
 @RobotKeywords
 public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	
-	private static AppiumDriverLocalService server;
+//	private static AppiumDriverLocalService server;
 
 	/**
 	 * Instantiated BrowserManagement keyword bean
@@ -213,28 +213,28 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	 * desiredCapabilitiesString); } } } } return desiredCapabilities; }
 	 */
 	
-	@RobotKeyword
-	@ArgumentNames({"androidHome","node","appiumDir"})
-	public void startServer(String androidHome, String nodeExecutable, String appiumDir) {
-		HashMap<String, String> env = new HashMap<>();
-		env.put("ANDROID_HOME", androidHome);
-		AppiumServiceBuilder builder = new AppiumServiceBuilder()
-				.usingAnyFreePort()
-				.withArgument(GeneralServerFlag.LOG_LEVEL, "error")
-				.withArgument(GeneralServerFlag.SESSION_OVERRIDE)
-				// .withArgument(GeneralServerFlag.NO_RESET)
-				.withEnvironment(env)
-				.usingDriverExecutable(new File(nodeExecutable))
-				.withAppiumJS(new File(appiumDir))
-				.withLogFile(
-						new File(System.getProperty("user.dir") + "/log.txt"));
-		server = AppiumDriverLocalService.buildService(builder);
-	}
-	
-	@RobotKeyword
-	public void stopServer(){
-		if(server != null){
-			server.stop();
-		}
-	}
+//	@RobotKeyword
+//	@ArgumentNames({"androidHome","node","appiumDir"})
+//	public void startServer(String androidHome, String nodeExecutable, String appiumDir) {
+//		HashMap<String, String> env = new HashMap<>();
+//		env.put("ANDROID_HOME", androidHome);
+//		AppiumServiceBuilder builder = new AppiumServiceBuilder()
+//				.usingAnyFreePort()
+//				.withArgument(GeneralServerFlag.LOG_LEVEL, "error")
+//				.withArgument(GeneralServerFlag.SESSION_OVERRIDE)
+//				// .withArgument(GeneralServerFlag.NO_RESET)
+//				.withEnvironment(env)
+//				.usingDriverExecutable(new File(nodeExecutable))
+//				.withAppiumJS(new File(appiumDir))
+//				.withLogFile(
+//						new File(System.getProperty("user.dir") + "/log.txt"));
+//		server = AppiumDriverLocalService.buildService(builder);
+//	}
+//	
+//	@RobotKeyword
+//	public void stopServer(){
+//		if(server != null){
+//			server.stop();
+//		}
+//	}
 }
