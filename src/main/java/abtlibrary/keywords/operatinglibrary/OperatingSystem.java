@@ -29,6 +29,17 @@ import abtlibrary.RunOnFailureKeywordsAdapter;
 
 @RobotKeywords
 public class OperatingSystem extends RunOnFailureKeywordsAdapter {
+	/**
+	 * For Testing
+	 * @param args
+	 */
+	public static void main(String[] args){
+		OperatingSystem os = new OperatingSystem();
+		/*System.out.println("Case1: " + os.getMidText("abcdef", "b", "in"));
+		System.out.println("Case2: " + os.getMidText("abcdef", "in", "d"));
+		System.out.println("Case3: " + os.getMidText("abcdef", "in", "in"));*/
+		System.out.println("Case4: " + os.getMidText("//*[@resource-id='ch.anibis.anibis.beta:id/contactType']//android.widget.EditText", "android.widget.EditText", "]"));
+	}
 
 	/**
 	 * Returns value of specified key in .properties file.
@@ -201,6 +212,42 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
+	 * Retrieves list of text between start and end text from specified text.<br>
+	 * Split specified text by end text, if start text does not exist.<br>
+	 * Split specified text by start text and retrieve a text list without first item if end text does not exist.<br>
+	 * If both end and start text do not exist, retrieves null. <br>
+	 * <b>Example: </b><br> 
+	 * original text: "a b c d a ef c". <br>
+	 * start text:  "a".
+	 * end text: "c". <br>
+	 * return: ['b','ef'].<br>
+	 * @param originalText Original Text.
+	 * @param startText	Start Text.
+	 * @param endText	End Text.
+	 * @return	List of text between start and end text.
+	 */
+	public List<String> getMidText(String originalText, String startText, String endText) {
+		List<String> midTextList = new ArrayList<String>();
+		String[] tempList = originalText.split(startText);
+		for(String temp:tempList){
+		System.out.println("String: " + temp);
+		}
+		for(int i=1; i < tempList.length; i++){
+			if(tempList[i].indexOf(endText) > -1){
+			midTextList.add(tempList[i].substring(0, tempList[i].indexOf(endText)));
+			} else if(tempList[i].indexOf(endText) == -1 && i == (tempList.length -1)) {
+				midTextList.add(tempList[i]);
+			}
+		}
+		if(!originalText.contains(startText)){
+			if(tempList[0].indexOf(endText) > -1){
+				midTextList.add(tempList[0].substring(0, tempList[0].indexOf(endText)));
+				}
+		}
+		return midTextList;
+	}
+
+	/**
 	 * Generates unique string from original text by adding date time at the end
 	 * of original text.
 	 * 
@@ -208,6 +255,8 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	 *            The original text.
 	 * @return the unique text
 	 */
+	@RobotKeyword
+	@ArgumentNames({"originalText"})
 	public String generateUniqueString(String originalText) {
 		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 		Calendar calendar = Calendar.getInstance();

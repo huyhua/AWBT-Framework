@@ -283,7 +283,7 @@ public class ABTLibrary extends AnnotationLibrary {
 	}
 
 	public ABTLibrary(String timeout) {
-		this(timeout, "0.0");
+		this(timeout, "5.0");
 	}
 
 	public ABTLibrary(String timeout, String implicitWait) {
@@ -359,7 +359,7 @@ public class ABTLibrary extends AnnotationLibrary {
 	 * @param timeout
 	 *            Default=5.0. Optional custom timeout.
 	 * @param implicitWait
-	 *            Default=0.0. Optional custom implicit wait time.
+	 *            Default=5.0. Optional custom implicit wait time.
 	 * @param keywordToRunOnFailure
 	 *            Default=Capture Page Screenshot. Optional custom keyword to
 	 *            run on failure.

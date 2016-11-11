@@ -23,6 +23,15 @@ public class Javadoc2Libdoc {
 	public Javadoc2Libdoc(java.lang.Class<?> clazz) {
 		InputStream inputStream = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream(clazz.getName().replace('.', '/') + ".javadoc");
+		if(inputStream == null){
+			inputStream = getClass().getResourceAsStream(clazz.getName().replace('.', '/') + ".javadoc");
+		}
+		if(inputStream == null){
+			inputStream = Javadoc2Libdoc.class.getClassLoader().getResourceAsStream(clazz.getName().replace('.', '/') + ".javadoc");
+		}
+		if(inputStream == null){
+			inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream(clazz.getName().replace('.', '/') + ".javadoc");
+		}
 		Root root = loadJavadocRoot(inputStream);
 		keywordDocumentationMap = loadKeywordDocumentationMap(root, clazz.getName());
 	}
