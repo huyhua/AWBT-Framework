@@ -143,7 +143,7 @@ public class Interfaces {
 		// Remove files that are not text file
 		for (int i = 0; i < interfaceFiles.size(); i++) {
 			String ext = FilenameUtils.getExtension(interfaceFiles.get(i).getAbsolutePath());
-			if (!ext.equals("txt")) {
+			if (!ext.equals("txt") && !ext.equals("robot")) {
 				interfaceFiles.remove(i);
 			}
 		}
