@@ -91,6 +91,14 @@ public class ElementFinder {
 						findByCoordinates);
 			}
 		},
+		
+		LABEL{
+			@Override
+			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
+				return ID.findBy(browserManagement, findByCoordinates);
+			}
+		},
+		
 		NAME {
 
 			@Override
