@@ -24,6 +24,7 @@ import abtlibrary.keywords.selenium2library.Element;
 import abtlibrary.utils.Python;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 
 public class ElementFinder {
 
@@ -186,6 +187,30 @@ public class ElementFinder {
 			}
 
 		},
+		
+		ANDROID {
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
+
+				return filterElements(
+						((AndroidDriver<WebElement>)browserManagement.getCurrentWebDriver()).findElements(MobileBy.AndroidUIAutomator(findByCoordinates.criteria)),
+						findByCoordinates);
+			}
+		},
+		
+		IOS	{
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
+
+				return filterElements(
+						((IOSDriver<WebElement>)browserManagement.getCurrentWebDriver()).findElements(MobileBy.IosUIAutomation(findByCoordinates.criteria)),
+						findByCoordinates);
+			}
+		};
 
 	}
 
