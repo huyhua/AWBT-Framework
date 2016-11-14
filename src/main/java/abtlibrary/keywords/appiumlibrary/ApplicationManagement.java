@@ -152,6 +152,7 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 		cap.setCapability("platformName", platformName);
 		cap.setCapability("platformVersion", platformVersion);
 		cap.setCapability("deviceName", deviceName);
+		cap.setCapability("autoAcceptAlerts", false);
 
 		try {
 			if (platformName.equals("Android")) {

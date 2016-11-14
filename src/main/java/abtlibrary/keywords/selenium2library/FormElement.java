@@ -12,10 +12,15 @@ import org.robotframework.javalib.annotation.RobotKeywords;
 
 import abtlibrary.RunOnFailureKeywordsAdapter;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.ios.IOSElement;
 import abtlibrary.ABTLibraryNonFatalException;
 
 @RobotKeywords
 public class FormElement extends RunOnFailureKeywordsAdapter {
+	
+	
+	@Autowired
+	protected BrowserManagement browsermanagement;
 
 	/**
 	 * Instantiated Element keyword bean
@@ -891,7 +896,11 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	protected void inputTextIntoTextField(String locator, String text) {
 		WebElement webElement = element.elementFind(locator, true, true).get(0);
 		webElement.clear();
-		webElement.sendKeys(text);
+		if(!browsermanagement.getCurrentPlatform().equalsIgnoreCase("android")){
+			((IOSElement) webElement).setValue(text);
+		}else{
+			webElement.sendKeys(text);
+		}
 		try {
 			((AppiumDriver<?>) element.browserManagement.getCurrentWebDriver()).hideKeyboard();
 			
