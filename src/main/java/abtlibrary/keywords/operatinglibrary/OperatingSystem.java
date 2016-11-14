@@ -31,14 +31,19 @@ import abtlibrary.RunOnFailureKeywordsAdapter;
 public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	/**
 	 * For Testing
+	 * 
 	 * @param args
 	 */
-	public static void main(String[] args){
+	public static void main(String[] args) {
 		OperatingSystem os = new OperatingSystem();
-		/*System.out.println("Case1: " + os.getMidText("abcdef", "b", "in"));
-		System.out.println("Case2: " + os.getMidText("abcdef", "in", "d"));
-		System.out.println("Case3: " + os.getMidText("abcdef", "in", "in"));*/
-		System.out.println("Case4: " + os.getMidText("//*[@resource-id='ch.anibis.anibis.beta:id/contactType']//android.widget.EditText", "android.widget.EditText", "]"));
+		/*
+		 * System.out.println("Case1: " + os.getMidText("abcdef", "b", "in"));
+		 * System.out.println("Case2: " + os.getMidText("abcdef", "in", "d"));
+		 * System.out.println("Case3: " + os.getMidText("abcdef", "in", "in"));
+		 */
+		System.out.println("Case4: "
+				+ os.getMidText("//*[@resource-id='ch.anibis.anibis.beta:id/contactType']//android.widget.EditText",
+						"android.widget.EditText", "]"));
 	}
 
 	/**
@@ -156,16 +161,18 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Split text
+	 * Splits text to array by specified delimiter.
 	 * 
 	 * @param orginalText
-	 *            original text.
-	 * @return String array.
+	 *            Specified text need to separate.
+	 * @param delimiter
+	 *            The character to separate text.
+	 * @return List of sub strings separated from specified text by delimiter.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "originalText" })
-	public String[] splitText(String orginalText) {
-		return orginalText.split("\\t");
+	@ArgumentNames({ "orginalText", "delimiter" })
+	public String[] splitText(String orginalText, String delimiter) {
+		return orginalText.split(delimiter);
 	}
 
 	/**
@@ -212,37 +219,42 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Retrieves list of text between start and end text from specified text.<br>
+	 * Retrieves list of text between start and end text from specified
+	 * text.<br>
 	 * Split specified text by end text, if start text does not exist.<br>
-	 * Split specified text by start text and retrieve a text list without first item if end text does not exist.<br>
+	 * Split specified text by start text and retrieve a text list without first
+	 * item if end text does not exist.<br>
 	 * If both end and start text do not exist, retrieves null. <br>
-	 * <b>Example: </b><br> 
+	 * <b>Example: </b><br>
 	 * original text: "a b c d a ef c". <br>
-	 * start text:  "a".
-	 * end text: "c". <br>
+	 * start text: "a". end text: "c". <br>
 	 * return: ['b','ef'].<br>
-	 * @param originalText Original Text.
-	 * @param startText	Start Text.
-	 * @param endText	End Text.
-	 * @return	List of text between start and end text.
+	 * 
+	 * @param originalText
+	 *            Original Text.
+	 * @param startText
+	 *            Start Text.
+	 * @param endText
+	 *            End Text.
+	 * @return List of text between start and end text.
 	 */
 	public List<String> getMidText(String originalText, String startText, String endText) {
 		List<String> midTextList = new ArrayList<String>();
 		String[] tempList = originalText.split(startText);
-		for(String temp:tempList){
-		System.out.println("String: " + temp);
+		for (String temp : tempList) {
+			System.out.println("String: " + temp);
 		}
-		for(int i=1; i < tempList.length; i++){
-			if(tempList[i].indexOf(endText) > -1){
-			midTextList.add(tempList[i].substring(0, tempList[i].indexOf(endText)));
-			} else if(tempList[i].indexOf(endText) == -1 && i == (tempList.length -1)) {
+		for (int i = 1; i < tempList.length; i++) {
+			if (tempList[i].indexOf(endText) > -1) {
+				midTextList.add(tempList[i].substring(0, tempList[i].indexOf(endText)));
+			} else if (tempList[i].indexOf(endText) == -1 && i == (tempList.length - 1)) {
 				midTextList.add(tempList[i]);
 			}
 		}
-		if(!originalText.contains(startText)){
-			if(tempList[0].indexOf(endText) > -1){
+		if (!originalText.contains(startText)) {
+			if (tempList[0].indexOf(endText) > -1) {
 				midTextList.add(tempList[0].substring(0, tempList[0].indexOf(endText)));
-				}
+			}
 		}
 		return midTextList;
 	}
@@ -256,7 +268,7 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	 * @return the unique text
 	 */
 	@RobotKeyword
-	@ArgumentNames({"originalText"})
+	@ArgumentNames({ "originalText" })
 	public String generateUniqueString(String originalText) {
 		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 		Calendar calendar = Calendar.getInstance();

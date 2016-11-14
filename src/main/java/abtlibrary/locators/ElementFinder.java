@@ -25,7 +25,9 @@ import abtlibrary.utils.Python;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.AppiumDriver;
 
+@SuppressWarnings("unchecked")
 public class ElementFinder {
 
 	protected final static Hashtable<String, CustomStrategy> registeredLocationStrategies = new Hashtable<String, CustomStrategy>();
@@ -64,7 +66,6 @@ public class ElementFinder {
 		},
 		IDENTIFIER {
 
-			@SuppressWarnings("unchecked")
 			@Override
 			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
 				List<WebElement> elements = browserManagement.getCurrentWebDriver()
@@ -177,12 +178,11 @@ public class ElementFinder {
 		
 		CONTENT_DESC {
 
-			@SuppressWarnings("unchecked")
 			@Override
 			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
 
 				return filterElements(
-						((AndroidDriver<WebElement>)browserManagement.getCurrentWebDriver()).findElements(MobileBy.AccessibilityId(findByCoordinates.criteria)),
+						((AppiumDriver<WebElement>)browserManagement.getCurrentWebDriver()).findElements(MobileBy.AccessibilityId(findByCoordinates.criteria)),
 						findByCoordinates);
 			}
 
@@ -190,7 +190,7 @@ public class ElementFinder {
 		
 		ANDROID {
 
-			@SuppressWarnings("unchecked")
+			
 			@Override
 			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
 
@@ -202,7 +202,6 @@ public class ElementFinder {
 		
 		IOS	{
 
-			@SuppressWarnings("unchecked")
 			@Override
 			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
 

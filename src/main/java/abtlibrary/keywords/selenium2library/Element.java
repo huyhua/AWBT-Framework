@@ -55,6 +55,25 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	// ##############################
 
 	/**
+	 * Check if Element identified by <b>locator</b> exists.<br>
+	 * <br>
+	 * 
+	 * @param locator
+	 *            The locator to locate the select element.
+	 * @return True if element exist and False if element not exist.
+	 */
+	@RobotKeyword
+	@ArgumentNames({"locator"})
+	public Boolean doesElementExist(String locator) {
+		List<WebElement> elements = elementFind(locator, true, false);
+		if (elements.size() == 0) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	/**
 	 * Returns the first Web Element identified by <b>locator</b>.<br>
 	 * <br>
 	 * Fails if there is no element matched with <b>locator</b>.<br>
@@ -856,8 +875,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 		List<WebElement> elements = elementFind(locator, true, false);
 
 		if (elements.size() == 0) {
-			throw new ABTLibraryNonFatalException(
-					String.format("Could not determine position for '%s'.", locator));
+			throw new ABTLibraryNonFatalException(String.format("Could not determine position for '%s'.", locator));
 		}
 
 		return elements.get(0).getLocation().getX();
@@ -931,8 +949,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 		List<WebElement> elements = elementFind(locator, true, false);
 
 		if (elements.size() == 0) {
-			throw new ABTLibraryNonFatalException(
-					String.format("Could not determine position for '%s'.", locator));
+			throw new ABTLibraryNonFatalException(String.format("Could not determine position for '%s'.", locator));
 		}
 
 		return elements.get(0).getLocation().getY();
@@ -1621,7 +1638,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 		String orgImplicitWait = "";
 		// Check if input user data for locator is name of defined elements.
 		List<String> tempLocators = interfaceManagement.getLocators(locator);
-		
+
 		for (String tempLocator : tempLocators) {
 			elements.addAll(ElementFinder.find(browserManagement, tempLocator, tag));
 			if (elements.size() > 0) {
@@ -1633,7 +1650,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 				orgImplicitWait = browserManagement.setSeleniumImplicitWait("0.0");
 			}
 		}
-		// If there is no element defined with name matched input locator. 
+		// If there is no element defined with name matched input locator.
 		if (elements.size() == 0) {
 			elements.addAll(ElementFinder.find(browserManagement, locator, tag));
 		}
@@ -1650,7 +1667,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 			}
 		}
 
-		if(!orgImplicitWait.equals("")){
+		if (!orgImplicitWait.equals("")) {
 			browserManagement.setSeleniumImplicitWait(orgImplicitWait);
 		}
 		return elements;
