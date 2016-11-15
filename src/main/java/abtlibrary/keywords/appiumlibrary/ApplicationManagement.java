@@ -180,8 +180,8 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({"text"})
-	public void scrollTo(String text) {
-		((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).scrollTo(text);
+	public WebElement scrollTo(String text) {
+		return ((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).scrollTo(text);
 	}
 
 	/**

@@ -109,14 +109,14 @@ public class MobileElement {
 	@ArgumentNames({ "locator", "tab" })
 	public void selectTabByName(String menuLocator, String tabName) {
 		WebElement tabMenu = element.elementFind(menuLocator, true, true).get(0);
-		List<WebElement> childElements = tabMenu.findElements(By.xpath("//*[contains(@class,'Tab')]"));
+		List<WebElement> childElements = tabMenu.findElements(By.xpath("//*[contains(@class,\"Tab\")]"));
 
 		if (childElements.size() == 0) {
 			throw new ABTLibraryNonFatalException(String.format("Menu '%s' does not have any tabs", menuLocator));
 		}
 
 		for (int i = 0; i < childElements.size(); i++) {
-			String tab = childElements.get(i).findElement(By.xpath("//*[contains(@class,'TextView')]")).getText();
+			String tab = childElements.get(i).findElement(By.xpath("//*[contains(@class,\"TextView\")]")).getText();
 			if (tabName.equals(tab)) {
 				childElements.get(i).click();
 				break;
@@ -139,7 +139,7 @@ public class MobileElement {
 	@ArgumentNames({ "locator", "tab" })
 	public void selectTabByIndex(String menuLocator, String index) {
 		WebElement tabMenu = element.elementFind(menuLocator, true, true).get(0);
-		List<WebElement> childElements = tabMenu.findElements(By.xpath("//*[contains(@class,'Tab')]"));
+		List<WebElement> childElements = tabMenu.findElements(By.xpath("//*[contains(@class,\"Tab\")]"));
 
 		if (childElements.size() == 0) {
 			throw new ABTLibraryNonFatalException(String.format("Menu '%s' does not have any tabs", menuLocator));
@@ -162,9 +162,9 @@ public class MobileElement {
 	@RobotKeyword
 	@ArgumentNames({"text"})
 	public void selectItemByText(String text) {
-		applicationManagement.scrollTo(text);
-		WebElement item = element.elementFind("//*[@text='" + text + "']", true, true).get(0);
-		item.click();
+		applicationManagement.scrollTo(text).click();
+//		WebElement item = element.elementFind("//*[@text=\"" + text + "\"]", true, true).get(0);
+//		item.click();
 	}
 
 	// ##############################
