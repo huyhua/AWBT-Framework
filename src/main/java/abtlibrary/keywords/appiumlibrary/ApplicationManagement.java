@@ -196,6 +196,12 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 		((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).scrollToExact(text);
 	}
 	
+	@RobotKeyword
+	@ArgumentNames({"key"})
+	public void pressKeyCode(int key) {
+		((AndroidDriver<?>) browserManagement.getCurrentWebDriver()).pressKeyCode(key);
+	}
+	
 	// ##############################
 	// Internal Methods
 	// ##############################

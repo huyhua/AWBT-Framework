@@ -88,7 +88,7 @@ public class MobileElement {
 	@ArgumentNames({ "locator", "index" })
 	public void selectFromListViewByIndex(String locator, String index) {
 		WebElement listView = element.elementFind(locator, true, true).get(0);
-		List<WebElement> options = listView.findElements(By.xpath("//android.widget.TextView"));
+		List<WebElement> options = listView.findElements(By.xpath("//*"));
 
 		if (options.size() == 0) {
 			throw new ABTLibraryNonFatalException(String.format("Listview '%s' does not have any options", locator));
