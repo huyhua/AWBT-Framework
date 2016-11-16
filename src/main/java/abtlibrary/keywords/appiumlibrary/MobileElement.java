@@ -1,5 +1,6 @@
 package abtlibrary.keywords.appiumlibrary;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,8 @@ import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileDriver;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.AndroidElement;
+import abtlibrary.utils.Helpers;
 
 @RobotKeywords
 public class MobileElement {
@@ -179,7 +182,7 @@ public class MobileElement {
 	@RobotKeyword
 	@ArgumentNames({ "text" })
 	public void selectItemByText(String text) {
-		applicationManagement.scrollTo(text).click();
+		applicationManagement.scrollToExact(text).click();
 	}
 	
 	
@@ -225,15 +228,12 @@ public class MobileElement {
 
 		Point point = new Point(0, 0);
 		point = el.getLocation();
-		 System.out.print("Location " + el.getLocation());
-		 System.out.println();
-		 System.out.print("height "+ el.getSize().getHeight());
-		 System.out.print(" width "+ el.getSize().getWidth());
+//		 System.out.print("Location " + el.getLocation());
+//		 System.out.println();
+//		 System.out.print("height "+ el.getSize().getHeight());
+//		 System.out.print(" width "+ el.getSize().getWidth());
 		point.x = point.getX() + (el.getSize().getWidth() / 2);
 		point.y = point.getY() + (el.getSize().getHeight() / 2);
-
-		// System.out.println();
-		// System.out.print("After " + point);
 
 		return point;
 	}
@@ -249,8 +249,23 @@ public class MobileElement {
 		}
 		return true;
 	}
-
-
+	
+	// convert when input data to app
+	public String convertFromUnicode(String target){
+		return Normalizer.normalize(target, Normalizer.Form.NFC);
+	}
+			
+	// convert when get data from app
+	public String convertToUnicode(String target){
+		return Normalizer.normalize(target, Normalizer.Form.NFD);
+	}
+	
+	// scroll to text value at android 
+	public void androidScrollToText(String text){
+		text = convertFromUnicode(text);
+		Helpers.googleAutomator("UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().textContains(\""+ text + "\"))").click();
+	}
+	
 	/**
 	 * Get Favorite List 
 	 * 
@@ -260,7 +275,6 @@ public class MobileElement {
 	 */
 	@RobotKeyword
 	public List<String> getResultList() throws InterruptedException {
-		System.out.println("Tessssttt");
 		@SuppressWarnings("unchecked")
 		AndroidDriver<WebElement> driver = (AndroidDriver<WebElement>) browserManagement.getCurrentWebDriver();
 		WebDriverWait driverwaitBase = new WebDriverWait(browserManagement.getCurrentWebDriver(), 300);
@@ -281,7 +295,6 @@ public class MobileElement {
 		// if(!checkElementVisibility(noResult, 10)){
 		// driverwaitBase.until(ExpectedConditions.visibilityOfAllElementsLocatedBy((By.id("ch.autoscout24.autoscout24.alpha:id/list"))));
 
-		int listSearchSize = 0;
 		List<String> resultList = new ArrayList<String>();
 
 		List<String> lastList = new ArrayList<String>();
@@ -290,7 +303,6 @@ public class MobileElement {
 		boolean flag = true;
 		String breakItem = "";
 		// waitMsec(500);
-		int count = 1;
 
 		while (flag) {
 			try {
@@ -300,7 +312,7 @@ public class MobileElement {
 				 */
 				List<WebElement> listRealResult = driver.findElementsById("ch.immoscout24.ImmoScout24.alpha:id/cardViewIncluder");
 				List<WebElement> listValue = driver.findElementsByXPath("//*[@resource-id ='ch.immoscout24.ImmoScout24.alpha:id/recycleView']/android.widget.FrameLayout");
-				List<WebElement> listResult = driver.findElementsById("ch.immoscout24.ImmoScout24.alpha:id/index_view");
+				//List<WebElement> listResult = driver.findElementsById("ch.immoscout24.ImmoScout24.alpha:id/index_view");
 				List<WebElement> listScroll = driver.findElementsById("ch.immoscout24.ImmoScout24.alpha:id/view_pager");
 				
 //				List<WebElement> listRealResult = element.elementFind("id=ch.immoscout24.ImmoScout24.alpha:id/cardViewIncluder", false, true);
@@ -317,8 +329,8 @@ public class MobileElement {
 				for (int i = 0; i <= listSize - 1 ; i++) {
 					compareList.add(listValue.get(i).getAttribute("name"));
 				}
-				System.out.println("Last list " + lastList);
-				System.out.println("compare list " + compareList);
+//				System.out.println("Last list " + lastList);
+//				System.out.println("compare list " + compareList);
 
 //				if(checkElementVisibility("ch.autoscout24.autoscout24.alpha:id/txtLoadingMessage",3)){
 //					 WebDriverWait driverwaitBase2 = new WebDriverWait(driver, 5);
@@ -330,7 +342,7 @@ public class MobileElement {
 					System.out.println("Duplicate");
 					flag = false;
 
-					System.out.println("compare list " + compareList);
+//					System.out.println("compare list " + compareList);
 					resultList.add(listValue.get(listSize).getAttribute("name"));
 				} else {
 
@@ -340,30 +352,27 @@ public class MobileElement {
 					if (compareList.indexOf(breakItem) != -1) {
 						List<String> tempList = compareList.subList(compareList.indexOf(breakItem) + 1,
 								compareList.size());
-						// System.out.println("temp list "+ tempList);
+
 						resultList.addAll(tempList);
 					} else
 						resultList.addAll(compareList);
 
-					System.out.println("Result list " + resultList);
+//					System.out.println("Result list " + resultList);
 
 					breakItem = listValue.get((listSize - 1)).getAttribute("name");
-					// System.out.println("breakitem "+ breakItem);
+
 					Thread.sleep(1000);
 					
 //					int scrHeight = driver.manage().window().getSize().height;
 //					int scrWidth = driver.manage().window().getSize().width;
 					
-					
-					System.out.println("listsize " + listSize);
+
 					Point start = new Point(0, 0);
 					Point end = new Point(0, 0);
 					start.x = getCenter(listScroll.get(1)).x;
 					start.y = listScroll.get(listSize-1).getLocation().y;
 					end.x = getCenter(listScroll.get(0)).x;
 
-					System.out.println("start " + start);
-					System.out.println("end " + end);
 					action.longPress(start.x, start.y).moveTo(end.x, 130).release().perform();
 					Thread.sleep(1000);
 				}

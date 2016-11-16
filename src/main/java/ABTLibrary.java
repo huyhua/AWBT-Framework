@@ -35,13 +35,28 @@ public class ABTLibrary extends abtlibrary.ABTLibrary {
 		test.element.clickElement("android=text(\"English\")");
 		Thread.sleep(1000);
 		test.element.clickElement("android=text(\"Dismiss\")");
-		test.element.clickElement("content_desc=Navigate up");
-		test.element.clickElement("//*[@text=\"Sign in\"]");
-		test.formElement.inputText("content_desc=Login_TxtEmail", "noahh@gmail.com");
-		test.formElement.inputPassword("content_desc=Login_TxtPassword", "testtest");
-		test.element.clickElement("content_desc=Login_BtnLogin");
-		test.element.clickElement("content_desc=Navigate up");
-		test.element.clickElement("content_desc=Global_BtnFavorites");
-		test.mobileElement.getResultList();
+//		test.element.clickElement("content_desc=Navigate up");
+//		test.element.clickElement("//*[@text=\"Sign in\"]");
+//		test.formElement.inputText("content_desc=Login_TxtEmail", "noahh@gmail.com");
+//		test.formElement.inputPassword("content_desc=Login_TxtPassword", "testtest");
+//		test.element.clickElement("content_desc=Login_BtnLogin");
+//		test.element.clickElement("content_desc=Navigate up");
+//		test.element.clickElement("content_desc=Global_BtnFavorites");
+
+		test.element.clickElement("content_desc=ContentText");
+		test.formElement.inputText("content_desc=Search_TxtCity", "Bern");
+		Thread.sleep(1000);
+		test.applicationManagement.pressKeyCode(66);
+		Thread.sleep(3000);
+		test.element.clickElement("//*[@content-desc =\"Search_BtnPriceFrom\"]//*[@content-desc=\"SpinnerText\"]");
+		test.mobileElement.selectItemByText("500");
+		test.element.clickElement("//*[@content-desc =\"Search_BtnPriceTo\"]//*[@content-desc=\"SpinnerText\"]");
+		Thread.sleep(2000);
+//		test.mobileElement.selectItemByText("1'000");
+		test.mobileElement.androidScrollToText("5'000");
+		test.element.clickElement("content_desc=Search_BtnSearch");
+		
+		//test.mobileElement.getResultList();
+		
 	}
 }

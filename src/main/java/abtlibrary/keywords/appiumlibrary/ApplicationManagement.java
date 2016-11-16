@@ -1,6 +1,7 @@
 package abtlibrary.keywords.appiumlibrary;
 
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 
@@ -27,6 +28,7 @@ import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
 import io.appium.java_client.service.local.flags.GeneralServerFlag;
+import abtlibrary.utils.Helpers;
 
 @SuppressWarnings("deprecation")
 @RobotKeywords
@@ -141,6 +143,7 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	 *            Platform version
 	 * @return Session Id
 	 */
+	@SuppressWarnings("unchecked")
 	@RobotKeyword
 	@ArgumentNames({ "remoteUrl", "alias", "appPath", "deviceName", "platformVersion" })
 	public String openApplication(String remoteUrl, String alias, String appPath, String deviceName,
@@ -158,6 +161,7 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 		try {
 			if (platformName.equals("Android")) {
 				driver = new AndroidDriver<>(new URL(remoteUrl), cap);
+				Helpers.init((AppiumDriver<MobileElement>) driver);
 				
 			} else{
 				cap.setCapability("autoAcceptAlerts", false);
@@ -195,8 +199,8 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({"text"})
-	public void scrollToExact(String text) {
-		((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).scrollToExact(text);
+	public WebElement scrollToExact(String text) {
+		return ((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).scrollToExact(text);
 	}
 	
 	@RobotKeyword
