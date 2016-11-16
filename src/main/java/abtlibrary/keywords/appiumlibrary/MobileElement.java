@@ -1,18 +1,29 @@
 package abtlibrary.keywords.appiumlibrary;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.robotframework.javalib.annotation.ArgumentNames;
 import org.robotframework.javalib.annotation.Autowired;
 import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
+
 import abtlibrary.ABTLibraryNonFatalException;
+import abtlibrary.keywords.selenium2library.BrowserManagement;
 import abtlibrary.keywords.selenium2library.Element;
 import abtlibrary.keywords.selenium2library.Logging;
 import abtlibrary.keywords.selenium2library.SelectElement;
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileDriver;
+import io.appium.java_client.TouchAction;
+import io.appium.java_client.android.AndroidDriver;
+
 
 @RobotKeywords
 public class MobileElement {
@@ -22,6 +33,12 @@ public class MobileElement {
 	@Autowired
 	protected ApplicationManagement applicationManagement;
 
+	/**
+	 * Instantiated BrowserManagement keyword bean
+	 */
+	@Autowired
+	protected BrowserManagement browserManagement;
+	
 	/**
 	 * Instantiated Element keyword bean
 	 */
@@ -45,8 +62,8 @@ public class MobileElement {
 	// ##############################
 
 	/**
-	 * Returns the values in the select list view identified by
-	 * <b>locator</b>.<br>
+	 * Returns the values in the select list view identified by <b>locator</b>.
+	 * <br>
 	 * <br>
 	 * Get list keywords work on mobile's list view . Key attributes for get
 	 * lists are id and name. See `Introduction` for details about locators.<br>
@@ -160,13 +177,172 @@ public class MobileElement {
 	 *            displayed text of selected item.
 	 */
 	@RobotKeyword
-	@ArgumentNames({"text"})
+	@ArgumentNames({ "text" })
 	public void selectItemByText(String text) {
 		applicationManagement.scrollTo(text).click();
 //		WebElement item = element.elementFind("//*[@text=\"" + text + "\"]", true, true).get(0);
 //		item.click();
 	}
+	
+	public Point getCenter(WebElement el) {
 
+		Point point = new Point(0, 0);
+		point = el.getLocation();
+		 System.out.print("Location " + el.getLocation());
+		 System.out.println();
+		 System.out.print("height "+ el.getSize().getHeight());
+		 System.out.print(" width "+ el.getSize().getWidth());
+		point.x = point.getX() + (el.getSize().getWidth() / 2);
+		point.y = point.getY() + (el.getSize().getHeight() / 2);
+
+		// System.out.println();
+		// System.out.print("After " + point);
+
+		return point;
+	}
+	
+	public boolean checkElementVisibility(String id, long secondWait) {
+		WebDriverWait  wait = new WebDriverWait(browserManagement.getCurrentWebDriver(),secondWait);
+		try {
+			wait.until(ExpectedConditions.visibilityOfElementLocated((By.id(id))));
+		} catch (Exception e) {
+			//System.out.println("No element");
+			//Reporter.log(e.getMessage());
+			return false;
+		}
+		return true;
+	}
+
+
+	/**
+	 * Get Favorite List 
+	 * 
+	 * @author Drake
+	 * @return list of item id of scroll list
+	 * @throws InterruptedException 
+	 */
+	@RobotKeyword
+	public List<String> getResultList() throws InterruptedException {
+		System.out.println("Tessssttt");
+		@SuppressWarnings("unchecked")
+		AndroidDriver<WebElement> driver = (AndroidDriver<WebElement>) browserManagement.getCurrentWebDriver();
+		WebDriverWait driverwaitBase = new WebDriverWait(browserManagement.getCurrentWebDriver(), 300);
+		//
+		// List<String> favorList = new ArrayList<String>();
+		// if(platform.equalsIgnoreCase(Constants.PLATFORM_IOS)){
+		// if(!checkElementVisibility(noResult, 10)){
+		// for(MobileElement item:listResult){
+		// //System.out.println(item.findElementByName("List_Button_Favourite").getAttribute("value"));
+		// if(("1").equalsIgnoreCase(item.findElementByName("List_Button_Favourite").getAttribute("value"))){
+		// waitMsec(200);
+		// favorList.add(item.getAttribute("name"));
+		// }
+		// waitMsec(300);
+		// }
+		// }
+		// }else{
+		// if(!checkElementVisibility(noResult, 10)){
+		// driverwaitBase.until(ExpectedConditions.visibilityOfAllElementsLocatedBy((By.id("ch.autoscout24.autoscout24.alpha:id/list"))));
+
+		int listSearchSize = 0;
+		List<String> resultList = new ArrayList<String>();
+
+		List<String> lastList = new ArrayList<String>();
+		Thread.sleep(5000);
+		
+		boolean flag = true;
+		String breakItem = "";
+		// waitMsec(500);
+		int count = 1;
+
+		while (flag) {
+			try {
+				/**
+				 * Drake : Specific elements to scroll for each application
+				 * 
+				 */
+				List<WebElement> listRealResult = driver.findElementsById("ch.immoscout24.ImmoScout24.alpha:id/cardViewIncluder");
+				List<WebElement> listValue = driver.findElementsByXPath("//*[@resource-id ='ch.immoscout24.ImmoScout24.alpha:id/recycleView']/android.widget.FrameLayout");
+				List<WebElement> listResult = driver.findElementsById("ch.immoscout24.ImmoScout24.alpha:id/index_view");
+				List<WebElement> listScroll = driver.findElementsById("ch.immoscout24.ImmoScout24.alpha:id/view_pager");
+				
+//				List<WebElement> listRealResult = element.elementFind("id=ch.immoscout24.ImmoScout24.alpha:id/cardViewIncluder", false, true);
+//				List<WebElement> listValue = element.elementFind("//*[@resource-id ='ch.immoscout24.ImmoScout24.alpha:id/recycleView']/android.widget.FrameLayout", false, true);
+//				List<WebElement> listResult = element.elementFind("id=ch.immoscout24.ImmoScout24.alpha:id/index_view", false, true);
+//				List<WebElement> listScroll = element.elementFind("id=ch.immoscout24.ImmoScout24.alpha:id/image_view", false, true);
+				
+				TouchAction action = new TouchAction ((MobileDriver) browserManagement.getCurrentWebDriver());
+				int listSize = listRealResult.size() - 1;
+				if (listSize == 0)
+					listSize = 1;
+
+				List<String> compareList = new ArrayList<String>();
+				for (int i = 0; i <= listSize - 1 ; i++) {
+					compareList.add(listValue.get(i).getAttribute("name"));
+				}
+				System.out.println("Last list " + lastList);
+				System.out.println("compare list " + compareList);
+
+//				if(checkElementVisibility("ch.autoscout24.autoscout24.alpha:id/txtLoadingMessage",3)){
+//					 WebDriverWait driverwaitBase2 = new WebDriverWait(driver, 5);
+//					 driverwaitBase2.until(ExpectedConditions.invisibilityOfElementLocated(By.id("ch.autoscout24.autoscout24.alpha:id/txtLoadingMessage")));
+//				 //compareList.remove(0);
+//				 }
+
+				if (lastList.containsAll(compareList)) {
+					System.out.println("Duplicate");
+					flag = false;
+
+					System.out.println("compare list " + compareList);
+					resultList.add(listValue.get(listSize).getAttribute("name"));
+				} else {
+
+					lastList = new ArrayList<String>();
+					lastList.addAll(compareList);
+
+					if (compareList.indexOf(breakItem) != -1) {
+						List<String> tempList = compareList.subList(compareList.indexOf(breakItem) + 1,
+								compareList.size());
+						// System.out.println("temp list "+ tempList);
+						resultList.addAll(tempList);
+					} else
+						resultList.addAll(compareList);
+
+					System.out.println("Result list " + resultList);
+
+					breakItem = listValue.get((listSize - 1)).getAttribute("name");
+					// System.out.println("breakitem "+ breakItem);
+					Thread.sleep(1000);
+					
+//					int scrHeight = driver.manage().window().getSize().height;
+//					int scrWidth = driver.manage().window().getSize().width;
+					
+					
+					System.out.println("listsize " + listSize);
+					Point start = new Point(0, 0);
+					Point end = new Point(0, 0);
+					start.x = getCenter(listScroll.get(1)).x;
+					start.y = listScroll.get(listSize-1).getLocation().y;
+					end.x = getCenter(listScroll.get(0)).x;
+
+					System.out.println("start " + start);
+					System.out.println("end " + end);
+					action.longPress(start.x, start.y).moveTo(end.x, 130).release().perform();
+					Thread.sleep(1000);
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				flag = false;
+			}
+		}
+		// }
+		// }
+		System.out.println("Result list " + resultList);
+		System.out.println("Result list size " + resultList.size());
+		return resultList;
+		// }
+	}
 	// ##############################
 	// Internal Methods
 	// ##############################
