@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -36,14 +38,10 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	 */
 	public static void main(String[] args) {
 		OperatingSystem os = new OperatingSystem();
-		/*
-		 * System.out.println("Case1: " + os.getMidText("abcdef", "b", "in"));
-		 * System.out.println("Case2: " + os.getMidText("abcdef", "in", "d"));
-		 * System.out.println("Case3: " + os.getMidText("abcdef", "in", "in"));
-		 */
-		System.out.println("Case4: "
-				+ os.getMidText("//*[@resource-id='ch.anibis.anibis.beta:id/contactType']//android.widget.EditText",
-						"android.widget.EditText", "]"));
+		String temp = os.getSubString("//[@resource-id= 'test']",
+				"(@resource-id.?=.?['|\"](.*?)['|\"]|contains\\(.?@resource-id.*?\\))");
+		System.out.println(temp);
+		System.out.println(os.getSubString(temp, "(\"|')(.*?)(\"|')"));
 	}
 
 	/**
@@ -172,7 +170,12 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	@RobotKeyword
 	@ArgumentNames({ "orginalText", "delimiter" })
 	public String[] splitText(String orginalText, String delimiter) {
-		return orginalText.split(delimiter);
+		String[] temp = orginalText.split(delimiter);
+		String[] items = new String[temp.length];
+		for (int i = 0; i < items.length; i++) {
+			items[i] = temp[i].trim();
+		}
+		return items;
 	}
 
 	/**
@@ -257,6 +260,30 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 			}
 		}
 		return midTextList;
+	}
+
+	/**
+	 * Retrieves sub-string matching with specified regex. <br>
+	 * <b>Example:</b> <br>
+	 * Using regex <b>'(.*?)'</b> to get sub-string <b>I have a sub-string</b>
+	 * from String: <br>
+	 * Hello world! I said: 'I have a sub-string'.
+	 * 
+	 * @param fullString
+	 *            The original string.
+	 * @param regex
+	 *            The regular expression is used to find sub-string.
+	 * @return The sub-strings match with regular expression.
+	 */
+	@RobotKeyword
+	@ArgumentNames({ "fullString", "regex" })
+	public String getSubString(String fullString, String regex) {
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(fullString);
+		if (matcher.find()) {
+			return matcher.group(0);
+		} else
+			return "";
 	}
 
 	/**
