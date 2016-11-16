@@ -1,8 +1,11 @@
 package abtlibrary.keywords.appiumlibrary;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.robotframework.javalib.annotation.ArgumentNames;
 import org.robotframework.javalib.annotation.Autowired;
@@ -163,9 +166,46 @@ public class MobileElement {
 	@ArgumentNames({"text"})
 	public void selectItemByText(String text) {
 		applicationManagement.scrollTo(text).click();
-//		WebElement item = element.elementFind("//*[@text=\"" + text + "\"]", true, true).get(0);
-//		item.click();
 	}
+	
+	
+	@RobotKeyword
+	@ArgumentNames({"locator"})
+	public List<String>	scrollAndGetItemNames(String locator){
+		List<String> results = new ArrayList<>();
+//		WebElement scrollable = element.elementFind(scrollableLocator, true, true).get(0);
+		List<WebElement> itemOnScreen;
+		itemOnScreen = element.elementFind(locator, false, true);
+		
+		if(itemOnScreen.isEmpty()){
+			logging.warn(String.format("List with locator '%s' contains no item", locator));
+			throw new ABTLibraryNonFatalException();
+		}
+		
+		WebElement firstElement = itemOnScreen.get(0);
+		WebElement lastElement = itemOnScreen.get(itemOnScreen.size()-1);
+		
+		Point start = lastElement.getLocation();
+		Point stop = firstElement.getLocation();
+		
+		int safeRetry=0;
+		
+		while(true){
+			itemOnScreen.forEach(item -> results.add(item.getAttribute("name")));
+			applicationManagement.swipe(start.getX(), start.getY(), stop.getX(), stop.getY(), 1500);
+			itemOnScreen = element.elementFind(locator, false, true);
+			String currentLastElement = itemOnScreen.get(itemOnScreen.size()-1).getAttribute("name");
+			
+			if(currentLastElement.equals(results.get(results.size()-1)) && safeRetry++ == 3){
+				break;
+			}
+		}
+		
+		List<String> finalResults = results.stream().distinct().collect(Collectors.toList());
+		return finalResults;
+	}
+	
+	
 
 	// ##############################
 	// Internal Methods

@@ -195,6 +195,12 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 		((AndroidDriver<?>) browserManagement.getCurrentWebDriver()).pressKeyCode(key);
 	}
 	
+	@RobotKeyword
+	@ArgumentNames({"startx", "starty", "endx", "endy", "duration"})
+	public void swipe(int startx,int starty,int endx,int endy,int duration){
+		((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).swipe(startx, starty, endx, endy, duration);
+	}
+	
 	// ##############################
 	// Internal Methods
 	// ##############################
