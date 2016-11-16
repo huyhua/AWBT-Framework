@@ -19,6 +19,7 @@ import abtlibrary.ABTLibraryFatalException;
 import abtlibrary.RunOnFailureKeywordsAdapter;
 import abtlibrary.keywords.selenium2library.BrowserManagement;
 import abtlibrary.keywords.selenium2library.Logging;
+<<<<<<< HEAD
 import abtlibrary.utils.Python;
 import abtlibrary.utils.WebDriverCache;
 import io.appium.java_client.AppiumDriver;
@@ -27,6 +28,8 @@ import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
 import io.appium.java_client.service.local.flags.GeneralServerFlag;
+=======
+>>>>>>> 4892e9bb71f9509e83122c3f33b6377e61f0303e
 
 @SuppressWarnings("deprecation")
 @RobotKeywords
