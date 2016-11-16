@@ -145,14 +145,16 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 		cap.setCapability("platformName", platformName);
 		cap.setCapability("platformVersion", platformVersion);
 		cap.setCapability("deviceName", deviceName);
-		cap.setCapability("autoAcceptAlerts", false);
+		
 
 		try {
 			if (platformName.equals("Android")) {
 				driver = new AndroidDriver<>(new URL(remoteUrl), cap);
 				
-			} else
+			} else{
+				cap.setCapability("autoAcceptAlerts", false);
 				driver = new IOSDriver<>(new URL(remoteUrl), cap);
+			}
 
 			String sessionId = browserManagement.webDriverCache.register(driver, alias, platformName);
 			logging.debug(String.format("Openning '%s' driver to base application '%s'", platformName, appPath));
