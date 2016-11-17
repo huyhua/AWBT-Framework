@@ -196,7 +196,7 @@ public class MobileElement {
 			itemOnScreen = element.elementFind(locator, false, true);
 			String currentLastElement = itemOnScreen.get(itemOnScreen.size()-1).getAttribute("name");
 			
-			if(currentLastElement.equals(results.get(results.size()-1)) && safeRetry++ == 3){
+			if(currentLastElement.equals(results.get(results.size()-1)) && safeRetry++ == 4){
 				break;
 			}
 		}
