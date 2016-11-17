@@ -24,6 +24,8 @@ import abtlibrary.keywords.selenium2library.TableElement;
 import abtlibrary.keywords.selenium2library.Waiting;
 import abtlibrary.utils.Javadoc2Libdoc;
 
+import abtlibrary.keywords.appiumlibrary.MobileElement;
+
 /**
  * ABTLibrary is a web testing library for the Robot Framework and was
  * originally written in Python. This is the Java port of the Selenium 2
@@ -448,10 +450,24 @@ public class ABTLibrary extends AnnotationLibrary {
 	 */
 	@Autowired
 	protected ApplicationManagement applicationManagement;
-
+	
+	/**
+	 * Instantiated MobileElement keyword bean
+	 */
+	@Autowired
+	protected MobileElement mobileElement;
+	
 	// ##############################
 	// Getter / Setter
 	// ##############################
+
+	public MobileElement getMobileElement() {
+		return mobileElement;
+	}
+
+	public void setMobileElement(MobileElement mobileElement) {
+		this.mobileElement = mobileElement;
+	}
 
 	public BrowserManagement getBrowserManagement() {
 		return browserManagement;
