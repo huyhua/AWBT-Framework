@@ -22,6 +22,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.robotframework.javalib.annotation.ArgumentNames;
 import org.robotframework.javalib.annotation.RobotKeyword;
+import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -244,8 +245,8 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	public List<String> getMidText(String originalText, String startText, String endText) {
 		List<String> midTextList = new ArrayList<String>();
 		String[] tempList = originalText.split(startText);
-		for (String temp : tempList) {
-			System.out.println("String: " + temp);
+		if(endText.equals("")){
+			endText = "<glna>";
 		}
 		for (int i = 1; i < tempList.length; i++) {
 			if (tempList[i].indexOf(endText) > -1) {
@@ -275,13 +276,35 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	 *            The regular expression is used to find sub-string.
 	 * @return The sub-strings match with regular expression.
 	 */
-	@RobotKeyword
+	@RobotKeywordOverload
 	@ArgumentNames({ "fullString", "regex" })
 	public String getSubString(String fullString, String regex) {
+		return getSubString(fullString, regex, "0");
+	}
+
+	/**
+	 * Retrieves sub-string matching with specified regex. <br>
+	 * <b>Example:</b> <br>
+	 * Using regex <b>'(.*?)'</b> to get sub-string <b>I have a sub-string</b>
+	 * from String: <br>
+	 * Hello world! I said: 'I have a sub-string'.
+	 * 
+	 * @param fullString
+	 *            The original string.
+	 * @param regex
+	 *            The regular expression is used to find sub-string.
+	 * @param group
+	 *            The index of matched sub-strings
+	 * @return The sub-strings match with regular expression.
+	 */
+
+	@RobotKeyword
+	@ArgumentNames({ "fullString", "regex", "group=NONE" })
+	public String getSubString(String fullString, String regex, String group) {
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(fullString);
 		if (matcher.find()) {
-			return matcher.group(0);
+			return matcher.group(Integer.parseInt(group));
 		} else
 			return "";
 	}

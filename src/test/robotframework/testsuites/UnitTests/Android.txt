@@ -3,4 +3,13 @@ Library	ABTLibrary
 
 *** Test Cases ***
 Verify android
-	Open Application	http://localhost:4723/wd/hub	MyAndroidApp	/Users/khoivo/Desktop/APK/anibis-alpha-v4.0.1_522616.apk	cde1aff6	5.0
+	test	key
+	Log to Console	${key}
+	
+*** Keywords ***
+test
+	[Arguments]	${variable}
+	Log to Console	${variable}
+	${dictionary}=	Set Variable	\${${variable}}
+	Set Global Variable	${dictionary}	Global
+	Log to Console	${dictionary}
