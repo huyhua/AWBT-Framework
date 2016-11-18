@@ -332,6 +332,7 @@ public class MobileElement {
 //				System.out.println("Last list " + lastList);
 //				System.out.println("compare list " + compareList);
 
+				// this part is used to list has page break
 //				if(checkElementVisibility("ch.autoscout24.autoscout24.alpha:id/txtLoadingMessage",3)){
 //					 WebDriverWait driverwaitBase2 = new WebDriverWait(driver, 5);
 //					 driverwaitBase2.until(ExpectedConditions.invisibilityOfElementLocated(By.id("ch.autoscout24.autoscout24.alpha:id/txtLoadingMessage")));
