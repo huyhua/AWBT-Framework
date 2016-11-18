@@ -15,18 +15,17 @@ import org.robotframework.javalib.annotation.Autowired;
 import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
-
 import abtlibrary.ABTLibraryNonFatalException;
 import abtlibrary.keywords.selenium2library.BrowserManagement;
 import abtlibrary.keywords.selenium2library.Element;
 import abtlibrary.keywords.selenium2library.Logging;
 import abtlibrary.keywords.selenium2library.SelectElement;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileBy;
 import io.appium.java_client.MobileDriver;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
-import abtlibrary.utils.Helpers;
 
 @RobotKeywords
 public class MobileElement {
@@ -39,8 +38,6 @@ public class MobileElement {
 	/**
 	 * Instantiated BrowserManagement keyword bean
 	 */
-	@Autowired
-	protected BrowserManagement browserManagement;
 	
 	/**
 	 * Instantiated Element keyword bean
@@ -208,12 +205,21 @@ public class MobileElement {
 		int safeRetry=0;
 		
 		while(true){
-			itemOnScreen.forEach(item -> results.add(item.getAttribute("name")));
+			itemOnScreen.forEach(item -> {
+				String id = item.getAttribute("name");
+				if(!id.equals(""))
+					results.add(id);
+			});
+			
 			applicationManagement.swipe(start.getX(), start.getY(), stop.getX(), stop.getY(), 1500);
 			itemOnScreen = element.elementFind(locator, false, true);
 			String currentLastElement = itemOnScreen.get(itemOnScreen.size()-1).getAttribute("name");
+			String previousLastElement = results.get(results.size()-1);
+			if(!currentLastElement.equals(previousLastElement)){
+				safeRetry = 0;
+			}
 			
-			if(currentLastElement.equals(results.get(results.size()-1)) && safeRetry++ == 3){
+			if(currentLastElement.equals(previousLastElement) && safeRetry++ == 2){
 				break;
 			}
 		}
@@ -239,7 +245,7 @@ public class MobileElement {
 	}
 	
 	public boolean checkElementVisibility(String id, long secondWait) {
-		WebDriverWait  wait = new WebDriverWait(browserManagement.getCurrentWebDriver(),secondWait);
+		WebDriverWait  wait = new WebDriverWait(applicationManagement.browserManagement.getCurrentWebDriver(),secondWait);
 		try {
 			wait.until(ExpectedConditions.visibilityOfElementLocated((By.id(id))));
 		} catch (Exception e) {
@@ -263,7 +269,9 @@ public class MobileElement {
 	// scroll to text value at android 
 	public void androidScrollToText(String text){
 		text = convertFromUnicode(text);
-		Helpers.googleAutomator("UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().textContains(\""+ text + "\"))").click();
+		applicationManagement.browserManagement
+		.getCurrentWebDriver()
+		.findElement(MobileBy.AndroidUIAutomator("UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().textContains(\""+ text + "\"))")).click();
 	}
 	
 	/**
@@ -276,8 +284,8 @@ public class MobileElement {
 	@RobotKeyword
 	public List<String> getResultList() throws InterruptedException {
 		@SuppressWarnings("unchecked")
-		AndroidDriver<WebElement> driver = (AndroidDriver<WebElement>) browserManagement.getCurrentWebDriver();
-		WebDriverWait driverwaitBase = new WebDriverWait(browserManagement.getCurrentWebDriver(), 300);
+		AndroidDriver<WebElement> driver = (AndroidDriver<WebElement>) applicationManagement.browserManagement.getCurrentWebDriver();
+		WebDriverWait driverwaitBase = new WebDriverWait(applicationManagement.browserManagement.getCurrentWebDriver(), 300);
 		//
 		// List<String> favorList = new ArrayList<String>();
 		// if(platform.equalsIgnoreCase(Constants.PLATFORM_IOS)){
@@ -320,7 +328,7 @@ public class MobileElement {
 //				List<WebElement> listResult = element.elementFind("id=ch.immoscout24.ImmoScout24.alpha:id/index_view", false, true);
 //				List<WebElement> listScroll = element.elementFind("id=ch.immoscout24.ImmoScout24.alpha:id/image_view", false, true);
 				
-				TouchAction action = new TouchAction ((MobileDriver) browserManagement.getCurrentWebDriver());
+				TouchAction action = new TouchAction ((MobileDriver) applicationManagement.browserManagement.getCurrentWebDriver());
 				int listSize = listRealResult.size() - 1;
 				if (listSize == 0)
 					listSize = 1;

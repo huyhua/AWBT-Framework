@@ -1,7 +1,6 @@
 package abtlibrary.keywords.appiumlibrary;
 
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 
@@ -20,21 +19,10 @@ import abtlibrary.ABTLibraryFatalException;
 import abtlibrary.RunOnFailureKeywordsAdapter;
 import abtlibrary.keywords.selenium2library.BrowserManagement;
 import abtlibrary.keywords.selenium2library.Logging;
-import abtlibrary.utils.Python;
-import abtlibrary.utils.WebDriverCache;
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.service.local.AppiumDriverLocalService;
-import io.appium.java_client.service.local.AppiumServiceBuilder;
-import io.appium.java_client.service.local.flags.GeneralServerFlag;
-import abtlibrary.utils.Helpers;
 
 @SuppressWarnings("deprecation")
 @RobotKeywords
 public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
-	
-//	private static AppiumDriverLocalService server;
 
 	/**
 	 * Instantiated BrowserManagement keyword bean
@@ -143,7 +131,6 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	 *            Platform version
 	 * @return Session Id
 	 */
-	@SuppressWarnings("unchecked")
 	@RobotKeyword
 	@ArgumentNames({ "remoteUrl", "alias", "appPath", "deviceName", "platformVersion" })
 	public String openApplication(String remoteUrl, String alias, String appPath, String deviceName,
@@ -161,7 +148,6 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 		try {
 			if (platformName.equals("Android")) {
 				driver = new AndroidDriver<>(new URL(remoteUrl), cap);
-				Helpers.init((AppiumDriver<MobileElement>) driver);
 				
 			} else{
 				cap.setCapability("autoAcceptAlerts", false);
@@ -238,28 +224,4 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	 * desiredCapabilitiesString); } } } } return desiredCapabilities; }
 	 */
 	
-//	@RobotKeyword
-//	@ArgumentNames({"androidHome","node","appiumDir"})
-//	public void startServer(String androidHome, String nodeExecutable, String appiumDir) {
-//		HashMap<String, String> env = new HashMap<>();
-//		env.put("ANDROID_HOME", androidHome);
-//		AppiumServiceBuilder builder = new AppiumServiceBuilder()
-//				.usingAnyFreePort()
-//				.withArgument(GeneralServerFlag.LOG_LEVEL, "error")
-//				.withArgument(GeneralServerFlag.SESSION_OVERRIDE)
-//				// .withArgument(GeneralServerFlag.NO_RESET)
-//				.withEnvironment(env)
-//				.usingDriverExecutable(new File(nodeExecutable))
-//				.withAppiumJS(new File(appiumDir))
-//				.withLogFile(
-//						new File(System.getProperty("user.dir") + "/log.txt"));
-//		server = AppiumDriverLocalService.buildService(builder);
-//	}
-//	
-//	@RobotKeyword
-//	public void stopServer(){
-//		if(server != null){
-//			server.stop();
-//		}
-//	}
 }

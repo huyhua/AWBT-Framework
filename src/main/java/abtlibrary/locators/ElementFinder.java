@@ -70,11 +70,8 @@ public class ElementFinder {
 						.findElements(By.id(findByCoordinates.criteria));
 				elements.addAll(
 						browserManagement.getCurrentWebDriver().findElements(By.name(findByCoordinates.criteria)));
-				if (browserManagement.getCurrentPlatform().equalsIgnoreCase("Android")) {
-					elements.addAll(((AndroidDriver<WebElement>) browserManagement.getCurrentWebDriver())
-							.findElementsByAndroidUIAutomator(
-									"new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().resourceId(\""
-											+ findByCoordinates.criteria + "\"))"));
+				if (elements.isEmpty() && browserManagement.getCurrentPlatform().equalsIgnoreCase("android")) {
+					elements.addAll(scrollToFind(browserManagement, findByCoordinates, "resourceId"));
 				}
 
 				return filterElements(elements, findByCoordinates);
@@ -101,9 +98,21 @@ public class ElementFinder {
 
 			@Override
 			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
-				return filterElements(
-						browserManagement.getCurrentWebDriver().findElements(By.name(findByCoordinates.criteria)),
-						findByCoordinates);
+				List<WebElement> elements;
+				
+				if(browserManagement.getCurrentPlatform().equalsIgnoreCase("Android")){
+					elements = ((AndroidDriver<WebElement>)browserManagement.getCurrentWebDriver())
+							.findElementsByAndroidUIAutomator("text(\""+findByCoordinates.criteria+"\")");
+					if(elements.isEmpty()){
+						elements = scrollToFind(browserManagement, findByCoordinates, "textContains");
+					}
+				}else 
+					if(browserManagement.getCurrentPlatform().equalsIgnoreCase("iOS")){
+					elements = ID.findBy(browserManagement, findByCoordinates);
+				}else{
+					elements = browserManagement.getCurrentWebDriver().findElements(By.name(findByCoordinates.criteria));
+				}
+				return filterElements(elements, findByCoordinates);
 			}
 		},
 		XPATH {
@@ -113,24 +122,21 @@ public class ElementFinder {
 				List<WebElement> elements = new ArrayList<WebElement>();
 				// Handle hidden elements (elements do not on the view screen)
 				// on android.
-				if (browserManagement.getCurrentPlatform().equalsIgnoreCase("Android")) {
-					findByUiSelector(browserManagement.getCurrentWebDriver(), findByCoordinates);
-					elements = browserManagement.getCurrentWebDriver()
-							.findElements(By.xpath(findByCoordinates.criteria));
-
-					// Handle for the elements at the end of screen and screen
-					// has
-					// not been scroll to end yet.
-					if (elements.size() == 0) {
-						scrollDown(browserManagement.getCurrentWebDriver(), 1);
+				elements = browserManagement.getCurrentWebDriver()
+						.findElements(By.xpath(findByCoordinates.criteria));
+				if(elements.isEmpty() && browserManagement.getCurrentPlatform().equalsIgnoreCase("android")){
+						findByUiSelector(browserManagement.getCurrentWebDriver(), findByCoordinates);
 						elements = browserManagement.getCurrentWebDriver()
 								.findElements(By.xpath(findByCoordinates.criteria));
-					}
-				} else {
-					elements = browserManagement.getCurrentWebDriver()
-							.findElements(By.xpath(findByCoordinates.criteria));
-				}
 
+						// Handle for the elements at the end of screen and screen has
+						// not been scroll to end yet.
+						if (elements.size() == 0) {
+							scrollDown(browserManagement.getCurrentWebDriver(), 1);
+							elements = browserManagement.getCurrentWebDriver()
+									.findElements(By.xpath(findByCoordinates.criteria));
+						}
+					}
 				return filterElements(elements, findByCoordinates);
 			}
 		},
@@ -192,20 +198,25 @@ public class ElementFinder {
 
 			@Override
 			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
-
-				return filterElements(((AppiumDriver<WebElement>) browserManagement.getCurrentWebDriver())
-						.findElements(MobileBy.AccessibilityId(findByCoordinates.criteria)), findByCoordinates);
+				List<WebElement> elements = ((AppiumDriver<WebElement>) browserManagement.getCurrentWebDriver())
+				.findElements(MobileBy.AccessibilityId(findByCoordinates.criteria));
+				
+				if (elements.isEmpty() && browserManagement.getCurrentPlatform().equalsIgnoreCase("android")) {
+					elements.addAll(scrollToFind(browserManagement, findByCoordinates, "descriptionContains"));
+				}
+				return filterElements(elements, findByCoordinates);
 			}
 
 		},
 
 		ANDROID {
-
+			// To keep the android locator pure it's necessary to not include any scrolling method here.
 			@Override
 			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
 
 				return filterElements(((AndroidDriver<WebElement>) browserManagement.getCurrentWebDriver())
 						.findElements(MobileBy.AndroidUIAutomator(findByCoordinates.criteria)), findByCoordinates);
+				
 			}
 		},
 
@@ -428,6 +439,17 @@ public class ElementFinder {
 			int x = size.width / 2;
 			((AndroidDriver<WebElement>) driver).swipe(x, y_start, x, y_end, 4000);
 		}
+	}
+	
+	protected static List<WebElement> scrollToFind(BrowserManagement browserManagement, FindByCoordinates findByCoordinates, String strategy){
+		List<WebElement> scroll = ((AndroidDriver<WebElement>) browserManagement.getCurrentWebDriver())
+				.findElementsByAndroidUIAutomator(".scrollable(true)");
+		
+		return ((AndroidDriver<WebElement>) browserManagement.getCurrentWebDriver())
+		.findElementsByAndroidUIAutomator(
+				"new UiScrollable(new UiSelector().scrollable(true).instance("
+				+ (scroll.size() - 1) + ")).scrollIntoView(new UiSelector()."+ strategy +"(\""
+						+ findByCoordinates.criteria + "\"))");
 	}
 
 	protected static String getBaseUrl(WebDriver webDriver) {
