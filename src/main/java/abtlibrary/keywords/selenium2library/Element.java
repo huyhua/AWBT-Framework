@@ -78,7 +78,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * <br>
 	 * Fails if there is no element matched with <b>locator</b>.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -97,7 +97,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * <br>
 	 * Fails if there is no element matched with <b>locator</b>.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -349,7 +349,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * Verify the element identified by <b>locator</b> is found on the current
 	 * page.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about log levels and locators.<br>
 	 * 
 	 * @param locator
@@ -392,7 +392,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * Verify the element identified by <b>locator</b> is not found on the
 	 * current page.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about log levels and locators.<br>
 	 * 
 	 * @param locator
@@ -464,7 +464,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	/**
 	 * Verify the element identified by <b>locator</b> is enabled.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -481,7 +481,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	/**
 	 * Verify the element identified by <b>locator</b> is disabled.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -503,7 +503,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	/**
 	 * Verify the element identified by <b>locator</b> is selected.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -533,7 +533,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	/**
 	 * Verify the element identified by <b>locator</b> is not selected.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -568,7 +568,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * element that carries display:none is not logically visible, so using this
 	 * keyword on that element would fail.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -603,7 +603,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * element that carries display:none is not logically visible, so using this
 	 * keyword on that element would fail.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -633,7 +633,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	/**
 	 * Verify the element identified by <b>locator</b> is clickable.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -663,7 +663,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	/**
 	 * Verify the element identified by <b>locator</b> is not clickable.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -698,7 +698,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * substring match but an exact match on the element identified by locator.
 	 * <br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -736,7 +736,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * substring match but an exact match on the element identified by locator.
 	 * <br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -767,7 +767,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * The <b>attribute_locator</b> consists of element locator followed by an @
 	 * sign and attribute name. Example: element_id@class<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param attributeLocator
@@ -797,10 +797,10 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * <br>
 	 * Also, this method will use WebDriver's internal _element.clear()_ method,
 	 * i.e. it will not send any keypresses, and it will not have any effect
-	 * whatsoever on elements other than input textfields or input textareas.
+	 * whatsoever on elements1 other than input textfields or input textareas.
 	 * Clients relying on keypresses should implement their own methods.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -821,7 +821,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * The position is returned in pixels off the left side of the page, as an
 	 * integer. Fails if the matching element is not found.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 *
 	 * @param locator
@@ -862,7 +862,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * The position is returned in pixels off the left side of the page, as an
 	 * integer. Fails if the matching element is not found.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -885,7 +885,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * Returns the value attribute of the element identified by <b>locator</b>.
 	 * <br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -911,7 +911,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	/**
 	 * Returns the text of the element identified by <b>locator</b>.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -936,7 +936,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * The position is returned in pixels off the top of the page, as an
 	 * integer. Fails if the matching element is not found.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -962,7 +962,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	/**
 	 * Click on the element identified by <b>locator</b>.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -985,7 +985,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * offset from that point. Both offsets are specified as negative (left/up)
 	 * or positive (right/down) number.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * <br>
 	 * 
@@ -1012,7 +1012,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	/**
 	 * Double-Click on the element identified by <b>locator</b>.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -1032,7 +1032,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	/**
 	 * Set the focus to the element identified by <b>locator</b>.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -1050,7 +1050,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * Drag the element identified by the locator <b>source</b> and move it on
 	 * top of the element identified by the locator <b>target</b>.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * <br>
 	 * Example:
@@ -1086,7 +1086,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * Both offsets are specified as negative (left/up) or positive (right/down)
 	 * number.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * <br>
 	 * Example:
@@ -1124,7 +1124,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * <br>
 	 * The element is pressed without releasing the mouse button.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -1150,7 +1150,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * Simulates moving the mouse away from the element identified by
 	 * <b>locator</b>.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -1179,7 +1179,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * Simulates moving the mouse over the element identified by <b>locator</b>.
 	 * <br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -1204,7 +1204,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * Simulates releasing the left mouse button on the element identified by
 	 * <b>locator</b>.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -1228,7 +1228,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	/**
 	 * Opens the context menu on the element identified by <b>locator</b>.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -1250,7 +1250,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * This keyword is especially useful, when the element has an OnEvent
 	 * handler that needs to be explicitly invoked.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * 
 	 * @param locator
@@ -1277,7 +1277,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * Key is either a single character, or a numerical ASCII code of the key
 	 * lead by '\\'.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements are id and name. See `Introduction`
+	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
 	 * for details about locators.<br>
 	 * <br>
 	 * Example:
@@ -1556,14 +1556,14 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	// ##############################
 
 	/**
-	 * Returns the number of elements located the given <b>xpath</b>.<br>
+	 * Returns the number of elements1 located the given <b>xpath</b>.<br>
 	 * <br>
-	 * If you wish to assert the number of located elements, use `Xpath Should
+	 * If you wish to assert the number of located elements1, use `Xpath Should
 	 * Match X Times`.<br>
 	 * 
 	 * @param xpath
-	 *            The XPath to match page elements
-	 * @return The number of located elements
+	 *            The XPath to match page elements1
+	 * @return The number of located elements1
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "xpath" })
@@ -1589,13 +1589,13 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Verify that the page contains the <b>expectedXpathCount</b> of elements
+	 * Verify that the page contains the <b>expectedXpathCount</b> of elements1
 	 * located by the given <b>xpath</b>.<br>
 	 * 
 	 * @param xpath
-	 *            The XPath to match page elements
+	 *            The XPath to match page elements1
 	 * @param expectedXpathCount
-	 *            The expected number of located elements
+	 *            The expected number of located elements1
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * @param logLevel
@@ -1618,7 +1618,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 			throw new ABTLibraryNonFatalException(message);
 		}
 
-		logging.log(String.format("Current page contains %s elements matching '%s'.", actualXpathCount, xpath),
+		logging.log(String.format("Current page contains %s elements1 matching '%s'.", actualXpathCount, xpath),
 				logLevel);
 	}
 
@@ -1636,7 +1636,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 		 * Updated by Khoi Date: Sep 05, 2016
 		 */
 		String orgImplicitWait = "";
-		// Check if input user data for locator is name of defined elements.
+		// Check if input user data for locator is name of defined elements1.
 		List<String> tempLocators = interfaceManagement.getLocators(locator);
 
 		for (String tempLocator : tempLocators) {
@@ -1645,7 +1645,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 				break;
 			} else {
 				/**
-				 * Decrease wait time to find elements faster.
+				 * Decrease wait time to find elements1 faster.
 				 */
 				orgImplicitWait = browserManagement.setSeleniumImplicitWait("0.0");
 			}
@@ -1656,7 +1656,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 		}
 		if (required && elements.size() == 0) {
 			throw new ABTLibraryNonFatalException(
-					String.format("Element locator '%s' did not match any elements.", locator));
+					String.format("Element locator '%s' did not match any elements1.", locator));
 		}
 
 		if (firstOnly) {

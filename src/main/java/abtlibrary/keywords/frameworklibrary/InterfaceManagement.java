@@ -54,9 +54,9 @@ public class InterfaceManagement extends RunOnFailureKeywordsAdapter {
 	/**
 	 * Returns all locators that match with element name defined in repository.
 	 * <br>
-	 * Get locators keyword will access the list of defined elements stored in
+	 * Get locators keyword will access the list of defined elements1 stored in
 	 * <b>../Interface/Interface.xml</b> and retrieves locator of all matched
-	 * elements.
+	 * elements1.
 	 * 
 	 * @param elementName
 	 *            element name

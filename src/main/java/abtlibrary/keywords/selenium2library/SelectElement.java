@@ -75,7 +75,7 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Returns the visible labels of the first selected elements as a list from
+	 * Returns the visible labels of the first selected elements1 as a list from
 	 * the select list identified by <b>locator</b>.<br>
 	 * <br>
 	 * Fails if there is no selection.<br>
@@ -125,7 +125,7 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Returns the values of the first selected elements as a list from the
+	 * Returns the values of the first selected elements1 as a list from the
 	 * select list identified by <b>locator</b>.<br>
 	 * <br>
 	 * Fails if there is no selection. The return values are read from the value
