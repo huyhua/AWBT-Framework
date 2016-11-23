@@ -40,8 +40,9 @@ public class MobileElement {
 	protected ApplicationManagement applicationManagement;
 
 	/**
-	 * Instantiated BrowserManagement keyword bean
+	 * Instantiated Touch keyword bean
 	 */
+	protected Touch touch;
 	
 	/**
 	 * Instantiated Element keyword bean
@@ -215,7 +216,7 @@ public class MobileElement {
 					results.add(id);
 			});
 			
-			applicationManagement.swipe(start.getX(), start.getY(), stop.getX(), stop.getY(), 1500);
+			touch.swipe(start.getX(), start.getY(), stop.getX(), stop.getY(), 1500);
 			itemOnScreen = element.elementFind(locator, false, true);
 			String currentLastElement = itemOnScreen.get(itemOnScreen.size()-1).getAttribute("name");
 			String previousLastElement = results.get(results.size()-1);
