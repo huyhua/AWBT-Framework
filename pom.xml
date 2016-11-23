@@ -156,6 +156,12 @@
 			<artifactId>jrobotremoteserver</artifactId>
 			<version>3.0</version>
 		</dependency>
+		<!-- For applitool - Drake -->
+		<dependency>
+            <groupId>com.applitools</groupId>
+            <artifactId>eyes-selenium-java</artifactId>
+            <version>RELEASE</version>
+        </dependency>
 	</dependencies>
 
 	<build>
