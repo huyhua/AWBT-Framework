@@ -194,26 +194,7 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	public WebElement scrollToExact(String text) {
 		return ((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).scrollToExact(text);
 	}
-	
-	@RobotKeyword
-	@ArgumentNames({"key"})
-	public void pressKeyCode(int key) {
-		((AndroidDriver<?>) browserManagement.getCurrentWebDriver()).pressKeyCode(key);
-	}
-	
-	@RobotKeyword
-	@ArgumentNames({"startx", "starty", "endx", "endy", "duration"})
-	public void swipe(int startx,int starty,int endx,int endy,int duration){
-		((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).swipe(startx, starty, endx, endy, duration);
-	}
-	
-	/**
-	 * Enable applitool to run cloud server 
-	 * 
-	 * @param APIKey
-	 * @param matchLevel
-	 * @param deviceName
-	 */
+
 	@RobotKeyword
 	@ArgumentNames({"APIKey", "matchLevel", "deviceName"})
 	public void enableApplitool(String APIKey, String matchLevel, String deviceName){
