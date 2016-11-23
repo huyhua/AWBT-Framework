@@ -1,9 +1,8 @@
 package abtlibrary.keywords.appiumlibrary;
 
-import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileDriver;
 import io.appium.java_client.TouchAction;
 
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.robotframework.javalib.annotation.ArgumentNames;
 import org.robotframework.javalib.annotation.Autowired;
@@ -45,13 +44,13 @@ public class Touch extends RunOnFailureKeywordsAdapter {
 	@RobotKeyword
 	@ArgumentNames({"startx", "starty", "endx", "endy", "duration"})
 	public void swipe(int startx,int starty,int endx,int endy,int duration){
-		((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).swipe(startx, starty, endx, endy, duration);
+		((MobileDriver) browserManagement.getCurrentWebDriver()).swipe(startx, starty, endx, endy, duration);
 	}
 	
 	@RobotKeyword
 	@ArgumentNames({"locator"})
 	public void zoom(String locator){
-		AppiumDriver<?> driver = (AppiumDriver<?>) browserManagement.getCurrentWebDriver();
+		MobileDriver driver = (MobileDriver) browserManagement.getCurrentWebDriver();
 		WebElement item = element.elementFind(locator, true, true).get(0);
 		driver.zoom(item);
 	}
@@ -59,17 +58,17 @@ public class Touch extends RunOnFailureKeywordsAdapter {
 	@RobotKeyword
 	@ArgumentNames({"locator"})
 	public void longPress(String locator){
-		AppiumDriver<?> driver = (AppiumDriver<?>) browserManagement.getCurrentWebDriver();
+		MobileDriver driver = (MobileDriver) browserManagement.getCurrentWebDriver();
 		WebElement item = element.elementFind(locator, true, true).get(0);
 		TouchAction longPress = new TouchAction(driver).longPress(item);
 		longPress.perform();
 	}
 	
-	@RobotKeyword
-	@ArgumentNames({"coordinate_X","coordinate_Y"})
-	public void clickElementAtCoorDinates(int x, int y){
-		AppiumDriver<?> driver = (AppiumDriver<?>) browserManagement.getCurrentWebDriver();
-		TouchAction longPress = new TouchAction(driver).press(x, y).release();
-		longPress.perform();
-	}
+//	@RobotKeyword
+//	@ArgumentNames({"coordinate_X","coordinate_Y"})
+//	public void clickElementAtCoorDinates(int x, int y){
+//		MobileDriver driver = (MobileDriver) browserManagement.getCurrentWebDriver();
+//		TouchAction longPress = new TouchAction(driver).press(x, y).release();
+//		longPress.perform();
+//	}
 }
