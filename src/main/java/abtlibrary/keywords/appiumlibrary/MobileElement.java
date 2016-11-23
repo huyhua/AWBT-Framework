@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -14,6 +15,9 @@ import org.robotframework.javalib.annotation.ArgumentNames;
 import org.robotframework.javalib.annotation.Autowired;
 import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywords;
+
+import com.applitools.eyes.EyesException;
+import com.applitools.eyes.TestResults;
 
 import abtlibrary.ABTLibraryNonFatalException;
 import abtlibrary.keywords.selenium2library.BrowserManagement;
@@ -341,6 +345,7 @@ public class MobileElement {
 //				System.out.println("Last list " + lastList);
 //				System.out.println("compare list " + compareList);
 
+				// this part is used to list has page break
 //				if(checkElementVisibility("ch.autoscout24.autoscout24.alpha:id/txtLoadingMessage",3)){
 //					 WebDriverWait driverwaitBase2 = new WebDriverWait(driver, 5);
 //					 driverwaitBase2.until(ExpectedConditions.invisibilityOfElementLocated(By.id("ch.autoscout24.autoscout24.alpha:id/txtLoadingMessage")));
@@ -397,6 +402,91 @@ public class MobileElement {
 		System.out.println("Result list size " + resultList.size());
 		return resultList;
 		// }
+	}
+	
+	/**
+	 * 
+	 * @param appName
+	 * @param testName
+	 */
+	@RobotKeyword
+	@ArgumentNames({"appName", "testName"})
+	public void startEyesTest(String appName, String testName){
+		applicationManagement.eyes.open(applicationManagement.browserManagement.getCurrentWebDriver(), appName, testName);
+		applicationManagement.eyes.setSaveNewTests(true);
+	}
+	
+	/**
+	 * 
+	 * @param desciption
+	 */
+	@RobotKeyword
+	@ArgumentNames({"desciption"})
+	public void checkWindow(String desciption){
+		applicationManagement.eyes.checkWindow(desciption);
+	}
+	
+	/**
+	 * 
+	 */
+	@RobotKeyword
+	public void endEyesTest(){
+		try{
+			TestResults testResults = applicationManagement.eyes.close(false);		
+		}
+		finally {
+			applicationManagement.eyes.abortIfNotClosed();
+		}
+	}
+
+	public void testApplitool() throws InterruptedException{
+		AndroidDriver<WebElement> driver = (AndroidDriver<WebElement>) applicationManagement.browserManagement.getCurrentWebDriver();
+		WebDriver driver2 = applicationManagement.browserManagement.getCurrentWebDriver();
+//		applicationManagement.eyes.open(applicationManagement.browserManagement.getCurrentWebDriver(), "Immo24", "TestImmo");
+//		applicationManagement.eyes.checkWindow("Popup Screen");
+		startEyesTest("Immo24", "TestImmo");
+		checkWindow("Popup Screen");
+		element.clickElement("android=text(\"English\")");
+		Thread.sleep(1000);
+		checkWindow("Popup Screen 2");
+//		applicationManagement.eyes.checkWindow("Popup Screen 2");
+//		try{
+//			TestResults testResults = applicationManagement.eyes.close(false);		
+//			//applicationManagement.eyes.close();
+//		}catch (EyesException e){
+//			
+//		}
+//		finally {
+//			applicationManagement.eyes.abortIfNotClosed();
+//		}
+//		
+		endEyesTest();
+		startEyesTest("Immo24", "TestImmo 2");
+		element.clickElement("android=text(\"Dismiss\")");
+		Thread.sleep(1000);
+		element.clickElement("content_desc=Navigate up");
+		Thread.sleep(2000);
+		
+		checkWindow("Menu Screen");
+		endEyesTest();
+		
+//		applicationManagement.eyes.open(applicationManagement.browserManagement.getCurrentWebDriver(), "Immo24", "Test Element");
+//		WebElement test = (WebElement) driver2.findElement(By.className("android.widget.ImageButton"));
+//		//WebElement test = element.elementFind("content_desc=Navigate up)", true, true).get(0);
+//		//test.click();
+//		applicationManagement.eyes.checkRegion(test,10,"test");
+//		try{
+//			TestResults testResults = applicationManagement.eyes.close(false);		
+//		}
+//		finally {
+//			applicationManagement.eyes.abortIfNotClosed();
+//		}
+//
+		applicationManagement.closeApplication();
+		
+		
+		
+		
 	}
 	// ##############################
 	// Internal Methods

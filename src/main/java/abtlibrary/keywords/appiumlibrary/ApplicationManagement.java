@@ -15,6 +15,9 @@ import org.robotframework.javalib.annotation.Autowired;
 import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
+import com.applitools.eyes.Eyes;
+import com.applitools.eyes.MatchLevel;
+
 import abtlibrary.ABTLibraryFatalException;
 import abtlibrary.RunOnFailureKeywordsAdapter;
 import abtlibrary.keywords.selenium2library.BrowserManagement;
@@ -35,6 +38,8 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	 */
 	@Autowired
 	protected Logging logging;
+	
+	protected Eyes eyes;
 
 	// ##############################
 	// Keywords
@@ -137,7 +142,8 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 			String platformVersion) {
 		WebDriver driver;
 		String platformName = appPath.contains(".apk") ? "Android" : "iOS";
-
+		
+		
 		DesiredCapabilities cap = new DesiredCapabilities();
 		cap.setCapability("app", appPath);
 		cap.setCapability("platformName", platformName);
@@ -188,6 +194,37 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	public WebElement scrollToExact(String text) {
 		return ((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).scrollToExact(text);
 	}
+	
+	@RobotKeyword
+	@ArgumentNames({"key"})
+	public void pressKeyCode(int key) {
+		((AndroidDriver<?>) browserManagement.getCurrentWebDriver()).pressKeyCode(key);
+	}
+	
+	@RobotKeyword
+	@ArgumentNames({"startx", "starty", "endx", "endy", "duration"})
+	public void swipe(int startx,int starty,int endx,int endy,int duration){
+		((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).swipe(startx, starty, endx, endy, duration);
+	}
+	
+	/**
+	 * Enable applitool to run cloud server 
+	 * 
+	 * @param APIKey
+	 * @param matchLevel
+	 * @param deviceName
+	 */
+	@RobotKeyword
+	@ArgumentNames({"APIKey", "matchLevel", "deviceName"})
+	public void enableApplitool(String APIKey, String matchLevel, String deviceName){
+				eyes = new Eyes();
+				//eyes.setApiKey("Eyt18cF9exK4109txbzzE2ij0isWh8D2zFdts3vYVOhIg110");
+				eyes.setApiKey(APIKey);
+				eyes.setMatchLevel(MatchLevel.valueOf(matchLevel));
+				eyes.setHostOS(deviceName);
+				
+	}
+	
 	// ##############################
 	// Internal Methods
 	// ##############################
