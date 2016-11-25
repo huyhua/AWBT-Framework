@@ -184,7 +184,13 @@ public class MobileElement {
 	@RobotKeyword
 	@ArgumentNames({ "text" })
 	public void selectItemByText(String text) {
-		applicationManagement.scrollToExact(text).click();
+		element.elementFind("name="+text, true, true).get(0).click();
+//		if(applicationManagement.browserManagement.getCurrentPlatform().equalsIgnoreCase("android")){
+//			
+//			applicationManagement.scrollToExact(text).click();
+//		}else{
+//			applicationManagement.browserManagement.getCurrentWebDriver().findElement(By.id(text)).click();
+//		}
 	}
 	
 	
@@ -193,16 +199,27 @@ public class MobileElement {
 	public List<String>	scrollAndGetItemNames(String locator){
 		List<String> results = new ArrayList<>();
 //		WebElement scrollable = element.elementFind(scrollableLocator, true, true).get(0);
-		List<WebElement> itemOnScreen;
-		itemOnScreen = element.elementFind(locator, false, true);
+		List<WebElement> itemsOnScreen;
+		itemsOnScreen = element.elementFind(locator, false, false);
 		
-		if(itemOnScreen.isEmpty()){
+		if(itemsOnScreen.isEmpty()){
 			logging.warn(String.format("List with locator '%s' contains no item", locator));
 			throw new ABTLibraryNonFatalException();
 		}
 		
-		WebElement firstElement = itemOnScreen.get(0);
-		WebElement lastElement = itemOnScreen.get(itemOnScreen.size()-1);
+		if(itemsOnScreen.size() < 2){
+			itemsOnScreen.forEach(item -> {
+				String id = item.getAttribute("name");
+				if(!id.equals(""))
+					results.add(id);
+			});
+			
+			List<String> finalResults = results.stream().distinct().collect(Collectors.toList());
+			return finalResults;
+		}
+		
+		WebElement firstElement = itemsOnScreen.get(0);
+		WebElement lastElement = itemsOnScreen.get(itemsOnScreen.size()-1);
 		
 		Point start = lastElement.getLocation();
 		Point stop = firstElement.getLocation();
@@ -210,15 +227,15 @@ public class MobileElement {
 		int safeRetry=0;
 		
 		while(true){
-			itemOnScreen.forEach(item -> {
+			itemsOnScreen.forEach(item -> {
 				String id = item.getAttribute("name");
 				if(!id.equals(""))
 					results.add(id);
 			});
 			
 			touch.swipe(start.getX(), start.getY(), stop.getX(), stop.getY(), 1500);
-			itemOnScreen = element.elementFind(locator, false, true);
-			String currentLastElement = itemOnScreen.get(itemOnScreen.size()-1).getAttribute("name");
+			itemsOnScreen = element.elementFind(locator, false, true);
+			String currentLastElement = itemsOnScreen.get(itemsOnScreen.size()-1).getAttribute("name");
 			String previousLastElement = results.get(results.size()-1);
 			if(!currentLastElement.equals(previousLastElement)){
 				safeRetry = 0;
