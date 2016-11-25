@@ -1,5 +1,10 @@
 package abtlibrary.keywords.appiumlibrary;
 
+import io.appium.java_client.MobileBy;
+import io.appium.java_client.MobileDriver;
+import io.appium.java_client.TouchAction;
+import io.appium.java_client.android.AndroidDriver;
+
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,20 +21,12 @@ import org.robotframework.javalib.annotation.Autowired;
 import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
-import com.applitools.eyes.EyesException;
-import com.applitools.eyes.TestResults;
-
 import abtlibrary.ABTLibraryNonFatalException;
-import abtlibrary.keywords.selenium2library.BrowserManagement;
 import abtlibrary.keywords.selenium2library.Element;
 import abtlibrary.keywords.selenium2library.Logging;
 import abtlibrary.keywords.selenium2library.SelectElement;
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileBy;
-import io.appium.java_client.MobileDriver;
-import io.appium.java_client.TouchAction;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
+
+import com.applitools.eyes.TestResults;
 
 @RobotKeywords
 public class MobileElement {
@@ -197,57 +194,62 @@ public class MobileElement {
 	@RobotKeyword
 	@ArgumentNames({"locator"})
 	public List<String>	scrollAndGetItemNames(String locator){
-		List<String> results = new ArrayList<>();
+		try {
+			List<String> results = new ArrayList<>();
 //		WebElement scrollable = element.elementFind(scrollableLocator, true, true).get(0);
-		List<WebElement> itemsOnScreen;
-		itemsOnScreen = element.elementFind(locator, false, false);
-		
-		if(itemsOnScreen.isEmpty()){
-			logging.warn(String.format("List with locator '%s' contains no item", locator));
-			throw new ABTLibraryNonFatalException();
-		}
-		
-		if(itemsOnScreen.size() < 2){
-			itemsOnScreen.forEach(item -> {
-				String id = item.getAttribute("name");
-				if(!id.equals(""))
-					results.add(id);
-			});
+			List<WebElement> itemsOnScreen;
+			itemsOnScreen = element.elementFind(locator, false, false);
+			
+			if(itemsOnScreen.isEmpty()){
+				logging.warn(String.format("List with locator '%s' contains no item", locator));
+				throw new ABTLibraryNonFatalException();
+			}
+			
+			if(itemsOnScreen.size() < 2){
+				itemsOnScreen.forEach(item -> {
+					String id = item.getAttribute("name");
+					if(!id.equals(""))
+						results.add(id);
+				});
+				
+				List<String> finalResults = results.stream().distinct().collect(Collectors.toList());
+				return finalResults;
+			}
+			
+			WebElement firstElement = itemsOnScreen.get(0);
+			WebElement lastElement = itemsOnScreen.get(itemsOnScreen.size()-1);
+			
+			Point start = lastElement.getLocation();
+			Point stop = firstElement.getLocation();
+			
+			int safeRetry=0;
+			
+			while(true){
+				itemsOnScreen.forEach(item -> {
+					String id = item.getAttribute("name");
+					if(!id.equals(""))
+						results.add(id);
+				});
+				
+				touch.swipe(start.getX(), start.getY(), stop.getX(), stop.getY(), 1500);
+				itemsOnScreen = element.elementFind(locator, false, true);
+				String currentLastElement = itemsOnScreen.get(itemsOnScreen.size()-1).getAttribute("name");
+				String previousLastElement = results.get(results.size()-1);
+				if(!currentLastElement.equals(previousLastElement)){
+					safeRetry = 0;
+				}
+				
+				if(currentLastElement.equals(previousLastElement) && safeRetry++ == 2){
+					break;
+				}
+			}
 			
 			List<String> finalResults = results.stream().distinct().collect(Collectors.toList());
 			return finalResults;
+		} catch (Exception e) {
+			logging.warn(e.getMessage());
+			throw e;
 		}
-		
-		WebElement firstElement = itemsOnScreen.get(0);
-		WebElement lastElement = itemsOnScreen.get(itemsOnScreen.size()-1);
-		
-		Point start = lastElement.getLocation();
-		Point stop = firstElement.getLocation();
-		
-		int safeRetry=0;
-		
-		while(true){
-			itemsOnScreen.forEach(item -> {
-				String id = item.getAttribute("name");
-				if(!id.equals(""))
-					results.add(id);
-			});
-			
-			touch.swipe(start.getX(), start.getY(), stop.getX(), stop.getY(), 1500);
-			itemsOnScreen = element.elementFind(locator, false, true);
-			String currentLastElement = itemsOnScreen.get(itemsOnScreen.size()-1).getAttribute("name");
-			String previousLastElement = results.get(results.size()-1);
-			if(!currentLastElement.equals(previousLastElement)){
-				safeRetry = 0;
-			}
-			
-			if(currentLastElement.equals(previousLastElement) && safeRetry++ == 2){
-				break;
-			}
-		}
-		
-		List<String> finalResults = results.stream().distinct().collect(Collectors.toList());
-		return finalResults;
 	}
 	
 	
