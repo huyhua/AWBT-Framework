@@ -11,6 +11,8 @@ import org.robotframework.javalib.annotation.Autowired;
 import org.robotframework.javalib.library.AnnotationLibrary;
 
 import abtlibrary.keywords.appiumlibrary.ApplicationManagement;
+import abtlibrary.keywords.appiumlibrary.KeyEvent;
+import abtlibrary.keywords.appiumlibrary.Touch;
 import abtlibrary.keywords.selenium2library.BrowserManagement;
 import abtlibrary.keywords.selenium2library.Cookie;
 import abtlibrary.keywords.selenium2library.Element;
@@ -23,7 +25,6 @@ import abtlibrary.keywords.selenium2library.SelectElement;
 import abtlibrary.keywords.selenium2library.TableElement;
 import abtlibrary.keywords.selenium2library.Waiting;
 import abtlibrary.utils.Javadoc2Libdoc;
-
 import abtlibrary.keywords.appiumlibrary.MobileElement;
 
 /**
@@ -457,6 +458,12 @@ public class ABTLibrary extends AnnotationLibrary {
 	@Autowired
 	protected MobileElement mobileElement;
 	
+	@Autowired
+	protected Touch touch;
+	
+	@Autowired
+	protected KeyEvent keyEvent;
+	
 	// ##############################
 	// Getter / Setter
 	// ##############################
@@ -516,6 +523,16 @@ public class ABTLibrary extends AnnotationLibrary {
 	public ApplicationManagement getApplicationManagement() {
 		return applicationManagement;
 	}
+	
+	public Touch getTouch() {
+		return touch;
+	}
+	
+	public KeyEvent getKeyEvent(){
+		return keyEvent;
+	}
+	
+	
 
 	// ##############################
 	// Public Methods

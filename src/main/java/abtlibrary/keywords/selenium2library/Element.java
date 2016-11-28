@@ -926,7 +926,6 @@ public class Element extends RunOnFailureKeywordsAdapter {
 		if (elements.size() == 0) {
 			return null;
 		}
-
 		return elements.get(0).getText();
 	}
 

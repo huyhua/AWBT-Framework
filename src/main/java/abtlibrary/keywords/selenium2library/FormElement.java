@@ -896,7 +896,7 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	protected void inputTextIntoTextField(String locator, String text) {
 		WebElement webElement = element.elementFind(locator, true, true).get(0);
 		webElement.clear();
-		if(!browsermanagement.getCurrentPlatform().equalsIgnoreCase("android")){
+		if(browsermanagement.getCurrentPlatform().equalsIgnoreCase("ios")){
 			((IOSElement) webElement).setValue(text);
 		}else{
 			webElement.sendKeys(text);
