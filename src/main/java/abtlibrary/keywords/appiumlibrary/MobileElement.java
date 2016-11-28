@@ -404,11 +404,7 @@ public class MobileElement {
 		// }
 	}
 	
-	/**
-	 * 
-	 * @param appName
-	 * @param testName
-	 */
+
 	@RobotKeyword
 	@ArgumentNames({"appName", "testName"})
 	public void startEyesTest(String appName, String testName){
@@ -416,19 +412,14 @@ public class MobileElement {
 		applicationManagement.eyes.setSaveNewTests(true);
 	}
 	
-	/**
-	 * 
-	 * @param desciption
-	 */
+
 	@RobotKeyword
 	@ArgumentNames({"desciption"})
 	public void checkWindow(String desciption){
 		applicationManagement.eyes.checkWindow(desciption);
 	}
 	
-	/**
-	 * 
-	 */
+
 	@RobotKeyword
 	public void endEyesTest(){
 		try{
