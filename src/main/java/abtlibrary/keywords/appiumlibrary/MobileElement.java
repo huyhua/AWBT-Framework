@@ -39,6 +39,7 @@ public class MobileElement {
 	/**
 	 * Instantiated Touch keyword bean
 	 */
+	@Autowired
 	protected Touch touch;
 	
 	/**
