@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.tools.ant.types.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
@@ -449,13 +450,26 @@ public class MobileElement {
 	}
 	
 	@RobotKeyword
-	public void endEyesTest(){
+	@ArgumentNames({"message=NONE" })
+	public void checkResultWithBaseline(){
 		try{
-			TestResults testResults = applicationManagement.eyes.close(false);		
+//			TestResults testResults = applicationManagement.eyes.close(false);	
+//			if(!testResults.isPassed()){ 
+//				logging.info(String.format("Screen should be the same"));
+//				throw new ABTLibraryNonFatalException(
+//					String.format("Screen should be the same"));
+//			}
+			applicationManagement.eyes.close();
+		}
+		catch (Exception e){
+			logging.info(String.format("Screen should be the same"));
+			throw new ABTLibraryNonFatalException(
+				String.format("Screen should be the same"));
 		}
 		finally {
 			applicationManagement.eyes.abortIfNotClosed();
 		}
+
 	}
 
 	public void testApplitool() throws InterruptedException{
@@ -479,7 +493,7 @@ public class MobileElement {
 //			applicationManagement.eyes.abortIfNotClosed();
 //		}
 //		
-		endEyesTest();
+		//endEyesTest();
 		startEyesTest("Immo24", "TestImmo 2");
 		element.clickElement("android=text(\"Dismiss\")");
 		Thread.sleep(1000);
@@ -487,7 +501,7 @@ public class MobileElement {
 		Thread.sleep(2000);
 		
 		checkWindow("Menu Screen");
-		endEyesTest();
+		//endEyesTest();
 		
 //		applicationManagement.eyes.open(applicationManagement.browserManagement.getCurrentWebDriver(), "Immo24", "Test Element");
 //		WebElement test = (WebElement) driver2.findElement(By.className("android.widget.ImageButton"));
