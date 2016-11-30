@@ -193,7 +193,6 @@ public class MobileElement {
 	@RobotKeyword
 	@ArgumentNames({ "text" })
 	public void selectItemByText(String text) {
-		applicationManagement.scrollToExact(text).click();
 		element.elementFind("name="+text, true, true).get(0).click();
 //		if(applicationManagement.browserManagement.getCurrentPlatform().equalsIgnoreCase("android")){
 //			
