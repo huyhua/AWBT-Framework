@@ -219,17 +219,28 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 		return ((AppiumDriver<?>) browserManagement.getCurrentWebDriver())
 				.scrollToExact(text);
 	}
-
+	
+	
+	
+	/**
+	 * Enable applitool to run cloud server 
+	 * 
+	 * @param APIKey 
+	 * 				test
+	 * @param matchLevel 
+	 * 					test
+	 * @param deviceName 
+	 * 					test
+	 */
 	@RobotKeyword
-	@ArgumentNames({ "APIKey", "matchLevel", "deviceName" })
-	public void enableApplitool(String APIKey, String matchLevel,
-			String deviceName) {
-		eyes = new Eyes();
-		// eyes.setApiKey("Eyt18cF9exK4109txbzzE2ij0isWh8D2zFdts3vYVOhIg110");
-		eyes.setApiKey(APIKey);
-		eyes.setMatchLevel(MatchLevel.valueOf(matchLevel));
-		eyes.setHostOS(deviceName);
-
+	@ArgumentNames({"APIKey", "matchLevel", "deviceName"})
+	public void enableApplitool(String APIKey, String matchLevel, String deviceName){
+				eyes = new Eyes();
+				//eyes.setApiKey("Eyt18cF9exK4109txbzzE2ij0isWh8D2zFdts3vYVOhIg110");
+				eyes.setApiKey(APIKey);
+				eyes.setMatchLevel(MatchLevel.valueOf(matchLevel));
+				//eyes.setMatchLevel(MatchLevel.LAYOUT2);
+				eyes.setHostOS(deviceName);
 	}
 	
 	@RobotKeywordOverload
