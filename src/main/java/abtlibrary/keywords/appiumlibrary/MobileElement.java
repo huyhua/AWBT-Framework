@@ -49,8 +49,6 @@ public class MobileElement {
 	 */
 	@Autowired
 	protected Touch touch;
-	@Autowired
-	protected Touch touch;
 
 	/**
 	 * Instantiated Element keyword bean
@@ -278,7 +276,7 @@ public class MobileElement {
 					results.add(id);
 			});
 
-			applicationManagement.swipe(start.getX(), start.getY(), stop.getX(), stop.getY(), 1500);
+			touch.swipe(start.getX(), start.getY(), stop.getX(), stop.getY(), 1500);
 			itemOnScreen = element.elementFind(window, control, false, true);
 			String currentLastElement = itemOnScreen.get(itemOnScreen.size() - 1).getAttribute("name");
 			String previousLastElement = results.get(results.size() - 1);
@@ -289,6 +287,7 @@ public class MobileElement {
 			if (currentLastElement.equals(previousLastElement) && safeRetry++ == 2) {
 				break;
 			}
+		}
 			
 			List<String> finalResults = results.stream().distinct().collect(Collectors.toList());
 			return finalResults;
@@ -296,9 +295,6 @@ public class MobileElement {
 			logging.warn(e.getMessage());
 			throw e;
 		}
-
-		List<String> finalResults = results.stream().distinct().collect(Collectors.toList());
-		return finalResults;
 	}
 
 	public Point getCenter(WebElement el) {
@@ -526,14 +522,14 @@ public class MobileElement {
 
 	}
 
-	public void testApplitool() throws InterruptedException{
+	/*public void testApplitool() throws InterruptedException{
 		AndroidDriver<WebElement> driver = (AndroidDriver<WebElement>) applicationManagement.browserManagement.getCurrentWebDriver();
 		WebDriver driver2 = applicationManagement.browserManagement.getCurrentWebDriver();
 //		applicationManagement.eyes.open(applicationManagement.browserManagement.getCurrentWebDriver(), "Immo24", "TestImmo");
 //		applicationManagement.eyes.checkWindow("Popup Screen");
 		startEyesTest("Immo24", "TestImmo");
 		checkWindow("Popup Screen");
-		element.clickElement("android=text(\"English\")");
+		element.clickElement("","android=text(\"English\")");
 		Thread.sleep(1000);
 		checkWindow("Popup Screen 2");
 //		applicationManagement.eyes.checkWindow("Popup Screen 2");
@@ -549,9 +545,9 @@ public class MobileElement {
 //		
 		//endEyesTest();
 		startEyesTest("Immo24", "TestImmo 2");
-		element.clickElement("android=text(\"Dismiss\")");
+		element.clickElement("","android=text(\"Dismiss\")");
 		Thread.sleep(1000);
-		element.clickElement("content_desc=Navigate up");
+		element.clickElement("","content_desc=Navigate up");
 		Thread.sleep(2000);
 		
 		checkWindow("Menu Screen");
@@ -571,10 +567,10 @@ public class MobileElement {
 //
 		applicationManagement.closeApplication();
 		
+	
 		
 		
-		
-	}
+	}	*/
 	// ##############################
 	// Internal Methods
 	// ##############################

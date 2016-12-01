@@ -48,18 +48,18 @@ public class Touch extends RunOnFailureKeywordsAdapter {
 	}
 	
 	@RobotKeyword
-	@ArgumentNames({"locator"})
-	public void zoom(String locator){
+	@ArgumentNames({"window", "locator"})
+	public void zoom(String window, String locator){
 		MobileDriver driver = (MobileDriver) browserManagement.getCurrentWebDriver();
-		WebElement item = element.elementFind(locator, true, true).get(0);
+		WebElement item = element.elementFind(window, locator, true, true).get(0);
 		driver.zoom(item);
 	}
 	
 	@RobotKeyword
-	@ArgumentNames({"locator"})
-	public void longPress(String locator){
+	@ArgumentNames({"window", "locator"})
+	public void longPress(String window, String locator){
 		MobileDriver driver = (MobileDriver) browserManagement.getCurrentWebDriver();
-		WebElement item = element.elementFind(locator, true, true).get(0);
+		WebElement item = element.elementFind(window, locator, true, true).get(0);
 		TouchAction longPress = new TouchAction(driver).longPress(item);
 		longPress.perform();
 	}
