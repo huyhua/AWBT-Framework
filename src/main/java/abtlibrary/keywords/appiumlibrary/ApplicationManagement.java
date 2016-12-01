@@ -316,7 +316,7 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 					if (disposition == null
 							|| !disposition.contains("filename=\"")) {
 						// extracts file name from downloadVersion
-						appFileName = downloadVersion.title.substring(0, downloadVersion.title.indexOf(" ")) + "." + fileExtension;
+						appFileName = downloadVersion.title.substring(0, downloadVersion.title.indexOf(" ")) + "-"+ downloadVersion.version+ "." + fileExtension;
 					} else {
 						// extracts file name from header field
 						int index = disposition.indexOf("filename=\"");
@@ -325,6 +325,10 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 				}
 				File appFile = new File(appPath + File.separator + appFileName);
 				appFile.getParentFile().mkdirs();
+				
+				if(appFile.exists() && !appFile.isDirectory() && appFile.length() == downloadVersion.fileSize) { 
+				    return;
+				}
 				
 				ReadableByteChannel rbc = Channels.newChannel(con
 						.getInputStream());
