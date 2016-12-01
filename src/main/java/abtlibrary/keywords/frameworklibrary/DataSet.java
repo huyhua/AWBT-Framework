@@ -25,6 +25,9 @@ import abtlibrary.utils.Excel;
 @RobotKeywords
 public class DataSet extends RunOnFailureKeywordsAdapter {
 
+	@Autowired
+	Initialization init;
+	
 	/**
 	 * Instantiated OpenrationSysteam
 	 */
@@ -48,6 +51,10 @@ public class DataSet extends RunOnFailureKeywordsAdapter {
 	public static void main (String[] args){
 		DataSet ds = new DataSet();
 		ds.getCurrentDirectory();
+		
+		System.out.println(ds.getContentOfTestCase("/Users/mac/git/anisapp/Tests/BVT/LO01 - Verify Login.robot", "Verify functionality of Login with valid values"));
+		System.out.println(ds.getDataSet("account").get(2)[0]);
+		System.out.println(ds.getDatasetBlock("/Users/mac/git/anisapp/Tests/BVT/LO01 - Verify Login.robot", "Verify functionality of Login with valid values"));
 	}
 	@RobotKeyword
 	public void getCurrentDirectory(){
@@ -55,14 +62,14 @@ public class DataSet extends RunOnFailureKeywordsAdapter {
 	}
 	@RobotKeywordOverload
 	public List<String[]> getDataSet(String dataSet) {
-		return excel.getExcelSheet(Constant.datasetDir + "/" + dataSet + ".xlsx", "", 0, 0);
+		return excel.getExcelSheet(init.getDatasetDirectory() + "/" + dataSet + ".xlsx", "", 0, 0);
 	}
 
 	@RobotKeyword
 	@ArgumentNames({ "dataSet", "filter=NONE" })
 	public List<String[]> getDataSet(String dataSet, String filter) {
 		List<String[]> filterDataset = new ArrayList<String[]>();
-		List<String[]> dataset = excel.getExcelSheet(Constant.datasetDir + "/" + dataSet + ".xlsx", "", 0, 0);
+		List<String[]> dataset = excel.getExcelSheet(init.getDatasetDirectory() + "/" + dataSet + ".xlsx", "", 0, 0);
 		String[] headers = dataset.get(0);
 
 		// Get filter column index
@@ -170,21 +177,21 @@ public class DataSet extends RunOnFailureKeywordsAdapter {
 		int indexOfEndDataSet = -1;
 		List<String> dataSetBlock = new ArrayList<String>();
 		for (int i = 0; i < contentBlock.size(); i++) {
-			if (contentBlock.get(i).trim().startsWith("Use Dataset")) {
+			if (contentBlock.get(i).trim().startsWith("use data set")) {
 				indexOfUseDataSet = i;
 			}
-			if (contentBlock.get(i).trim().startsWith("End Dataset")) {
+			if (contentBlock.get(i).trim().startsWith("repeat for data set")) {
 				indexOfEndDataSet = i;
 				break;
 			}
 		}
 		if (indexOfUseDataSet == -1) {
-			logging.warn("Could not find keyword 'Use Dataset' in testcase.");
+			logging.warn("Could not find keyword 'use data set' in testcase.");
 		} else {
 			if (indexOfEndDataSet == -1) {
 				indexOfEndDataSet = contentBlock.size();
 				logging.warn(
-						"Could not find keyword 'End Dataset' in testcase. All keywords under 'Use Dataset' keyword will be looped.");
+						"Could not find keyword 'repeat for data set' in testcase. All keywords under 'use data set' keyword will be looped.");
 			}
 			dataSetBlock = contentBlock.subList(indexOfUseDataSet + 1, indexOfEndDataSet);
 

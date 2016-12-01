@@ -73,8 +73,8 @@ public class Waiting extends RunOnFailureKeywordsAdapter {
 
 			@Override
 			public boolean isFinished() {
-				return Boolean.TRUE.equals(((JavascriptExecutor) browserManagement.getCurrentWebDriver())
-						.executeScript(condition));
+				return Boolean.TRUE.equals(
+						((JavascriptExecutor) browserManagement.getCurrentWebDriver()).executeScript(condition));
 			}
 		});
 	}
@@ -188,387 +188,390 @@ public class Waiting extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilPageContainsElement(String condition) {
-		waitUntilPageContainsElement(condition, null);
+	public void waitUntilPageContainsElement(String window, String condition) {
+		waitUntilPageContainsElement(window, condition, null);
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilPageContainsElement(String condition, String timeout) {
-		waitUntilPageContainsElement(condition, timeout, null);
+	public void waitUntilPageContainsElement(String window, String condition, String timeout) {
+		waitUntilPageContainsElement(window, condition, timeout, null);
 	}
 
 	/**
-	 * Waits until the element identified by <b>locator</b> is found on the
+	 * Waits until the element identified by <b>control</b> is found on the
 	 * current page.<br>
 	 * <br>
 	 * Fails, if the timeout expires, before the element appears. <br>
 	 * <br>
-	 * See `Introduction` for details about locators and timeouts.<br>
+	 * See `Introduction` for details about controls and timeouts.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param control
+	 *            The control to locate the element.
 	 * @param timeout
 	 *            Default=NONE. Optional timeout interval.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "timeout=NONE", "message=NONE" })
-	public void waitUntilPageContainsElement(final String locator, String timeout, String message) {
+	@ArgumentNames({ "control", "timeout=NONE", "message=NONE" })
+	public void waitUntilPageContainsElement(String window, final String control, String timeout, String message) {
 		if (message == null) {
-			message = String.format("Element '%s' did not appear in <TIMEOUT>", locator);
+			message = String.format("Element '%s' did not appear in <TIMEOUT>", control);
 		}
 		waitUntil(timeout, message, new WaitUntilFunction() {
 
 			@Override
 			public boolean isFinished() {
-				return element.isElementPresent(locator);
+				return element.isElementPresent(window, control);
 			}
 		});
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilPageNotContainsElement(String locator) {
-		waitUntilPageNotContainsElement(locator, null);
+	public void waitUntilPageNotContainsElement(String window, String control) {
+		waitUntilPageNotContainsElement(window, control, null);
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilPageNotContainsElement(String locator, String timeout) {
-		waitUntilPageNotContainsElement(locator, timeout, null);
+	public void waitUntilPageNotContainsElement(String window, String control, String timeout) {
+		waitUntilPageNotContainsElement(window, control, timeout, null);
 	}
 
 	/**
-	 * Waits until the element identified by <b>locator</b> is not found on the
+	 * Waits until the element identified by <b>control</b> is not found on the
 	 * current page.<br>
 	 * <br>
 	 * Fails, if the timeout expires, before the element disappears. <br>
 	 * <br>
-	 * See `Introduction` for details about locators and timeouts.<br>
+	 * See `Introduction` for details about controls and timeouts.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param control
+	 *            The control to locate the element.
 	 * @param timeout
 	 *            Default=NONE. Optional timeout interval.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "timeout=NONE", "message=NONE" })
-	public void waitUntilPageNotContainsElement(final String locator, String timeout, String message) {
+	@ArgumentNames({ "control", "timeout=NONE", "message=NONE" })
+	public void waitUntilPageNotContainsElement(String window, final String control, String timeout, String message) {
 		if (message == null) {
-			message = String.format("Element '%s' did not disappear in <TIMEOUT>", locator);
+			message = String.format("Element '%s' did not disappear in <TIMEOUT>", control);
 		}
 		waitUntil(timeout, message, new WaitUntilFunction() {
 
 			@Override
 			public boolean isFinished() {
-				return !element.isElementPresent(locator);
+				return !element.isElementPresent(window, control);
 			}
 		});
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilPageDoesNotContainElement(String locator) {
-		waitUntilPageDoesNotContainElement(locator, null);
+	public void waitUntilPageDoesNotContainElement(String window, String control) {
+		waitUntilPageDoesNotContainElement(window, control, null);
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilPageDoesNotContainElement(String locator, String timeout) {
-		waitUntilPageDoesNotContainElement(locator, timeout, null);
+	public void waitUntilPageDoesNotContainElement(String window, String control, String timeout) {
+		waitUntilPageDoesNotContainElement(window, control, timeout, null);
 	}
 
 	/**
-	 * Waits until the element identified by <b>locator</b> is not found on the
+	 * Waits until the element identified by <b>control</b> is not found on the
 	 * current page.<br>
 	 * <br>
 	 * Fails, if the timeout expires, before the element disappears. <br>
 	 * <br>
-	 * See `Introduction` for details about locators and timeouts.<br>
+	 * See `Introduction` for details about controls and timeouts.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param control
+	 *            The control to locate the element.
 	 * @param timeout
 	 *            Default=NONE. Optional timeout interval.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "timeout=NONE", "message=NONE" })
-	public void waitUntilPageDoesNotContainElement(final String locator, String timeout, String message) {
-	    waitUntilPageNotContainsElement(locator, timeout, message);
+	@ArgumentNames({ "control", "timeout=NONE", "message=NONE" })
+	public void waitUntilPageDoesNotContainElement(String window, final String control, String timeout,
+			String message) {
+		waitUntilPageNotContainsElement(window, control, timeout, message);
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilElementIsVisible(String locator, String timeout) {
-		waitUntilElementIsVisible(locator, timeout, null);
+	public void waitUntilElementIsVisible(String window, String control, String timeout) {
+		waitUntilElementIsVisible(window, control, timeout, null);
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilElementIsVisible(String locator) {
-		waitUntilElementIsVisible(locator, null);
+	public void waitUntilElementIsVisible(String window, String control) {
+		waitUntilElementIsVisible(window, control, null);
 	}
 
 	/**
-	 * Waits until the element identified by <b>locator</b> is visible.<br>
+	 * Waits until the element identified by <b>control</b> is visible.<br>
 	 * <br>
 	 * Fails, if the timeout expires, before the element gets visible. <br>
 	 * <br>
-	 * See `Introduction` for details about locators and timeouts.<br>
+	 * See `Introduction` for details about controls and timeouts.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param control
+	 *            The control to locate the element.
 	 * @param timeout
 	 *            Default=NONE. Optional timeout interval.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "timeout=NONE", "message=NONE" })
-	public void waitUntilElementIsVisible(final String locator, String timeout, String message) {
+	@ArgumentNames({ "control", "timeout=NONE", "message=NONE" })
+	public void waitUntilElementIsVisible(String window, final String control, String timeout, String message) {
 		if (message == null) {
-			message = String.format("Element '%s' not visible in <TIMEOUT>", locator);
+			message = String.format("Element '%s' not visible in <TIMEOUT>", control);
 		}
 		waitUntil(timeout, message, new WaitUntilFunction() {
 
 			@Override
 			public boolean isFinished() {
-				return element.isVisible(locator);
+				return element.isVisible(window, control);
 			}
 		});
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilElementIsNotVisible(String locator, String timeout) {
-		waitUntilElementIsNotVisible(locator, timeout, null);
+	public void waitUntilElementIsNotVisible(String window, String control, String timeout) {
+		waitUntilElementIsNotVisible(window, control, timeout, null);
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilElementIsNotVisible(String locator) {
-		waitUntilElementIsNotVisible(locator, null);
+	public void waitUntilElementIsNotVisible(String window, String control) {
+		waitUntilElementIsNotVisible(window, control, null);
 	}
 
 	/**
-	 * Waits until the element identified by <b>locator</b> is not visible.<br>
+	 * Waits until the element identified by <b>control</b> is not visible.<br>
 	 * <br>
 	 * Fails, if the timeout expires, before the element gets invisible. <br>
 	 * <br>
-	 * See `Introduction` for details about locators and timeouts.<br>
+	 * See `Introduction` for details about controls and timeouts.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param control
+	 *            The control to locate the element.
 	 * @param timeout
 	 *            Default=NONE. Optional timeout interval.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "timeout=NONE", "message=NONE" })
-	public void waitUntilElementIsNotVisible(final String locator, String timeout, String message) {
+	@ArgumentNames({ "control", "timeout=NONE", "message=NONE" })
+	public void waitUntilElementIsNotVisible(String window, final String control, String timeout, String message) {
 		if (message == null) {
-			message = String.format("Element '%s' still visible in <TIMEOUT>", locator);
+			message = String.format("Element '%s' still visible in <TIMEOUT>", control);
 		}
 		waitUntil(timeout, message, new WaitUntilFunction() {
 
 			@Override
 			public boolean isFinished() {
-				return !element.isVisible(locator);
+				return !element.isVisible(window, control);
 			}
 		});
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilElementIsClickable(String locator) {
-		waitUntilElementIsClickable(locator, null, null);
+	public void waitUntilElementIsClickable(String window, String control) {
+		waitUntilElementIsClickable(window, control, null, null);
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilElementIsClickable(String locator, String timeout) {
-		waitUntilElementIsClickable(locator, timeout, null);
+	public void waitUntilElementIsClickable(String window, String control, String timeout) {
+		waitUntilElementIsClickable(window, control, timeout, null);
 	}
 
 	/**
-	 * Waits until the element identified by <b>locator</b> is clickable.<br>
+	 * Waits until the element identified by <b>control</b> is clickable.<br>
 	 * <br>
 	 * Fails, if the timeout expires, before the element gets clickable. <br>
 	 * <br>
-	 * See `Introduction` for details about locators and timeouts.<br>
+	 * See `Introduction` for details about controls and timeouts.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param control
+	 *            The control to locate the element.
 	 * @param timeout
 	 *            Default=NONE. Optional timeout interval.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "timeout=NONE", "message=NONE" })
-	public void waitUntilElementIsClickable(final String locator, String timeout, String message) {
+	@ArgumentNames({ "control", "timeout=NONE", "message=NONE" })
+	public void waitUntilElementIsClickable(String window, final String control, String timeout, String message) {
 		if (message == null) {
-			message = String.format("Element '%s' not clickable in <TIMEOUT>", locator);
+			message = String.format("Element '%s' not clickable in <TIMEOUT>", control);
 		}
 		waitUntil(timeout, message, new WaitUntilFunction() {
 
 			@Override
 			public boolean isFinished() {
-				return element.isClickable(locator);
+				return element.isClickable(window, control);
 			}
 		});
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilElementIsNotClickable(String locator, String timeout) {
-		waitUntilElementIsNotClickable(locator, timeout, null);
+	public void waitUntilElementIsNotClickable(String window, String control, String timeout) {
+		waitUntilElementIsNotClickable(window, control, timeout, null);
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilElementIsNotClickable(String locator) {
-		waitUntilElementIsNotClickable(locator, null);
+	public void waitUntilElementIsNotClickable(String window, String control) {
+		waitUntilElementIsNotClickable(window, control, null);
 	}
 
 	/**
-	 * Waits until the element identified by <b>locator</b> is not clickable.<br>
+	 * Waits until the element identified by <b>control</b> is not clickable.
+	 * <br>
 	 * <br>
 	 * Fails, if the timeout expires, before the element gets unclickable. <br>
 	 * <br>
-	 * See `Introduction` for details about locators and timeouts.<br>
+	 * See `Introduction` for details about controls and timeouts.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param control
+	 *            The control to locate the element.
 	 * @param timeout
 	 *            Default=NONE. Optional timeout interval.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "timeout=NONE", "message=NONE" })
-	public void waitUntilElementIsNotClickable(final String locator, String timeout, String message) {
+	@ArgumentNames({ "control", "timeout=NONE", "message=NONE" })
+	public void waitUntilElementIsNotClickable(String window, final String control, String timeout, String message) {
 		if (message == null) {
-			message = String.format("Element '%s' still clickable in <TIMEOUT>", locator);
+			message = String.format("Element '%s' still clickable in <TIMEOUT>", control);
 		}
 		waitUntil(timeout, message, new WaitUntilFunction() {
 
 			@Override
 			public boolean isFinished() {
-				return !element.isClickable(locator);
+				return !element.isClickable(window, control);
 			}
 		});
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilElementIsSuccessfullyClicked(String locator, String timeout) {
-		waitUntilElementIsSuccessfullyClicked(locator, timeout, null);
+	public void waitUntilElementIsSuccessfullyClicked(String window, String control, String timeout) {
+		waitUntilElementIsSuccessfullyClicked(window, control, timeout, null);
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilElementIsSuccessfullyClicked(String locator) {
-		waitUntilElementIsSuccessfullyClicked(locator, null);
+	public void waitUntilElementIsSuccessfullyClicked(String window, String control) {
+		waitUntilElementIsSuccessfullyClicked(window, control, null);
 	}
 
 	/**
-	 * Waits until the element identified by <b>locator</b> is sucessfully
+	 * Waits until the element identified by <b>control</b> is sucessfully
 	 * clicked on.<br>
 	 * <br>
 	 * Fails, if the timeout expires, before the element gets clicked on. <br>
 	 * <br>
-	 * See `Introduction` for details about locators and timeouts.<br>
+	 * See `Introduction` for details about controls and timeouts.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param control
+	 *            The control to locate the element.
 	 * @param timeout
 	 *            Default=NONE. Optional timeout interval.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "timeout=NONE", "message=NONE" })
-	public void waitUntilElementIsSuccessfullyClicked(final String locator, String timeout, String message) {
+	@ArgumentNames({ "control", "timeout=NONE", "message=NONE" })
+	public void waitUntilElementIsSuccessfullyClicked(String window, final String control, String timeout,
+			String message) {
 		if (message == null) {
-			message = String.format("Element '%s' not successfully clicked in <TIMEOUT>", locator);
+			message = String.format("Element '%s' not successfully clicked in <TIMEOUT>", control);
 		}
 		waitUntil(timeout, message, new WaitUntilFunction() {
 
 			@Override
 			public boolean isFinished() {
-				element.clickElement(locator);
+				element.click(window, control);
 				return true;
 			}
 		});
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilElementIsSelected(String locator, String timeout) {
-		waitUntilElementIsSelected(locator, timeout, null);
+	public void waitUntilElementIsSelected(String window, String control, String timeout) {
+		waitUntilElementIsSelected(window, control, timeout, null);
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilElementIsSelected(String locator) {
-		waitUntilElementIsSelected(locator, null);
+	public void waitUntilElementIsSelected(String window, String control) {
+		waitUntilElementIsSelected(window, control, null);
 	}
 
 	/**
-	 * Waits until the element identified by <b>locator</b> is selected.<br>
+	 * Waits until the element identified by <b>control</b> is selected.<br>
 	 * <br>
 	 * Fails, if the timeout expires, before the element gets selected. <br>
 	 * <br>
-	 * See `Introduction` for details about locators and timeouts.<br>
+	 * See `Introduction` for details about controls and timeouts.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param control
+	 *            The control to locate the element.
 	 * @param timeout
 	 *            Default=NONE. Optional timeout interval.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "timeout=NONE", "message=NONE" })
-	public void waitUntilElementIsSelected(final String locator, String timeout, String message) {
+	@ArgumentNames({ "control", "timeout=NONE", "message=NONE" })
+	public void waitUntilElementIsSelected(String window, final String control, String timeout, String message) {
 		if (message == null) {
-			message = String.format("Element '%s' not selected in <TIMEOUT>", locator);
+			message = String.format("Element '%s' not selected in <TIMEOUT>", control);
 		}
 		waitUntil(timeout, message, new WaitUntilFunction() {
 
 			@Override
 			public boolean isFinished() {
-				return element.isSelected(locator);
+				return element.isSelected(window, control);
 			}
 		});
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilElementIsNotSelected(String locator, String timeout) {
-		waitUntilElementIsNotSelected(locator, timeout, null);
+	public void waitUntilElementIsNotSelected(String window, String control, String timeout) {
+		waitUntilElementIsNotSelected(window, control, timeout, null);
 	}
 
 	@RobotKeywordOverload
-	public void waitUntilElementIsNotSelected(String locator) {
-		waitUntilElementIsNotSelected(locator, null);
+	public void waitUntilElementIsNotSelected(String window, String control) {
+		waitUntilElementIsNotSelected(window, control, null);
 	}
 
 	/**
-	 * Waits until the element identified by <b>locator</b> is not selected.<br>
+	 * Waits until the element identified by <b>control</b> is not selected.<br>
 	 * <br>
 	 * Fails, if the timeout expires, before the element gets unselected. <br>
 	 * <br>
-	 * See `Introduction` for details about locators and timeouts.<br>
+	 * See `Introduction` for details about controls and timeouts.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param control
+	 *            The control to locate the element.
 	 * @param timeout
 	 *            Default=NONE. Optional timeout interval.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "timeout=NONE", "message=NONE" })
-	public void waitUntilElementIsNotSelected(final String locator, String timeout, String message) {
+	@ArgumentNames({ "control", "timeout=NONE", "message=NONE" })
+	public void waitUntilElementIsNotSelected(String window, final String control, String timeout, String message) {
 		if (message == null) {
-			message = String.format("Element '%s' still selected in <TIMEOUT>", locator);
+			message = String.format("Element '%s' still selected in <TIMEOUT>", control);
 		}
 		waitUntil(timeout, message, new WaitUntilFunction() {
 
 			@Override
 			public boolean isFinished() {
-				return !element.isSelected(locator);
+				return !element.isSelected(window, control);
 			}
 		});
 	}

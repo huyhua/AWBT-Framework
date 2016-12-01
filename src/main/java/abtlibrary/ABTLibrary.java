@@ -11,6 +11,8 @@ import org.robotframework.javalib.annotation.Autowired;
 import org.robotframework.javalib.library.AnnotationLibrary;
 
 import abtlibrary.keywords.appiumlibrary.ApplicationManagement;
+import abtlibrary.keywords.appiumlibrary.KeyEvent;
+import abtlibrary.keywords.appiumlibrary.Touch;
 import abtlibrary.keywords.selenium2library.BrowserManagement;
 import abtlibrary.keywords.selenium2library.Cookie;
 import abtlibrary.keywords.selenium2library.Element;
@@ -23,27 +25,22 @@ import abtlibrary.keywords.selenium2library.SelectElement;
 import abtlibrary.keywords.selenium2library.TableElement;
 import abtlibrary.keywords.selenium2library.Waiting;
 import abtlibrary.utils.Javadoc2Libdoc;
-
 import abtlibrary.keywords.appiumlibrary.MobileElement;
 
 /**
- * ABTLibrary is a web testing library for the Robot Framework and was
- * originally written in Python. This is the Java port of the Selenium 2
- * (WebDriver) Python library for Robot Framework. It uses the Selenium 2
- * (WebDriver) libraries internally to control a web browser. See <a
- * href="http://seleniumhq.org/docs/03_webdriver.html">WebDriver</a> for more
- * information on Selenium 2 and WebDriver. It runs tests in a real browser
- * instance and should work with most modern browsers and can be used with the
- * Jython interpreter or any other Java application.<br>
+ * ABTLibrary is a built-in testing library and was written in Java.
+ * It is included the Selenium 2 (WebDriver) libraries internally to control a web browser
+ * and Appium libraries to control android and ios application. 
+ * <br>
  * <br>
  * <span style="font-size: 120%;"><b>Before running tests</b></span><br>
  * Prior to running test cases using ABTLibrary, the library must be
- * imported into your Robot Framework test suite (see importing section), and
- * the `Open Browser` keyword must be used to open a browser to the desired
- * location.<br>
+ * imported into your test suite (see importing section), and
+ * the `Open Browser` or `Open application` action must be used to open a browser/application
+ *  to the desired location.<br>
  * <br>
  * <span style="font-size: 120%;"><b>Locating elements</b></span><br>
- * All keywords in ABTLibrary that need to find an element on the page
+ * All actions in ABTLibrary that need to find an element on the page
  * take an locator argument.<br>
  * <br>
  * <b>Key attributes</b><br>
@@ -59,31 +56,37 @@ import abtlibrary.keywords.appiumlibrary.MobileElement;
  * </tr>
  * <tr>
  * <td>A</td>
- * <td>@id,@name,@href,text</td>
+ * <td>id,name,href,text</td>
  * </tr>
  * <tr>
  * <td>IMG</td>
- * <td>@id,@name,@src,@alt</td>
+ * <td>id,name,src,alt</td>
  * </tr>
  * <tr>
  * <td>INPUT</td>
- * <td>@id,@name,@value,@src</td>
+ * <td>id,name,value,src</td>
  * </tr>
  * <tr>
  * <td>BUTTON</td>
- * <td>@id,@name,@value,text</td>
+ * <td>id,name,value,text</td>
  * </tr>
  * <tr>
- * <td>*</td>
- * <td>@id,@name</td>
+ * <td>DEFAULT</td>
+ * <td>id,name</td>
  * </tr>
  * </table>
  * <br>
  * Example:
  * <table border="1" cellspacing="0" summary="">
  * <tr>
- * <td>Click Element</td>
- * <td>my_element</td>
+ * <td></td>
+ * <td>window</td>
+ * <td>control</td>
+ * </tr>
+ * <tr>
+ * <td>Click</td>
+ * <td>*</td>
+ * <td>my_control_attribute</td>
  * </tr>
  * </table>
  * <br>
@@ -457,6 +460,12 @@ public class ABTLibrary extends AnnotationLibrary {
 	@Autowired
 	protected MobileElement mobileElement;
 	
+	@Autowired
+	protected Touch touch;
+	
+	@Autowired
+	protected KeyEvent keyEvent;
+	
 	// ##############################
 	// Getter / Setter
 	// ##############################
@@ -516,6 +525,16 @@ public class ABTLibrary extends AnnotationLibrary {
 	public ApplicationManagement getApplicationManagement() {
 		return applicationManagement;
 	}
+	
+	public Touch getTouch() {
+		return touch;
+	}
+	
+	public KeyEvent getKeyEvent(){
+		return keyEvent;
+	}
+	
+	
 
 	// ##############################
 	// Public Methods

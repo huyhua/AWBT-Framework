@@ -1,5 +1,8 @@
 import org.robotframework.remoteserver.RemoteServer;
 
+import abtlibrary.keywords.appiumlibrary.MobileElement;
+import abtlibrary.keywords.selenium2library.Element;
+
 public class ABTLibrary extends abtlibrary.ABTLibrary {
 
 	public ABTLibrary(String timeout, String implicitWait, String runOnFailure) {
@@ -19,6 +22,7 @@ public class ABTLibrary extends abtlibrary.ABTLibrary {
 	}
 
 	public static void main(String[] args) throws Exception {
+		System.out.println("[INFO] Starting remote library server...");
 		int port = Integer.parseInt("8270");
 		RemoteServer.configureLogging();
 		RemoteServer server = new RemoteServer();

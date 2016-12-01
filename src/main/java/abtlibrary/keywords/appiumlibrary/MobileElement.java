@@ -1,12 +1,19 @@
 package abtlibrary.keywords.appiumlibrary;
 
+import io.appium.java_client.MobileBy;
+import io.appium.java_client.MobileDriver;
+import io.appium.java_client.TouchAction;
+import io.appium.java_client.android.AndroidDriver;
+
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.tools.ant.types.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -15,17 +22,19 @@ import org.robotframework.javalib.annotation.Autowired;
 import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
+import com.applitools.eyes.EyesException;
+import com.applitools.eyes.TestResults;
+
 import abtlibrary.ABTLibraryNonFatalException;
-import abtlibrary.keywords.selenium2library.BrowserManagement;
 import abtlibrary.keywords.selenium2library.Element;
 import abtlibrary.keywords.selenium2library.Logging;
 import abtlibrary.keywords.selenium2library.SelectElement;
-import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.MobileDriver;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
+
+import com.applitools.eyes.TestResults;
 
 @RobotKeywords
 public class MobileElement {
@@ -36,9 +45,11 @@ public class MobileElement {
 	protected ApplicationManagement applicationManagement;
 
 	/**
-	 * Instantiated BrowserManagement keyword bean
+	 * Instantiated Touch keyword bean
 	 */
-	
+	@Autowired
+	protected Touch touch;
+
 	/**
 	 * Instantiated Element keyword bean
 	 */
@@ -62,24 +73,46 @@ public class MobileElement {
 	// ##############################
 
 	/**
-	 * Returns the values in the select list view identified by <b>locator</b>.
+	 * Returns the values in the select listview identified by <b>locator</b>.
 	 * <br>
 	 * <br>
-	 * Get list keywords work on mobile's list view . Key attributes for get
-	 * lists are id and name. See `Introduction` for details about locators.<br>
+	 * Get list keywords work on mobile's list view.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the select list.
-	 * @return The select list values
+	 * @param window
+	 *            The interface contains listview. If listview has not defined
+	 *            in any interfaces, input "*" for window.
+	 * @param control
+	 *            The test name of select listview defined in <b>window</b>. If
+	 *            listview has not defined in any interfaces, input
+	 *            locator/xpath of listview. See `Introduction`.
+	 * @return The select list values <br>
+	 *         <b>Example</b>
+	 *         <table border="1" cellspacing="0" summary="">
+	 *         <tr>
+	 *         <td>&nbsp;</td>
+	 *         <td><b>window<b></td>
+	 *         <td><b>locator</b></td>
+	 *         </tr>
+	 *         <tr>
+	 *         <td>get listview labels</td>
+	 *         <td>my interface</td>
+	 *         <td>my listview</td>
+	 *         </tr>
+	 *         <tr>
+	 *         <td>get listview labels</td>
+	 *         <td>*</td>
+	 *         <td>//listview[@attribute="my_listview"]</td>
+	 *         </tr>
+	 *         </table>
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public List<String> getListViewLabels(String locator) {
-		WebElement listView = element.elementFind(locator, true, true).get(0);
+	@ArgumentNames({ "window", "control" })
+	public List<String> getListViewLabels(String window, String control) {
+		WebElement listView = element.elementFind(window, control, true, true).get(0);
 		List<WebElement> options = listView.findElements(By.xpath("//android.widget.TextView"));
 
 		if (options.size() == 0) {
-			throw new ABTLibraryNonFatalException(String.format("Listview '%s' does not have any options", locator));
+			throw new ABTLibraryNonFatalException(String.format("Listview '%s' does not have any options", control));
 		}
 
 		return selectElement.getLabelsForOptions(options);
@@ -94,21 +127,21 @@ public class MobileElement {
 	 * <br>
 	 * Select list keywords work on mobile's list view. Key attributes for
 	 * select lists are id and name. See `Introduction` for details about
-	 * locators.<br>
+	 * controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the list view.
+	 * @param control
+	 *            The control to locate the list view.
 	 * @param index
 	 *            The index of item selected (first item indexed by 0)
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "index" })
-	public void selectFromListViewByIndex(String locator, String index) {
-		WebElement listView = element.elementFind(locator, true, true).get(0);
+	@ArgumentNames({ "window", "control", "index" })
+	public void selectFromListViewByIndex(String window, String control, String index) {
+		WebElement listView = element.elementFind(window, control, true, true).get(0);
 		List<WebElement> options = listView.findElements(By.xpath("//*"));
 
 		if (options.size() == 0) {
-			throw new ABTLibraryNonFatalException(String.format("Listview '%s' does not have any options", locator));
+			throw new ABTLibraryNonFatalException(String.format("Listview '%s' does not have any options", control));
 		}
 
 		options.get(Integer.parseInt(index)).click();
@@ -117,19 +150,19 @@ public class MobileElement {
 	/**
 	 * Selects the tab by Name in tab menu identified by <b>locator</b> <br>
 	 * 
-	 * @param menuLocator
-	 *            locator to locate tab menu
+	 * @param menu
+	 *            control to locate tab menu
 	 * @param tabName
 	 *            name of tab
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "tab" })
-	public void selectTabByName(String menuLocator, String tabName) {
-		WebElement tabMenu = element.elementFind(menuLocator, true, true).get(0);
+	@ArgumentNames({ "window", "control", "tab" })
+	public void selectTabByName(String window, String menu, String tabName) {
+		WebElement tabMenu = element.elementFind(window, menu, true, true).get(0);
 		List<WebElement> childElements = tabMenu.findElements(By.xpath("//*[contains(@class,\"Tab\")]"));
 
 		if (childElements.size() == 0) {
-			throw new ABTLibraryNonFatalException(String.format("Menu '%s' does not have any tabs", menuLocator));
+			throw new ABTLibraryNonFatalException(String.format("Menu '%s' does not have any tabs", menu));
 		}
 
 		for (int i = 0; i < childElements.size(); i++) {
@@ -145,21 +178,49 @@ public class MobileElement {
 	}
 
 	/**
-	 * Selects the tab by Index in tab menu identified by <b>locator</b> <br>
+	 * Selects the tab by index in tab menu identified by <b>locator</b> <br>
 	 * 
-	 * @param menuLocator
-	 *            locator to locate tab menu
+	 * @param window
+	 *            The interface contains menu. If menu has not defined in any
+	 *            interfaces, input "*" for window.
+	 * @param control
+	 *            The test name of menu if menu has been defined in interface.
+	 *            If menu has not been defined in any interfaces, input
+	 *            locator/xpath of menu.
 	 * @param index
 	 *            the index of selected tab (first tab is indexed by 1)
+	 *            <table border="1" cellspacing="0" summary="">
+	 *            <tr>
+	 *            <td>&nbsp;</td>
+	 *            <td><b>window<b></td>
+	 *            <td><b>control</b></td>
+	 *            <td><b>index</b></td>
+	 *            </tr>
+	 *            <tr>
+	 *            <td>select tab by index</td>
+	 *            <td>my interface</td>
+	 *            <td>my menu</td>
+	 *            <td>1</td>
+	 *            </tr>
+	 *            <tr>
+	 *            <td>select tab by index</td>
+	 *            <td>*</td>
+	 *            <td>//menu[@attribute="my_menu"]</td>
+	 *            <td>2</td>
+	 *            </tr>
+	 *            </table>
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "tab" })
-	public void selectTabByIndex(String menuLocator, String index) {
-		WebElement tabMenu = element.elementFind(menuLocator, true, true).get(0);
+	@ArgumentNames({ "window", "control", "index" })
+	public void selectTabByIndex(String window, String control, String index) {
+		System.out.println(window);
+		;
+		WebElement tabMenu = element.elementFind(window, control, true, true).get(0);
+
 		List<WebElement> childElements = tabMenu.findElements(By.xpath("//*[contains(@class,\"Tab\")]"));
 
 		if (childElements.size() == 0) {
-			throw new ABTLibraryNonFatalException(String.format("Menu '%s' does not have any tabs", menuLocator));
+			throw new ABTLibraryNonFatalException(String.format("Menu '%s' does not have any tabs", control));
 		}
 
 		if (childElements.size() < Integer.parseInt(index) || Integer.parseInt(index) < 0) {
@@ -179,113 +240,127 @@ public class MobileElement {
 	@RobotKeyword
 	@ArgumentNames({ "text" })
 	public void selectItemByText(String text) {
-		applicationManagement.scrollToExact(text).click();
+		String locator = "text=" + text;
+		element.elementFind("", locator, true, true).get(0).click();
 	}
-	
-	
+
 	@RobotKeyword
-	@ArgumentNames({"locator"})
-	public List<String>	scrollAndGetItemNames(String locator){
-		List<String> results = new ArrayList<>();
-//		WebElement scrollable = element.elementFind(scrollableLocator, true, true).get(0);
+	@ArgumentNames({ "window", "control" })
+	public List<String> scrollAndGetItemNames(String window, String control) {
+		try {
+			List<String> results = new ArrayList<>();
+
+		// WebElement scrollable = element.elementFind(scrollablecontrol, true,
+		// true).get(0);
+
 		List<WebElement> itemOnScreen;
-		itemOnScreen = element.elementFind(locator, false, true);
-		
-		if(itemOnScreen.isEmpty()){
-			logging.warn(String.format("List with locator '%s' contains no item", locator));
+		itemOnScreen = element.elementFind(window, control, false, true);
+
+		if (itemOnScreen.isEmpty()) {
+			logging.warn(String.format("List with control '%s' contains no item", control));
 			throw new ABTLibraryNonFatalException();
 		}
-		
+
 		WebElement firstElement = itemOnScreen.get(0);
-		WebElement lastElement = itemOnScreen.get(itemOnScreen.size()-1);
-		
+		WebElement lastElement = itemOnScreen.get(itemOnScreen.size() - 1);
+
 		Point start = lastElement.getLocation();
 		Point stop = firstElement.getLocation();
-		
-		int safeRetry=0;
-		
-		while(true){
+
+		int safeRetry = 0;
+
+		while (true) {
 			itemOnScreen.forEach(item -> {
 				String id = item.getAttribute("name");
-				if(!id.equals(""))
+				if (!id.equals(""))
 					results.add(id);
 			});
-			
+
 			applicationManagement.swipe(start.getX(), start.getY(), stop.getX(), stop.getY(), 1500);
-			itemOnScreen = element.elementFind(locator, false, true);
-			String currentLastElement = itemOnScreen.get(itemOnScreen.size()-1).getAttribute("name");
-			String previousLastElement = results.get(results.size()-1);
-			if(!currentLastElement.equals(previousLastElement)){
+			itemOnScreen = element.elementFind(window, control, false, true);
+			String currentLastElement = itemOnScreen.get(itemOnScreen.size() - 1).getAttribute("name");
+			String previousLastElement = results.get(results.size() - 1);
+			if (!currentLastElement.equals(previousLastElement)) {
 				safeRetry = 0;
 			}
-			
-			if(currentLastElement.equals(previousLastElement) && safeRetry++ == 2){
+
+			if (currentLastElement.equals(previousLastElement) && safeRetry++ == 2) {
 				break;
 			}
+			
+			List<String> finalResults = results.stream().distinct().collect(Collectors.toList());
+			return finalResults;
+		} catch (Exception e) {
+			logging.warn(e.getMessage());
+			throw e;
 		}
-		
+
 		List<String> finalResults = results.stream().distinct().collect(Collectors.toList());
 		return finalResults;
 	}
-	
-	
-	
+
 	public Point getCenter(WebElement el) {
 
 		Point point = new Point(0, 0);
 		point = el.getLocation();
-//		 System.out.print("Location " + el.getLocation());
-//		 System.out.println();
-//		 System.out.print("height "+ el.getSize().getHeight());
-//		 System.out.print(" width "+ el.getSize().getWidth());
+		// System.out.print("Location " + el.getLocation());
+		// System.out.println();
+		// System.out.print("height "+ el.getSize().getHeight());
+		// System.out.print(" width "+ el.getSize().getWidth());
 		point.x = point.getX() + (el.getSize().getWidth() / 2);
 		point.y = point.getY() + (el.getSize().getHeight() / 2);
 
 		return point;
 	}
-	
+
 	public boolean checkElementVisibility(String id, long secondWait) {
-		WebDriverWait  wait = new WebDriverWait(applicationManagement.browserManagement.getCurrentWebDriver(),secondWait);
+		WebDriverWait wait = new WebDriverWait(applicationManagement.browserManagement.getCurrentWebDriver(),
+				secondWait);
 		try {
 			wait.until(ExpectedConditions.visibilityOfElementLocated((By.id(id))));
 		} catch (Exception e) {
-			//System.out.println("No element");
-			//Reporter.log(e.getMessage());
+			// System.out.println("No element");
+			// Reporter.log(e.getMessage());
 			return false;
 		}
 		return true;
 	}
-	
+
 	// convert when input data to app
-	public String convertFromUnicode(String target){
+	public String convertFromUnicode(String target) {
 		return Normalizer.normalize(target, Normalizer.Form.NFC);
 	}
-			
+
 	// convert when get data from app
-	public String convertToUnicode(String target){
+	public String convertToUnicode(String target) {
 		return Normalizer.normalize(target, Normalizer.Form.NFD);
 	}
-	
-	// scroll to text value at android 
-	public void androidScrollToText(String text){
+
+	// scroll to text value at android
+	public void androidScrollToText(String text) {
 		text = convertFromUnicode(text);
-		applicationManagement.browserManagement
-		.getCurrentWebDriver()
-		.findElement(MobileBy.AndroidUIAutomator("UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().textContains(\""+ text + "\"))")).click();
+		applicationManagement.browserManagement.getCurrentWebDriver()
+				.findElement(MobileBy.AndroidUIAutomator(
+						"UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().textContains(\""
+								+ text + "\"))"))
+				.click();
 	}
-	
+
 	/**
-	 * Get Favorite List 
+	 * Get Favorite List
 	 * 
 	 * @author Drake
 	 * @return list of item id of scroll list
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	@RobotKeyword
 	public List<String> getResultList() throws InterruptedException {
 		@SuppressWarnings("unchecked")
-		AndroidDriver<WebElement> driver = (AndroidDriver<WebElement>) applicationManagement.browserManagement.getCurrentWebDriver();
-		WebDriverWait driverwaitBase = new WebDriverWait(applicationManagement.browserManagement.getCurrentWebDriver(), 300);
+		AndroidDriver<WebElement> driver = (AndroidDriver<WebElement>) applicationManagement.browserManagement
+				.getCurrentWebDriver();
+		// WebDriverWait driverwaitBase = new
+		// WebDriverWait(applicationManagement.browserManagement.getCurrentWebDriver(),
+		// 300);
 		//
 		// List<String> favorList = new ArrayList<String>();
 		// if(platform.equalsIgnoreCase(Constants.PLATFORM_IOS)){
@@ -307,7 +382,7 @@ public class MobileElement {
 
 		List<String> lastList = new ArrayList<String>();
 		Thread.sleep(5000);
-		
+
 		boolean flag = true;
 		String breakItem = "";
 		// waitMsec(500);
@@ -318,39 +393,53 @@ public class MobileElement {
 				 * Drake : Specific elements to scroll for each application
 				 * 
 				 */
-				List<WebElement> listRealResult = driver.findElementsById("ch.immoscout24.ImmoScout24.alpha:id/cardViewIncluder");
-				List<WebElement> listValue = driver.findElementsByXPath("//*[@resource-id ='ch.immoscout24.ImmoScout24.alpha:id/recycleView']/android.widget.FrameLayout");
-				//List<WebElement> listResult = driver.findElementsById("ch.immoscout24.ImmoScout24.alpha:id/index_view");
+				List<WebElement> listRealResult = driver
+						.findElementsById("ch.immoscout24.ImmoScout24.alpha:id/cardViewIncluder");
+				List<WebElement> listValue = driver.findElementsByXPath(
+						"//*[@resource-id ='ch.immoscout24.ImmoScout24.alpha:id/recycleView']/android.widget.FrameLayout");
+				// List<WebElement> listResult =
+				// driver.findElementsById("ch.immoscout24.ImmoScout24.alpha:id/index_view");
 				List<WebElement> listScroll = driver.findElementsById("ch.immoscout24.ImmoScout24.alpha:id/view_pager");
-				
-//				List<WebElement> listRealResult = element.elementFind("id=ch.immoscout24.ImmoScout24.alpha:id/cardViewIncluder", false, true);
-//				List<WebElement> listValue = element.elementFind("//*[@resource-id ='ch.immoscout24.ImmoScout24.alpha:id/recycleView']/android.widget.FrameLayout", false, true);
-//				List<WebElement> listResult = element.elementFind("id=ch.immoscout24.ImmoScout24.alpha:id/index_view", false, true);
-//				List<WebElement> listScroll = element.elementFind("id=ch.immoscout24.ImmoScout24.alpha:id/image_view", false, true);
-				
-				TouchAction action = new TouchAction ((MobileDriver) applicationManagement.browserManagement.getCurrentWebDriver());
+
+				// List<WebElement> listRealResult =
+				// element.elementFind("id=ch.immoscout24.ImmoScout24.alpha:id/cardViewIncluder",
+				// false, true);
+				// List<WebElement> listValue =
+				// element.elementFind("//*[@resource-id
+				// ='ch.immoscout24.ImmoScout24.alpha:id/recycleView']/android.widget.FrameLayout",
+				// false, true);
+				// List<WebElement> listResult =
+				// element.elementFind("id=ch.immoscout24.ImmoScout24.alpha:id/index_view",
+				// false, true);
+				// List<WebElement> listScroll =
+				// element.elementFind("id=ch.immoscout24.ImmoScout24.alpha:id/image_view",
+				// false, true);
+
+				TouchAction action = new TouchAction(
+						(MobileDriver) applicationManagement.browserManagement.getCurrentWebDriver());
 				int listSize = listRealResult.size() - 1;
 				if (listSize == 0)
 					listSize = 1;
 
 				List<String> compareList = new ArrayList<String>();
-				for (int i = 0; i <= listSize - 1 ; i++) {
+				for (int i = 0; i <= listSize - 1; i++) {
 					compareList.add(listValue.get(i).getAttribute("name"));
 				}
-//				System.out.println("Last list " + lastList);
-//				System.out.println("compare list " + compareList);
+				// System.out.println("Last list " + lastList);
+				// System.out.println("compare list " + compareList);
 
-//				if(checkElementVisibility("ch.autoscout24.autoscout24.alpha:id/txtLoadingMessage",3)){
-//					 WebDriverWait driverwaitBase2 = new WebDriverWait(driver, 5);
-//					 driverwaitBase2.until(ExpectedConditions.invisibilityOfElementLocated(By.id("ch.autoscout24.autoscout24.alpha:id/txtLoadingMessage")));
-//				 //compareList.remove(0);
-//				 }
+				// this part is used to list has page break
+				// if(checkElementVisibility("ch.autoscout24.autoscout24.alpha:id/txtLoadingMessage",3)){
+				// WebDriverWait driverwaitBase2 = new WebDriverWait(driver, 5);
+				// driverwaitBase2.until(ExpectedConditions.invisibilityOfElementLocated(By.id("ch.autoscout24.autoscout24.alpha:id/txtLoadingMessage")));
+				// //compareList.remove(0);
+				// }
 
 				if (lastList.containsAll(compareList)) {
 					System.out.println("Duplicate");
 					flag = false;
 
-//					System.out.println("compare list " + compareList);
+					// System.out.println("compare list " + compareList);
 					resultList.add(listValue.get(listSize).getAttribute("name"));
 				} else {
 
@@ -365,20 +454,20 @@ public class MobileElement {
 					} else
 						resultList.addAll(compareList);
 
-//					System.out.println("Result list " + resultList);
+					// System.out.println("Result list " + resultList);
 
 					breakItem = listValue.get((listSize - 1)).getAttribute("name");
 
 					Thread.sleep(1000);
-					
-//					int scrHeight = driver.manage().window().getSize().height;
-//					int scrWidth = driver.manage().window().getSize().width;
-					
+
+					// int scrHeight =
+					// driver.manage().window().getSize().height;
+					// int scrWidth = driver.manage().window().getSize().width;
 
 					Point start = new Point(0, 0);
 					Point end = new Point(0, 0);
 					start.x = getCenter(listScroll.get(1)).x;
-					start.y = listScroll.get(listSize-1).getLocation().y;
+					start.y = listScroll.get(listSize - 1).getLocation().y;
 					end.x = getCenter(listScroll.get(0)).x;
 
 					action.longPress(start.x, start.y).moveTo(end.x, 130).release().perform();
@@ -396,6 +485,92 @@ public class MobileElement {
 		System.out.println("Result list size " + resultList.size());
 		return resultList;
 		// }
+	}
+	
+	@RobotKeyword
+	@ArgumentNames({"appName", "testName"})
+	public void startEyesTest(String appName, String testName){
+		applicationManagement.eyes.open(applicationManagement.browserManagement.getCurrentWebDriver(), appName, testName);
+		applicationManagement.eyes.setSaveNewTests(true);
+	}
+	
+	@RobotKeyword
+	@ArgumentNames({"desciption"})
+	public void checkWindow(String desciption){
+		applicationManagement.eyes.checkWindow(desciption);
+	}
+	
+	@RobotKeyword
+	@ArgumentNames({"message=NONE" })
+	public void checkResultWithBaseline(){
+		try{
+//			TestResults testResults = applicationManagement.eyes.close(false);	
+//			if(!testResults.isPassed()){ 
+//				logging.info(String.format("Screen should be the same"));
+//				throw new ABTLibraryNonFatalException(
+//					String.format("Screen should be the same"));
+//			}
+			applicationManagement.eyes.close();
+		}
+		catch (Exception e){
+			logging.info(String.format("Screen should be the same"));
+			throw new ABTLibraryNonFatalException(
+				String.format("Screen should be the same"));
+		}
+		finally {
+			applicationManagement.eyes.abortIfNotClosed();
+		}
+
+	}
+
+	public void testApplitool() throws InterruptedException{
+		AndroidDriver<WebElement> driver = (AndroidDriver<WebElement>) applicationManagement.browserManagement.getCurrentWebDriver();
+		WebDriver driver2 = applicationManagement.browserManagement.getCurrentWebDriver();
+//		applicationManagement.eyes.open(applicationManagement.browserManagement.getCurrentWebDriver(), "Immo24", "TestImmo");
+//		applicationManagement.eyes.checkWindow("Popup Screen");
+		startEyesTest("Immo24", "TestImmo");
+		checkWindow("Popup Screen");
+		element.clickElement("android=text(\"English\")");
+		Thread.sleep(1000);
+		checkWindow("Popup Screen 2");
+//		applicationManagement.eyes.checkWindow("Popup Screen 2");
+//		try{
+//			TestResults testResults = applicationManagement.eyes.close(false);		
+//			//applicationManagement.eyes.close();
+//		}catch (EyesException e){
+//			
+//		}
+//		finally {
+//			applicationManagement.eyes.abortIfNotClosed();
+//		}
+//		
+		//endEyesTest();
+		startEyesTest("Immo24", "TestImmo 2");
+		element.clickElement("android=text(\"Dismiss\")");
+		Thread.sleep(1000);
+		element.clickElement("content_desc=Navigate up");
+		Thread.sleep(2000);
+		
+		checkWindow("Menu Screen");
+		//endEyesTest();
+		
+//		applicationManagement.eyes.open(applicationManagement.browserManagement.getCurrentWebDriver(), "Immo24", "Test Element");
+//		WebElement test = (WebElement) driver2.findElement(By.className("android.widget.ImageButton"));
+//		//WebElement test = element.elementFind("content_desc=Navigate up)", true, true).get(0);
+//		//test.click();
+//		applicationManagement.eyes.checkRegion(test,10,"test");
+//		try{
+//			TestResults testResults = applicationManagement.eyes.close(false);		
+//		}
+//		finally {
+//			applicationManagement.eyes.abortIfNotClosed();
+//		}
+//
+		applicationManagement.closeApplication();
+		
+		
+		
+		
 	}
 	// ##############################
 	// Internal Methods
