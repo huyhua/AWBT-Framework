@@ -4,21 +4,37 @@ import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.robotframework.javalib.annotation.ArgumentNames;
 import org.robotframework.javalib.annotation.Autowired;
 import org.robotframework.javalib.annotation.RobotKeyword;
+import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
 import abtlibrary.ABTLibraryFatalException;
 import abtlibrary.RunOnFailureKeywordsAdapter;
 import abtlibrary.keywords.selenium2library.BrowserManagement;
 import abtlibrary.keywords.selenium2library.Logging;
+import abtlibrary.utils.HttpRequestUtils;
+
+import com.applitools.eyes.Eyes;
+import com.applitools.eyes.MatchLevel;
 
 @SuppressWarnings("deprecation")
 @RobotKeywords
@@ -36,6 +52,8 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	@Autowired
 	protected Logging logging;
 
+	protected Eyes eyes;
+
 	// ##############################
 	// Keywords
 	// ##############################
@@ -46,7 +64,8 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	@RobotKeyword
 	public void closeApplication() {
 		if (browserManagement.webDriverCache.getCurrentSessionId() != null) {
-			logging.debug(String.format("Closing application with session id %s",
+			logging.debug(String.format(
+					"Closing application with session id %s",
 					browserManagement.webDriverCache.getCurrentSessionId()));
 			browserManagement.webDriverCache.close();
 		}
@@ -132,9 +151,10 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	 * @return Session Id
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "remoteUrl", "alias", "appPath", "deviceName", "platformVersion" })
-	public String openApplication(String remoteUrl, String alias, String appPath, String deviceName,
-			String platformVersion) {
+	@ArgumentNames({ "remoteUrl", "alias", "appPath", "deviceName",
+			"platformVersion" })
+	public String openApplication(String remoteUrl, String alias,
+			String appPath, String deviceName, String platformVersion) {
 		WebDriver driver;
 		String platformName = appPath.contains(".apk") ? "Android" : "iOS";
 
@@ -143,24 +163,31 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 		cap.setCapability("platformName", platformName);
 		cap.setCapability("platformVersion", platformVersion);
 		cap.setCapability("deviceName", deviceName);
-		
 
 		try {
 			if (platformName.equals("Android")) {
 				driver = new AndroidDriver<>(new URL(remoteUrl), cap);
-				
-			} else{
+
+			} else {
 				cap.setCapability("autoAcceptAlerts", false);
 				driver = new IOSDriver<>(new URL(remoteUrl), cap);
 			}
 
-			String sessionId = browserManagement.webDriverCache.register(driver, alias, platformName);
-			logging.debug(String.format("Openning '%s' driver to base application '%s'", platformName, appPath));
-			driver.manage().timeouts().implicitlyWait((int) (browserManagement.implicitWait * 1000.0),
-					TimeUnit.MILLISECONDS);
+			String sessionId = browserManagement.webDriverCache.register(
+					driver, alias, platformName);
+			logging.debug(String.format(
+					"Openning '%s' driver to base application '%s'",
+					platformName, appPath));
+			driver.manage()
+					.timeouts()
+					.implicitlyWait(
+							(int) (browserManagement.implicitWait * 1000.0),
+							TimeUnit.MILLISECONDS);
 			return sessionId;
 		} catch (Throwable t) {
-			logging.warn(String.format("Openning '%s' driver to base application '%s' failed", platformName, appPath));
+			logging.warn(String.format(
+					"Openning '%s' driver to base application '%s' failed",
+					platformName, appPath));
 			throw new ABTLibraryFatalException(t);
 		}
 	}
@@ -172,9 +199,10 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	 *            specified text.
 	 */
 	@RobotKeyword
-	@ArgumentNames({"text"})
+	@ArgumentNames({ "text" })
 	public WebElement scrollTo(String text) {
-		return ((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).scrollTo(text);
+		return ((AppiumDriver<?>) browserManagement.getCurrentWebDriver())
+				.scrollTo(text);
 	}
 
 	/**
@@ -184,23 +212,194 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	 *            specified text.
 	 */
 	@RobotKeyword
-	@ArgumentNames({"text"})
+	@ArgumentNames({ "text" })
 	public WebElement scrollToExact(String text) {
-		return ((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).scrollToExact(text);
+		return ((AppiumDriver<?>) browserManagement.getCurrentWebDriver())
+				.scrollToExact(text);
 	}
 	
+	
+	
+	/**
+	 * Enable applitool to run cloud server 
+	 * 
+	 * @param APIKey 
+	 * 				test
+	 * @param matchLevel 
+	 * 					test
+	 * @param deviceName 
+	 * 					test
+	 */
 	@RobotKeyword
-	@ArgumentNames({"key"})
-	public void pressKeyCode(int key) {
-		((AndroidDriver<?>) browserManagement.getCurrentWebDriver()).pressKeyCode(key);
+	@ArgumentNames({"APIKey", "matchLevel", "deviceName"})
+	public void enableApplitool(String APIKey, String matchLevel, String deviceName){
+				eyes = new Eyes();
+				//eyes.setApiKey("Eyt18cF9exK4109txbzzE2ij0isWh8D2zFdts3vYVOhIg110");
+				eyes.setApiKey(APIKey);
+				eyes.setMatchLevel(MatchLevel.valueOf(matchLevel));
+				//eyes.setMatchLevel(MatchLevel.LAYOUT2);
+				eyes.setHostOS(deviceName);
 	}
 	
+	@RobotKeywordOverload
+	public void downloadFromHockeyApp(String appId){
+		downloadFromHockeyApp(appId, null);
+	}
+	
+	@RobotKeywordOverload
+	public void downloadFromHockeyApp(String appId, String versionId){
+		downloadFromHockeyApp(appId, versionId, null);
+	}
+	
+	@RobotKeywordOverload
+	public void downloadFromHockeyApp(String appId, String versionId, String appPath){
+		downloadFromHockeyApp(appId, versionId, appPath, null);
+	}
+
+	@RobotKeywordOverload
+	public void downloadFromHockeyApp(String appId, String versionId, String appPath, String appFileName){
+		downloadFromHockeyApp(appId, versionId, appPath, appFileName, null);
+	}
+	
+	/**
+	 * Fetch the app file from Hockeyapps using the <b>appId</b> and <b>versionId</b> <br>
+	 * <br>
+	 * 
+	 * @param appId
+	 *            The id of the app as specified in the manage page of HockeyApps
+	 * @param versionId
+	 *            Default=NONE. The absolute version id of the app, as seen in the "code" column on HockeyApps manage site. If empty get latest.
+	 * @param appPath
+	 *            Default=NONE. Location of the download app. If not specify it will be located in the target folder inside the project.
+	 * @param appFileName
+	 *            Default=NONE. Name of the app file. If not specified it will be the first word of the app title retrieved from HockeyApps.
+	 * @param apiToken
+	 *            Default=19c4f87dde6444e89388a33b1077624e. Optional apiKey.
+	 */
 	@RobotKeyword
-	@ArgumentNames({"startx", "starty", "endx", "endy", "duration"})
-	public void swipe(int startx,int starty,int endx,int endy,int duration){
-		((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).swipe(startx, starty, endx, endy, duration);
+	@ArgumentNames({ "appId", "versionId=NONE", "appPath=NONE", "appFileName=NONE","apiToken=19c4f87dde6444e89388a33b1077624e" })
+	public void downloadFromHockeyApp(String appId, String versionId, String appPath, String appFileName, String apiToken) {
+		FileOutputStream fos;
+		
+		if(apiToken == null || apiToken.isEmpty()){
+			apiToken = "19c4f87dde6444e89388a33b1077624e";
+		}
+		
+		HockeyAppVersionItem downloadVersion = getHockeyAppVersion(appId, versionId, apiToken);
+		
+		try {
+			String fileExtension = "";
+			if (appFileName == null || appFileName.isEmpty()){
+				if(downloadVersion.title.contains("Android")){
+					fileExtension = "apk";
+				}else{
+					fileExtension = "ipa";
+				}
+			}else{
+				fileExtension = appFileName.substring(appFileName.lastIndexOf(".") + 1);
+			}
+			
+			//Change the download link to direct download link that contains the actual file
+			String baseURL = downloadVersion.downloadURL.replace("/apps/", "/api/2/apps/") + "?format="+fileExtension+"&avtoken=" + apiToken;
+			HttpURLConnection con = (HttpURLConnection) new URL(baseURL).openConnection();
+			int responseCode = con.getResponseCode();
+			if (responseCode == HttpURLConnection.HTTP_OK) {
+				
+				// If appPath is not specified
+				if (appPath == null || appPath.isEmpty()) {
+					appPath = System.getProperty("user.dir") + File.separator + "target";
+				}
+				
+				// If filename is not specified
+				if (appFileName == null || appFileName.isEmpty()) {
+					String redirect = con.getURL().toString();
+					if (redirect == null) {
+						// extracts file name from downloadVersion
+						appFileName = downloadVersion.title.substring(0, downloadVersion.title.indexOf(" ")) + "-"+ downloadVersion.version+ "." + fileExtension;
+					} else {
+						// extracts file name from URL
+						int index = redirect.lastIndexOf("/");
+						appFileName = redirect.substring(index + 1);
+					}
+				}
+				File appFile = new File(appPath + File.separator + appFileName);
+				appFile.getParentFile().mkdirs();
+				
+				if(appFile.exists() && !appFile.isDirectory() && appFile.length() == downloadVersion.fileSize) { 
+				    return;
+				}
+				
+				ReadableByteChannel rbc = Channels.newChannel(con
+						.getInputStream());
+				fos = new FileOutputStream(appFile);
+				fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+				fos.close();
+				rbc.close();
+				
+				//check file size and log a warning if the size is different
+				if(appFile.length() != downloadVersion.fileSize){
+					logging.warn("App size different! Downloaded size is " + appFile.length() + ". Expected size is " + downloadVersion.fileSize);
+				}
+				
+			} else {
+				throw new ABTLibraryFatalException("No file to download. Server replied HTTP code: " + responseCode);
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	private HockeyAppVersionItem getHockeyAppVersion(String appId, String appVersion,
+			String apiToken) {
+		String request = "https://rink.hockeyapp.net/api/2/apps/" + appId
+				+ "/app_versions";
+
+		HashMap<String, String> headers = new HashMap<String, String>();
+		headers.put("X-HockeyAppToken", apiToken);
+
+		String jsonResponse = HttpRequestUtils.getResponse(request, "GET",
+				headers);
+		JSONObject doc = HttpRequestUtils.parseStringIntoJson(jsonResponse);
+		JSONArray arr = (JSONArray) doc.get("app_versions");
+		
+		//Get latest item if appVersion is empty
+		if(appVersion == null || appVersion.isEmpty()){
+			return new HockeyAppVersionItem((JSONObject) arr.get(0));
+		}
+		
+		Iterator<JSONObject> it = arr.iterator();
+		while (it.hasNext()) {
+			HockeyAppVersionItem item = new HockeyAppVersionItem(it.next());
+			if (item.version.equals(appVersion)) {
+				return item;
+			}
+		}
+		throw new ABTLibraryFatalException("Could not get download link. Probably app id or app version is not correct");
+	}
+	
+	protected static class HockeyAppVersionItem{
+		String version;
+		String shortVersion;
+		String title;
+		String id;
+		String appId;
+		String downloadURL;
+		Long fileSize;
+		
+		
+		public HockeyAppVersionItem(JSONObject item){
+			version = (String) item.get("version");
+			shortVersion = (String) item.get("shortversion");
+			title = (String) item.get("title");
+			id = ((Long) item.get("id")).toString();
+			appId = ((Long) item.get("app_id")).toString();
+			downloadURL = (String) item.get("download_url");
+			fileSize = (Long) item.get("appsize");
+		}
+	}
+
 	// ##############################
 	// Internal Methods
 	// ##############################
@@ -223,5 +422,5 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	 * logging.warn("Invalid desiredCapabilities: " +
 	 * desiredCapabilitiesString); } } } } return desiredCapabilities; }
 	 */
-	
+
 }

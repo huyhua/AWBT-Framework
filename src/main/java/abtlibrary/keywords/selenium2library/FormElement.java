@@ -970,7 +970,11 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	protected void inputTextIntoTextField(String window, String control, String text) {
 		WebElement webElement = element.elementFind(window, control, true, true).get(0);
 		webElement.clear();
+<<<<<<< HEAD
 		if (browsermanagement.getCurrentPlatform().equalsIgnoreCase("ios")) {
+=======
+		if(browsermanagement.getCurrentPlatform().equalsIgnoreCase("ios")){
+>>>>>>> branch 'master' of https://github.xmedia.ch/QANVG/ABTLibrary.git
 			((IOSElement) webElement).setValue(text);
 		} else {
 			webElement.sendKeys(text);

@@ -49,6 +49,8 @@ public class MobileElement {
 	 */
 	@Autowired
 	protected Touch touch;
+	@Autowired
+	protected Touch touch;
 
 	/**
 	 * Instantiated Element keyword bean
@@ -428,6 +430,7 @@ public class MobileElement {
 				// System.out.println("Last list " + lastList);
 				// System.out.println("compare list " + compareList);
 
+				// this part is used to list has page break
 				// this part is used to list has page break
 				// if(checkElementVisibility("ch.autoscout24.autoscout24.alpha:id/txtLoadingMessage",3)){
 				// WebDriverWait driverwaitBase2 = new WebDriverWait(driver, 5);
