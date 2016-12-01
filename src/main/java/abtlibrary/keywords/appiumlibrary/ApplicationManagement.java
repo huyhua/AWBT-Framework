@@ -5,13 +5,10 @@ import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
@@ -29,14 +26,14 @@ import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
-import com.applitools.eyes.Eyes;
-import com.applitools.eyes.MatchLevel;
-
 import abtlibrary.ABTLibraryFatalException;
 import abtlibrary.RunOnFailureKeywordsAdapter;
 import abtlibrary.keywords.selenium2library.BrowserManagement;
 import abtlibrary.keywords.selenium2library.Logging;
 import abtlibrary.utils.HttpRequestUtils;
+
+import com.applitools.eyes.Eyes;
+import com.applitools.eyes.MatchLevel;
 
 @SuppressWarnings("deprecation")
 @RobotKeywords
@@ -267,18 +264,22 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 			apiToken = "19c4f87dde6444e89388a33b1077624e";
 		}
 		
-		String unfilteredURL = getHockeyAppDownloadURL(appId, versionId, apiToken);
+		HockeyAppVersionItem downloadVersion = getHockeyAppVersion(appId, versionId, apiToken);
+		
 		try {
 			String fileExtension = "";
 			if (appFileName == null || appFileName.isEmpty()){
-				fileExtension = unfilteredURL.substring(unfilteredURL.lastIndexOf("/")+1);
+				if(downloadVersion.title.contains("Android")){
+					fileExtension = "apk";
+				}else{
+					fileExtension = "ipa";
+				}
 			}else{
 				fileExtension = appFileName.substring(appFileName.lastIndexOf(".") + 1);
 			}
 			
-			//Remove the sneaky /appExtension at the end and change download link so that it actually contains the file.
-			String filteredURL = unfilteredURL.substring(0,unfilteredURL.lastIndexOf("/")).replace("/apps/", "/api/2/apps/");
-			String baseURL = filteredURL + "?format="+fileExtension+"&avtoken=" + apiToken;
+			//Change the download link to direct download link that contains the actual file
+			String baseURL = downloadVersion.downloadURL.replace("/apps/", "/api/2/apps/") + "?format="+fileExtension+"&avtoken=" + apiToken;
 			HttpURLConnection con = (HttpURLConnection) new URL(baseURL).openConnection();
 			int responseCode = con.getResponseCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -294,9 +295,8 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 							.getHeaderField("Content-Disposition");
 					if (disposition == null
 							|| !disposition.contains("filename=\"")) {
-						// extracts file name from URL
-						appFileName = baseURL.substring(
-								baseURL.lastIndexOf("/") + 1, baseURL.length()) + fileExtension;
+						// extracts file name from downloadVersion
+						appFileName = downloadVersion.title.substring(0, downloadVersion.title.indexOf(" ")) + "." + fileExtension;
 					} else {
 						// extracts file name from header field
 						int index = disposition.indexOf("filename=\"");
@@ -305,12 +305,19 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 				}
 				File appFile = new File(appPath + File.separator + appFileName);
 				appFile.getParentFile().mkdirs();
+				
 				ReadableByteChannel rbc = Channels.newChannel(con
 						.getInputStream());
 				fos = new FileOutputStream(appFile);
 				fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 				fos.close();
 				rbc.close();
+				
+				//check file size and log a warning if the size is different
+				if(appFile.length() != downloadVersion.fileSize){
+					logging.warn("App size different! Downloaded size is " + appFile.length() + ". Expected size is " + downloadVersion.fileSize);
+				}
+				
 			} else {
 				throw new ABTLibraryFatalException("No file to download. Server replied HTTP code: " + responseCode);
 			}
@@ -319,8 +326,9 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 			e.printStackTrace();
 		}
 	}
-
-	private String getHockeyAppDownloadURL(String appId, String appVersion,
+	
+	@SuppressWarnings("unchecked")
+	private HockeyAppVersionItem getHockeyAppVersion(String appId, String appVersion,
 			String apiToken) {
 		String request = "https://rink.hockeyapp.net/api/2/apps/" + appId
 				+ "/app_versions";
@@ -332,19 +340,36 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 				headers);
 		JSONObject doc = HttpRequestUtils.parseStringIntoJson(jsonResponse);
 		JSONArray arr = (JSONArray) doc.get("app_versions");
+
 		Iterator<JSONObject> it = arr.iterator();
 		while (it.hasNext()) {
-			JSONObject item = it.next();
-			if (item.containsValue(appVersion)) {
-				if(((String)item.get("title")).contains("Android")){
-					return (String) item.get("download_url") + "/apk";
-				} else {
-					return (String) item.get("download_url") + "/ipa";
-				}
-				
+			HockeyAppVersionItem item = new HockeyAppVersionItem(it.next());
+			if (item.version.equals(appVersion)) {
+				return item;
 			}
 		}
 		throw new ABTLibraryFatalException("Could not get download link. Probably app id or app version is not correct");
+	}
+	
+	protected static class HockeyAppVersionItem{
+		String version;
+		String shortVersion;
+		String title;
+		String id;
+		String appId;
+		String downloadURL;
+		Long fileSize;
+		
+		
+		public HockeyAppVersionItem(JSONObject item){
+			version = (String) item.get("version");
+			shortVersion = (String) item.get("shortversion");
+			title = (String) item.get("title");
+			id = ((Long) item.get("id")).toString();
+			appId = ((Long) item.get("app_id")).toString();
+			downloadURL = (String) item.get("download_url");
+			fileSize = (Long) item.get("appsize");
+		}
 	}
 
 	// ##############################
