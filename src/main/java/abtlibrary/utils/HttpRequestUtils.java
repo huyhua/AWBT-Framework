@@ -20,16 +20,16 @@ public class HttpRequestUtils {
 			URL obj;
 			obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			// optional default is GET
+			con.setRequestMethod(method);
+
+			// add request header
+			for (Map.Entry<String, String> cursor : headers.entrySet()){
+				con.setRequestProperty(cursor.getKey(), cursor.getValue());
+			}
+			
 			int responseCode = con.getResponseCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
-				// optional default is GET
-				con.setRequestMethod(method);
-	
-				// add request header
-				for (Map.Entry<String, String> cursor : headers.entrySet()){
-					con.setRequestProperty(cursor.getKey(), cursor.getValue());
-				}
-	
 				BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 				String inputLine;
 	
@@ -38,7 +38,7 @@ public class HttpRequestUtils {
 				}
 				in.close();
 			}else{
-				throw new ABTLibraryFatalException("Request to:" + url + " failed with code "+ responseCode);
+				throw new ABTLibraryFatalException("Request to:" + url + " failed with message "+ con.getResponseMessage());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
