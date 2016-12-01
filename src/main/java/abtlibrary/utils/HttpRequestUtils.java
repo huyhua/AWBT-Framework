@@ -10,6 +10,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import abtlibrary.ABTLibraryFatalException;
+
 public class HttpRequestUtils {
 	public static String getResponse(String url, String method, Map<String, String> headers) {
 		StringBuffer response = new StringBuffer();
@@ -18,22 +20,26 @@ public class HttpRequestUtils {
 			URL obj;
 			obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-			// optional default is GET
-			con.setRequestMethod(method);
-
-			// add request header
-			for (Map.Entry<String, String> cursor : headers.entrySet()){
-				con.setRequestProperty(cursor.getKey(), cursor.getValue());
+			int responseCode = con.getResponseCode();
+			if (responseCode == HttpURLConnection.HTTP_OK) {
+				// optional default is GET
+				con.setRequestMethod(method);
+	
+				// add request header
+				for (Map.Entry<String, String> cursor : headers.entrySet()){
+					con.setRequestProperty(cursor.getKey(), cursor.getValue());
+				}
+	
+				BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+				String inputLine;
+	
+				while ((inputLine = in.readLine()) != null) {
+					response.append(inputLine);
+				}
+				in.close();
+			}else{
+				throw new ABTLibraryFatalException("Request to:" + url + " failed with code "+ responseCode);
 			}
-
-			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-			String inputLine;
-
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			}
-			in.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

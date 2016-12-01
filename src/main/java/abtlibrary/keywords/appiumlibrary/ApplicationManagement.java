@@ -244,31 +244,29 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	}
 	
 	@RobotKeywordOverload
-	@ArgumentNames({ "appId", "versionId"})
 	public void downloadFromHockeyApp(String appId, String versionId){
-		
-		String defaultAPIToken = "19c4f87dde6444e89388a33b1077624e";
-		downloadFromHockeyApp(appId, versionId, defaultAPIToken);
+		downloadFromHockeyApp(appId, versionId, null);
 	}
 	
 	@RobotKeywordOverload
-	@ArgumentNames({ "appId", "versionId","apiToken=19c4f87dde6444e89388a33b1077624e"})
-	public void downloadFromHockeyApp(String appId, String versionId, String apiToken){
-		downloadFromHockeyApp(appId, versionId, apiToken, null);
+	public void downloadFromHockeyApp(String appId, String versionId, String appPath){
+		downloadFromHockeyApp(appId, versionId, appPath, null);
 	}
 
 	@RobotKeywordOverload
-	@ArgumentNames({ "appId", "versionId","apiToken=19c4f87dde6444e89388a33b1077624e", "appPath=NONE"})
-	public void downloadFromHockeyApp(String appId, String versionId,
-			String apiToken, String appPath){
-		downloadFromHockeyApp(appId, versionId, apiToken, appPath, null);
+	public void downloadFromHockeyApp(String appId, String versionId, String appPath, String appFileName){
+		downloadFromHockeyApp(appId, versionId, appPath, appFileName, null);
 	}
 	
 	@RobotKeyword
-	@ArgumentNames({ "appId", "versionId","apiToken=19c4f87dde6444e89388a33b1077624e", "appPath=NONE", "appFileName=NONE" })
-	public void downloadFromHockeyApp(String appId, String versionId,
-			String apiToken, String appPath, String appFileName) {
+	@ArgumentNames({ "appId", "versionId", "appPath=NONE", "appFileName=NONE","apiToken=19c4f87dde6444e89388a33b1077624e" })
+	public void downloadFromHockeyApp(String appId, String versionId, String appPath, String appFileName, String apiToken) {
 		FileOutputStream fos;
+		
+		if(apiToken == null || apiToken.isEmpty()){
+			apiToken = "19c4f87dde6444e89388a33b1077624e";
+		}
+		
 		String unfilteredURL = getHockeyAppDownloadURL(appId, versionId, apiToken);
 		try {
 			String fileExtension = "";
@@ -280,11 +278,8 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 			
 			//Remove the sneaky /appExtension at the end and change download link so that it actually contains the file.
 			String filteredURL = unfilteredURL.substring(0,unfilteredURL.lastIndexOf("/")).replace("/apps/", "/api/2/apps/");
-			
 			String baseURL = filteredURL + "?format="+fileExtension+"&avtoken=" + apiToken;
-			System.out.println(baseURL);
 			HttpURLConnection con = (HttpURLConnection) new URL(baseURL).openConnection();
-
 			int responseCode = con.getResponseCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
 				
@@ -317,7 +312,7 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 				fos.close();
 				rbc.close();
 			} else {
-				System.out.println("No file to download. Server replied HTTP code: " + responseCode);
+				throw new ABTLibraryFatalException("No file to download. Server replied HTTP code: " + responseCode);
 			}
 
 		} catch (IOException e) {
@@ -349,8 +344,7 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 				
 			}
 		}
-
-		return null;
+		throw new ABTLibraryFatalException("Could not get download link. Probably app id or app version is not correct");
 	}
 
 	// ##############################
