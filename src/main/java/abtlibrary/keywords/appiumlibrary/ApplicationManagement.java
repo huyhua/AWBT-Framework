@@ -241,6 +241,11 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	}
 	
 	@RobotKeywordOverload
+	public void downloadFromHockeyApp(String appId){
+		downloadFromHockeyApp(appId, null);
+	}
+	
+	@RobotKeywordOverload
 	public void downloadFromHockeyApp(String appId, String versionId){
 		downloadFromHockeyApp(appId, versionId, null);
 	}
@@ -255,8 +260,23 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 		downloadFromHockeyApp(appId, versionId, appPath, appFileName, null);
 	}
 	
+	/**
+	 * Fetch the app file from Hockeyapps using the <b>appId</b> and <b>versionId</b> <br>
+	 * <br>
+	 * 
+	 * @param appId
+	 *            The id of the app as specified in the manage page of HockeyApps
+	 * @param versionId
+	 *            Default=NONE. The absolute version id of the app, as seen in the "code" column on HockeyApps manage site. If empty get latest.
+	 * @param appPath
+	 *            Default=NONE. Location of the download app. If not specify it will be located in the target folder inside the project.
+	 * @param appFileName
+	 *            Default=NONE. Name of the app file. If not specified it will be the first word of the app title retrieved from HockeyApps.
+	 * @param apiToken
+	 *            Default=19c4f87dde6444e89388a33b1077624e. Optional apiKey.
+	 */
 	@RobotKeyword
-	@ArgumentNames({ "appId", "versionId", "appPath=NONE", "appFileName=NONE","apiToken=19c4f87dde6444e89388a33b1077624e" })
+	@ArgumentNames({ "appId", "versionId=NONE", "appPath=NONE", "appFileName=NONE","apiToken=19c4f87dde6444e89388a33b1077624e" })
 	public void downloadFromHockeyApp(String appId, String versionId, String appPath, String appFileName, String apiToken) {
 		FileOutputStream fos;
 		
@@ -340,7 +360,12 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 				headers);
 		JSONObject doc = HttpRequestUtils.parseStringIntoJson(jsonResponse);
 		JSONArray arr = (JSONArray) doc.get("app_versions");
-
+		
+		//Get latest item if appVersion is empty
+		if(appVersion == null || appVersion.isEmpty()){
+			return new HockeyAppVersionItem((JSONObject) arr.get(0));
+		}
+		
 		Iterator<JSONObject> it = arr.iterator();
 		while (it.hasNext()) {
 			HockeyAppVersionItem item = new HockeyAppVersionItem(it.next());
