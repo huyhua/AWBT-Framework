@@ -13,6 +13,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import org.json.simple.JSONArray;
@@ -311,16 +312,14 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 				
 				// If filename is not specified
 				if (appFileName == null || appFileName.isEmpty()) {
-					String disposition = con
-							.getHeaderField("Content-Disposition");
-					if (disposition == null
-							|| !disposition.contains("filename=\"")) {
+					String redirect = con.getURL().toString();
+					if (redirect == null) {
 						// extracts file name from downloadVersion
 						appFileName = downloadVersion.title.substring(0, downloadVersion.title.indexOf(" ")) + "-"+ downloadVersion.version+ "." + fileExtension;
 					} else {
-						// extracts file name from header field
-						int index = disposition.indexOf("filename=\"");
-						appFileName = disposition.substring(index + 10, disposition.length() - 1);
+						// extracts file name from URL
+						int index = redirect.lastIndexOf("/");
+						appFileName = redirect.substring(index + 1);
 					}
 				}
 				File appFile = new File(appPath + File.separator + appFileName);
