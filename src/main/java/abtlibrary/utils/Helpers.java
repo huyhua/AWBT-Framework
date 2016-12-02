@@ -1,13 +1,5 @@
 package abtlibrary.utils;
 
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileBy;
-import io.appium.java_client.MobileElement;
-import io.appium.java_client.SwipeElementDirection;
-import io.appium.java_client.TouchAction;
-import io.appium.java_client.android.AndroidElement;
-import io.appium.java_client.ios.IOSElement;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,14 +8,20 @@ import java.util.function.Consumer;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileBy;
+import io.appium.java_client.MobileElement;
+import io.appium.java_client.SwipeElementDirection;
+import io.appium.java_client.TouchAction;
+import io.appium.java_client.android.AndroidElement;
+import io.appium.java_client.ios.IOSElement;
 
 public abstract class Helpers {
 

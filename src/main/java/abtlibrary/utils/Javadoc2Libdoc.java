@@ -37,6 +37,7 @@ public class Javadoc2Libdoc {
 	}
 
 	public String getKeywordDocumentation(String keywordName) {
+		System.out.println(keywordName);
 		return keywordDocumentationMap.get(keywordName);
 	}
 
@@ -67,6 +68,7 @@ public class Javadoc2Libdoc {
 				for (Method methodNode : classNode.getMethod()) {
 					for (AnnotationInstance annotationInstanceNode : methodNode.getAnnotation()) {
 						if (annotationInstanceNode.getName().equals("RobotKeyword")) {
+							System.out.println("[INFO] Parsing " + methodNode.getName() + " to Keyword...");
 							keywordDocumentation.put(methodNode.getName(), formatComment(methodNode));
 							break;	
 						}
@@ -74,6 +76,8 @@ public class Javadoc2Libdoc {
 				}
 			}
 		}
+		
+		System.out.println("[INFO] All keywords are parsed successfully!");
 		return keywordDocumentation;
 	}
 

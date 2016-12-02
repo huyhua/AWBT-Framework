@@ -17,8 +17,7 @@ import abtlibrary.ABTLibraryNonFatalException;
 
 @RobotKeywords
 public class FormElement extends RunOnFailureKeywordsAdapter {
-	
-	
+
 	@Autowired
 	protected BrowserManagement browsermanagement;
 
@@ -40,232 +39,259 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 
 	@RobotKeywordOverload
 	public void submitForm() {
-		submitForm(null);
+		submitForm("", null);
 	}
 
 	/**
-	 * Submit the form identified by <b>locator</b>.<br>
+	 * Submit the form identified by <b>control</b>.<br>
 	 * <br>
-	 * If the locator is empty, the first form in the page will be
-	 * submitted.<br>
+	 * If the control is empty, the first form in the page will be submitted.
+	 * <br>
 	 * <br>
 	 * Key attributes for forms are id and name. See `Introduction` for details
-	 * about locators.<br>
+	 * about controls.<br>
 	 * 
-	 * @param locator
-	 *            Default=NONE. The locator to locate the form.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            Default=NONE. The control to locate the form.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator=NONE" })
-	public void submitForm(String locator) {
-		logging.info(String.format("Submitting form '%s'.", locator));
-		if (locator == null) {
-			locator = "xpath=//form";
+	@ArgumentNames({ "window", "control=NONE" })
+	public void submitForm(String window, String control) {
+		logging.info(String.format("Submitting form '%s'.", control));
+		if (control == null) {
+			control = "xpath=//form";
 		}
-		List<WebElement> webElements = element.elementFind(locator, true, true, "form");
+		List<WebElement> webElements = element.elementFind(window, control, true, true, "form");
 		webElements.get(0).submit();
 	}
 
 	/**
-	 * Verify the checkbox identified by <b>locator</b> is selected/checked.<br>
+	 * Verify the checkbox identified by <b>control</b> is selected/checked.<br>
 	 * <br>
 	 * Key attributes for checkboxes are id and name. See `Introduction` for
-	 * details about locators.<br>
+	 * details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the checkbox.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the checkbox.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void checkboxShouldBeSelected(String locator) {
-		logging.info(String.format("Verifying checkbox '%s' is selected.", locator));
-		WebElement element = getCheckbox(locator);
+	@ArgumentNames({ "window", "control" })
+	public void checkCheckboxSelected(String window, String control) {
+		logging.info(String.format("Verifying checkbox '%s' is selected.", control));
+		WebElement element = getCheckbox(window, control);
 		if (!element.isSelected()) {
-			throw new ABTLibraryNonFatalException(String.format("Checkbox '%s' should have been selected.", locator));
+			throw new ABTLibraryNonFatalException(String.format("Checkbox '%s' should have been selected.", control));
 		}
 	}
 
 	/**
-	 * Verify the checkbox identified by <b>locator</b> is not
-	 * selected/checked.<br>
+	 * Verify the checkbox identified by <b>control</b> is not selected/checked.
+	 * <br>
 	 * <br>
 	 * Key attributes for checkboxes are id and name. See `Introduction` for
-	 * details about locators.<br>
+	 * details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the checkbox.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the checkbox.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void checkboxShouldNotBeSelected(String locator) {
-		logging.info(String.format("Verifying checkbox '%s' is selected.", locator));
-		WebElement element = getCheckbox(locator);
+	@ArgumentNames({ "window", "control" })
+	public void checkCheckboxNotSelected(String window, String control) {
+		logging.info(String.format("Verifying checkbox '%s' is selected.", control));
+		WebElement element = getCheckbox(window, control);
 		if (element.isSelected()) {
 			throw new ABTLibraryNonFatalException(
-					String.format("Checkbox '%s' should not have been selected.", locator));
+					String.format("Checkbox '%s' should not have been selected.", control));
 		}
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldContainCheckbox(String locator) {
-		pageShouldContainCheckbox(locator, "");
+	public void checkPageContainsCheckbox(String window, String control) {
+		checkPageContainsCheckbox(window, control, "");
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldContainCheckbox(String locator, String message) {
-		pageShouldContainCheckbox(locator, message, "INFO");
+	public void checkPageContainsCheckbox(String window, String control, String message) {
+		checkPageContainsCheckbox(window, control, message, "INFO");
 	}
 
 	/**
-	 * Verify the checkbox identified by <b>locator</b> is found on the current
+	 * Verify the checkbox identified by <b>control</b> is found on the current
 	 * page.<br>
 	 * <br>
 	 * Key attributes for checkboxes are id and name. See `Introduction` for
-	 * details about log levels and locators.<br>
+	 * details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the checkbox.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the checkbox.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * @param logLevel
 	 *            Default=INFO. Optional log level.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE", "logLevel=INFO" })
-	public void pageShouldContainCheckbox(String locator, String message, String logLevel) {
-		element.pageShouldContainElement(locator, "checkbox", message, logLevel);
+	@ArgumentNames({ "window", "control", "message=NONE", "logLevel=INFO" })
+	public void checkPageContainsCheckbox(String window, String control, String message, String logLevel) {
+		element.checkPageContainsControl(window, control, "checkbox", message, logLevel);
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldNotContainCheckbox(String locator) {
-		pageShouldNotContainCheckbox(locator, "");
+	public void checkPageNotContainCheckbox(String window, String control) {
+		checkPageNotContainCheckbox(window, control, "");
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldNotContainCheckbox(String locator, String message) {
-		pageShouldNotContainCheckbox(locator, message, "INFO");
+	public void checkPageNotContainCheckbox(String window, String control, String message) {
+		checkPageNotContainCheckbox(window, control, message, "INFO");
 	}
 
 	/**
-	 * Verify the checkbox identified by <b>locator</b> is not found on the
+	 * Verify the checkbox identified by <b>control</b> is not found on the
 	 * current page.<br>
 	 * <br>
 	 * Key attributes for checkboxes are id and name. See `Introduction` for
-	 * details about log levels and locators.<br>
+	 * details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the checkbox.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the checkbox.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * @param logLevel
 	 *            Default=INFO. Optional log level.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE", "logLevel=INFO" })
-	public void pageShouldNotContainCheckbox(String locator, String message, String logLevel) {
-		element.pageShouldNotContainElement(locator, "checkbox", message, logLevel);
+	@ArgumentNames({ "window", "control", "message=NONE", "logLevel=INFO" })
+	public void checkPageNotContainCheckbox(String window, String control, String message, String logLevel) {
+		element.checkPageNotContainControl(window, control, "checkbox", message, logLevel);
 	}
 
 	/**
-	 * Select the checkbox identified by <b>locator</b>.<br>
+	 * Select the checkbox identified by <b>control</b>.<br>
 	 * <br>
 	 * Does nothing, if the checkbox is already selected.<br>
 	 * <br>
 	 * Key attributes for checkboxes are id and name. See `Introduction` for
-	 * details about locators.<br>
+	 * details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the checkbox.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the checkbox.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void selectCheckbox(String locator) {
-		logging.info(String.format("Selecting checkbox '%s'.", locator));
-		WebElement element = getCheckbox(locator);
+	@ArgumentNames({ "window", "control" })
+	public void selectCheckbox(String window, String control) {
+		logging.info(String.format("Selecting checkbox '%s'.", control));
+		WebElement element = getCheckbox(window, control);
 		if (!element.isSelected()) {
 			element.click();
 		}
 	}
 
 	/**
-	 * Unselect the checkbox identified by <b>locator</b>.<br>
+	 * Unselect the checkbox identified by <b>control</b>.<br>
 	 * <br>
 	 * Does nothing, if the checkbox is not selected.<br>
 	 * <br>
 	 * Key attributes for checkboxes are id and name. See `Introduction` for
-	 * details about locators.<br>
+	 * details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the checkbox.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the checkbox.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void unselectCheckbox(String locator) {
-		logging.info(String.format("Selecting checkbox '%s'.", locator));
-		WebElement element = getCheckbox(locator);
+	@ArgumentNames({ "window", "control" })
+	public void unselectCheckbox(String window, String control) {
+		logging.info(String.format("Selecting checkbox '%s'.", control));
+		WebElement element = getCheckbox(window, control);
 		if (element.isSelected()) {
 			element.click();
 		}
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldContainRadioButton(String locator) {
-		pageShouldContainRadioButton(locator, "");
+	public void checkPageContainsRadioButton(String window, String control) {
+		checkPageContainsRadioButton(window, control, "");
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldContainRadioButton(String locator, String message) {
-		pageShouldContainRadioButton(locator, message, "INFO");
+	public void checkPageContainsRadioButton(String window, String control, String message) {
+		checkPageContainsRadioButton(window, control, message, "INFO");
 	}
 
 	/**
-	 * Verify the radio button identified by <b>locator</b> is found on the
+	 * Verify the radio button identified by <b>control</b> is found on the
 	 * current page.<br>
 	 * <br>
 	 * Key attributes for radio buttons are id and name. See `Introduction` for
-	 * details about log levels and locators.<br>
+	 * details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the radio button.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the radio button.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * @param logLevel
 	 *            Default=INFO. Optional log level.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE", "logLevel=INFO" })
-	public void pageShouldContainRadioButton(String locator, String message, String logLevel) {
-		element.pageShouldContainElement(locator, "radio button", message, logLevel);
+	@ArgumentNames({ "window", "control", "message=NONE", "logLevel=INFO" })
+	public void checkPageContainsRadioButton(String window, String control, String message, String logLevel) {
+		element.checkPageContainsControl(window, control, "radio button", message, logLevel);
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldNotContainRadioButton(String locator) {
-		pageShouldNotContainRadioButton(locator, "");
+	public void checkPageNotContainRadioButton(String window, String control) {
+		checkPageNotContainRadioButton(window, control, "");
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldNotContainRadioButton(String locator, String message) {
-		pageShouldNotContainRadioButton(locator, message, "INFO");
+	public void checkPageNotContainRadioButton(String window, String control, String message) {
+		checkPageNotContainRadioButton(window, control, message, "INFO");
 	}
 
 	/**
-	 * Verify the radio button identified by <b>locator</b> is not found on the
+	 * Verify the radio button identified by <b>control</b> is not found on the
 	 * current page.<br>
 	 * <br>
 	 * Key attributes for radio buttons are id and name. See `Introduction` for
-	 * details about log levels and locators.<br>
+	 * details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the radio button.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the radio button.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * @param logLevel
 	 *            Default=INFO. Optional log level.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE", "logLevel=INFO" })
-	public void pageShouldNotContainRadioButton(String locator, String message, String logLevel) {
-		element.pageShouldNotContainElement(locator, "radio button", message, logLevel);
+	@ArgumentNames({ "window", "control", "message=NONE", "logLevel=INFO" })
+	public void checkPageNotContainRadioButton(String window, String control, String message, String logLevel) {
+		element.checkPageNotContainControl(window, control, "radio button", message, logLevel);
 	}
 
 	/**
@@ -353,7 +379,7 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 
 	/**
 	 * Types the given <b>filePath</b> into the input field identified by
-	 * <b>locator</b>.<br>
+	 * <b>control</b>.<br>
 	 * <br>
 	 * This keyword is most often used to input files into upload forms. The
 	 * file specified with filePath must be available on the same host where the
@@ -368,520 +394,568 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	 * </tr>
 	 * </table>
 	 * Key attributes for input fields are id and name. See `Introduction` for
-	 * details about locators.<br>
+	 * details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the input field.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the input field.
 	 * @param filePath
 	 *            The file path to input
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "filePath" })
-	public void chooseFile(String locator, String filePath) {
+	@ArgumentNames({ "window", "control", "filePath" })
+	public void chooseFile(String window, String control, String filePath) {
 		if (!new File(filePath).isFile()) {
 			logging.info(String.format("File '%s' does not exist on the local file system", filePath));
 		}
-		element.elementFind(locator, true, true).get(0).sendKeys(filePath);
+		element.elementFind(window, control, true, true).get(0).sendKeys(filePath);
 	}
 
 	/**
 	 * Types the given <b>text</b> into the password field identified by
-	 * <b>locator</b>.<br>
+	 * <b>control</b>.<br>
 	 * <br>
 	 * Key attributes for input fields are id and name. See `Introduction` for
-	 * details about locators.<br>
+	 * details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the password field.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the password field.
 	 * @param text
 	 *            The password to input
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "text" })
-	public void inputPassword(String locator, String text) {
-		logging.info(String.format("Typing password into text field '%s'", locator));
-		inputTextIntoTextField(locator, text);
+	@ArgumentNames({ "window", "control", "text" })
+	public void enterPassword(String window, String control, String text) {
+		logging.info(String.format("Typing password into text field '%s'", control));
+		inputTextIntoTextField(window, control, text);
 	}
 
 	/**
 	 * Types the given <b>text</b> into the text field identified by
-	 * <b>locator</b>.<br>
+	 * <b>control</b>.<br>
 	 * <br>
 	 * Key attributes for input fields are id and name. See `Introduction` for
-	 * details about locators.<br>
+	 * details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the text field.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the text field.
 	 * @param text
 	 *            The password to input
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "text" })
-	public void inputText(String locator, String text) {
-		logging.info(String.format("Typing text '%s' into text field '%s'", text, locator));
-		inputTextIntoTextField(locator, text);
+	@ArgumentNames({ "window", "control", "text" })
+	public void enter(String window, String control, String text) {
+		logging.info(String.format("Typing text '%s' into text field '%s'", text, control));
+		inputTextIntoTextField(window, control, text);
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldContainTextfield(String locator) {
-		pageShouldContainTextfield(locator, "");
+	public void checkPageContainsTextfield(String window, String control) {
+		checkPageContainsTextfield(window, control, "");
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldContainTextfield(String locator, String message) {
-		pageShouldContainTextfield(locator, message, "INFO");
+	public void checkPageContainsTextfield(String window, String control, String message) {
+		checkPageContainsTextfield(window, control, message, "INFO");
 	}
 
 	/**
-	 * Verify the text field identified by <b>locator</b> is found on the
+	 * Verify the text field identified by <b>control</b> is found on the
 	 * current page.<br>
 	 * <br>
 	 * Key attributes for text field are id and name. See `Introduction` for
-	 * details about log levels and locators.<br>
+	 * details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the text field.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the text field.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * @param logLevel
 	 *            Default=INFO. Optional log level.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE", "logLevel=INFO" })
-	public void pageShouldContainTextfield(String locator, String message, String logLevel) {
-		element.pageShouldContainElement(locator, "text field", message, logLevel);
+	@ArgumentNames({ "window", "control", "message=NONE", "logLevel=INFO" })
+	public void checkPageContainsTextfield(String window, String control, String message, String logLevel) {
+		element.checkPageContainsControl(window, control, "text field", message, logLevel);
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldNotContainTextfield(String locator) {
-		pageShouldNotContainTextfield(locator, "");
+	public void checkPageNotContainTextfield(String window, String control) {
+		checkPageNotContainTextfield(window, control, "");
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldNotContainTextfield(String locator, String message) {
-		pageShouldNotContainTextfield(locator, message, "INFO");
+	public void checkPageNotContainTextfield(String window, String control, String message) {
+		checkPageNotContainTextfield(window, control, message, "INFO");
 	}
 
 	/**
-	 * Verify the text field identified by <b>locator</b> is not found on the
+	 * Verify the text field identified by <b>control</b> is not found on the
 	 * current page.<br>
 	 * <br>
 	 * Key attributes for text field are id and name. See `Introduction` for
-	 * details about log levels and locators.<br>
+	 * details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the text field.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the text field.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * @param logLevel
 	 *            Default=INFO. Optional log level.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE", "logLevel=INFO" })
-	public void pageShouldNotContainTextfield(String locator, String message, String logLevel) {
-		element.pageShouldNotContainElement(locator, "text field", message, logLevel);
+	@ArgumentNames({ "window", "control", "message=NONE", "logLevel=INFO" })
+	public void checkPageNotContainTextfield(String window, String control, String message, String logLevel) {
+		element.checkPageNotContainControl(window, control, "text field", message, logLevel);
 	}
 
 	@RobotKeywordOverload
-	public void textfieldValueShouldBe(String locator, String text) {
-		textfieldValueShouldBe(locator, text, "");
+	public void checkTextfieldValue(String window, String control, String text) {
+		checkTextfieldValue(window, control, text, "");
 	}
 
 	/**
-	 * Verify the text field identified by <b>locator</b> is exactly
-	 * <b>text</b>.<br>
+	 * Verify the text field identified by <b>control</b> is exactly <b>text</b>
+	 * .<br>
 	 * <br>
 	 * Key attributes for text field are id and name. See `Introduction` for
-	 * details about log levels and locators.<br>
+	 * details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the text field.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the text field.
 	 * @param text
 	 *            The text to verify.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * 
-	 * @see FormElement#textfieldShouldContain
-	 * @see FormElement#textfieldShouldNotContain
+	 * @see FormElement#checkTextfieldContains
+	 * @see FormElement#checkTextfieldNotContain
 	 * @see FormElement#textfieldValueShouldNotBe
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "text", "message=NONE" })
-	public void textfieldValueShouldBe(String locator, String text, String message) {
-		String actual = element.getValue(locator, "text field");
+	@ArgumentNames({ "window", "control", "text", "message=NONE" })
+	public void checkTextfieldValue(String window, String control, String text, String message) {
+		String actual = element.getValue(window, control, "text field");
 		if (!actual.contains(text)) {
 			if (message == null) {
-				message = String.format("Value of text field '%s' should have been '%s' but was '%s'", locator, text,
+				message = String.format("Value of text field '%s' should have been '%s' but was '%s'", control, text,
 						actual);
 			}
 			throw new ABTLibraryNonFatalException(message);
 		}
-		logging.info(String.format("Content of text field '%s' is '%s'.", locator, text));
+		logging.info(String.format("Content of text field '%s' is '%s'.", control, text));
 	}
 
 	@RobotKeywordOverload
-	public void textfieldValueShouldNotBe(String locator, String text) {
-		textfieldValueShouldNotBe(locator, text, "");
+	public void textfieldValueShouldNotBe(String window, String control, String text) {
+		textfieldValueShouldNotBe(window, control, text, "");
 	}
 
 	/**
-	 * Verify the text field identified by <b>locator</b> is not exactly
+	 * Verify the text field identified by <b>control</b> is not exactly
 	 * <b>text</b>.<br>
 	 * <br>
 	 * Key attributes for text field are id and name. See `Introduction` for
-	 * details about log levels and locators.<br>
+	 * details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the text field.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the text field.
 	 * @param text
 	 *            The text to verify.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * 
-	 * @see FormElement#textfieldShouldContain
-	 * @see FormElement#textfieldShouldNotContain
-	 * @see FormElement#textfieldValueShouldBe
+	 * @see FormElement#checkTextfieldContains
+	 * @see FormElement#checkTextfieldNotContain
+	 * @see FormElement#checkTextfieldValue
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "text", "message=NONE" })
-	public void textfieldValueShouldNotBe(String locator, String text, String message) {
-		String actual = element.getValue(locator, "text field");
+	@ArgumentNames({ "window", "control", "text", "message=NONE" })
+	public void textfieldValueShouldNotBe(String window, String control, String text, String message) {
+		String actual = element.getValue(window, control, "text field");
 		if (actual.contains(text)) {
 			if (message == null) {
-				message = String.format("Value of text field '%s' should not have been '%s' but was '%s'", locator,
+				message = String.format("Value of text field '%s' should not have been '%s' but was '%s'", control,
 						text, actual);
 			}
 			throw new ABTLibraryNonFatalException(message);
 		}
-		logging.info(String.format("Content of text field '%s' is '%s'.", locator, text));
+		logging.info(String.format("Content of text field '%s' is '%s'.", control, text));
 	}
 
 	@RobotKeywordOverload
-	public void textfieldShouldContain(String locator, String text) {
-		textfieldShouldContain(locator, text, "");
+	public void checkTextfieldContains(String window, String control, String text) {
+		checkTextfieldContains(window, control, text, "");
 	}
 
 	/**
-	 * Verify the text field identified by <b>locator</b> contains
-	 * <b>text</b>.<br>
+	 * Verify the text field identified by <b>control</b> contains <b>text</b>.
+	 * <br>
 	 * <br>
 	 * Key attributes for text field are id and name. See `Introduction` for
-	 * details about log levels and locators.<br>
+	 * details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the text field.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the text field.
 	 * @param text
 	 *            The text to verify.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * 
-	 * @see FormElement#textfieldShouldNotContain
-	 * @see FormElement#textfieldValueShouldBe
+	 * @see FormElement#checkTextfieldNotContain
+	 * @see FormElement#checkTextfieldValue
 	 * @see FormElement#textfieldValueShouldNotBe
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "text", "message=NONE" })
-	public void textfieldShouldContain(String locator, String text, String message) {
-		String actual = element.getValue(locator, "text field");
+	@ArgumentNames({ "window", "control", "text", "message=NONE" })
+	public void checkTextfieldContains(String window, String control, String text, String message) {
+		String actual = element.getValue(window, control, "text field");
 		if (!actual.contains(text)) {
 			if (message == null) {
-				message = String.format("Text field '%s' should have contained text '%s', but was '%s'", locator, text,
+				message = String.format("Text field '%s' should have contained text '%s', but was '%s'", control, text,
 						actual);
 			}
 			throw new ABTLibraryNonFatalException(message);
 		}
-		logging.info(String.format("Text field '%s' contains text '%s'.", locator, text));
+		logging.info(String.format("Text field '%s' contains text '%s'.", control, text));
 	}
 
 	@RobotKeywordOverload
-	public void textfieldShouldNotContain(String locator, String text) {
-		textfieldShouldNotContain(locator, text, "");
+	public void checkTextfieldNotContain(String window, String control, String text) {
+		checkTextfieldNotContain(window, control, text, "");
 	}
 
 	/**
-	 * Verify the text field identified by <b>locator</b> does not contain
+	 * Verify the text field identified by <b>control</b> does not contain
 	 * <b>text</b>.<br>
 	 * <br>
 	 * Key attributes for text field are id and name. See `Introduction` for
-	 * details about log levels and locators.<br>
+	 * details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the text field.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the text field.
 	 * @param text
 	 *            The text to verify.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * 
-	 * @see FormElement#textfieldShouldContain
-	 * @see FormElement#textfieldValueShouldBe
+	 * @see FormElement#checkTextfieldContains
+	 * @see FormElement#checkTextfieldValue
 	 * @see FormElement#textfieldValueShouldNotBe
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "text", "message=NONE" })
-	public void textfieldShouldNotContain(String locator, String text, String message) {
-		String actual = element.getValue(locator, "text field");
+	@ArgumentNames({ "window", "control", "text", "message=NONE" })
+	public void checkTextfieldNotContain(String window, String control, String text, String message) {
+		String actual = element.getValue(window, control, "text field");
 		if (actual.contains(text)) {
 			if (message == null) {
-				message = String.format("Text field '%s' should not have contained text '%s', but was '%s'", locator,
+				message = String.format("Text field '%s' should not have contained text '%s', but was '%s'", control,
 						text, actual);
 			}
 			throw new ABTLibraryNonFatalException(message);
 		}
-		logging.info(String.format("Text field '%s' contains text '%s'.", locator, text));
+		logging.info(String.format("Text field '%s' contains text '%s'.", control, text));
 	}
 
 	@RobotKeywordOverload
-	public void textareaShouldContain(String locator, String text) {
-		textareaShouldContain(locator, text, "");
+	public void checkTextareaContains(String window, String control, String text) {
+		checkTextareaContains(window, control, text, "");
 	}
 
 	/**
-	 * Verify the text area identified by <b>locator</b> contains
+	 * Verify the text area identified by <b>control</b> contains <b>text</b>.
+	 * <br>
+	 * <br>
+	 * Key attributes for text areas are id and name. See `Introduction` for
+	 * details about log levels and controls.<br>
+	 * 
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the text area.
+	 * @param text
+	 *            The text to verify.
+	 * @param message
+	 *            Default=NONE. Optional custom error message.
+	 * 
+	 * @see FormElement#checkTextareaNotContain
+	 * @see FormElement#checkTextareaValue
+	 * @see FormElement#textareaValueShouldNotBe
+	 */
+	@RobotKeyword
+	@ArgumentNames({ "window", "control", "text", "message=NONE" })
+	public void checkTextareaContains(String window, String control, String text, String message) {
+		String actual = element.getValue(window, control, "text area");
+		if (!actual.contains(text)) {
+			if (message == null) {
+				message = String.format("Text area '%s' should have contained text '%s', but was '%s'", control, text,
+						actual);
+			}
+			throw new ABTLibraryNonFatalException(message);
+		}
+		logging.info(String.format("Text field '%s' contains text '%s'.", control, text));
+	}
+
+	@RobotKeywordOverload
+	public void checkTextareaNotContain(String window, String control, String text) {
+		checkTextareaNotContain(window, control, text, "");
+	}
+
+	/**
+	 * Verify the text area identified by <b>control</b> does not contain
 	 * <b>text</b>.<br>
 	 * <br>
 	 * Key attributes for text areas are id and name. See `Introduction` for
-	 * details about log levels and locators.<br>
+	 * details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the text area.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the text area.
 	 * @param text
 	 *            The text to verify.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * 
-	 * @see FormElement#textareaShouldNotContain
-	 * @see FormElement#textareaValueShouldBe
+	 * @see FormElement#checkTextareaContains
+	 * @see FormElement#checkTextareaValue
 	 * @see FormElement#textareaValueShouldNotBe
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "text", "message=NONE" })
-	public void textareaShouldContain(String locator, String text, String message) {
-		String actual = element.getValue(locator, "text area");
+	@ArgumentNames({ "window", "control", "text", "message=NONE" })
+	public void checkTextareaNotContain(String window, String control, String text, String message) {
+		String actual = element.getValue(window, control, "text area");
 		if (!actual.contains(text)) {
 			if (message == null) {
-				message = String.format("Text area '%s' should have contained text '%s', but was '%s'", locator, text,
-						actual);
-			}
-			throw new ABTLibraryNonFatalException(message);
-		}
-		logging.info(String.format("Text field '%s' contains text '%s'.", locator, text));
-	}
-
-	@RobotKeywordOverload
-	public void textareaShouldNotContain(String locator, String text) {
-		textareaShouldNotContain(locator, text, "");
-	}
-
-	/**
-	 * Verify the text area identified by <b>locator</b> does not contain
-	 * <b>text</b>.<br>
-	 * <br>
-	 * Key attributes for text areas are id and name. See `Introduction` for
-	 * details about log levels and locators.<br>
-	 * 
-	 * @param locator
-	 *            The locator to locate the text area.
-	 * @param text
-	 *            The text to verify.
-	 * @param message
-	 *            Default=NONE. Optional custom error message.
-	 * 
-	 * @see FormElement#textareaShouldContain
-	 * @see FormElement#textareaValueShouldBe
-	 * @see FormElement#textareaValueShouldNotBe
-	 */
-	@RobotKeyword
-	@ArgumentNames({ "locator", "text", "message=NONE" })
-	public void textareaShouldNotContain(String locator, String text, String message) {
-		String actual = element.getValue(locator, "text area");
-		if (!actual.contains(text)) {
-			if (message == null) {
-				message = String.format("Text area '%s' should not have contained text '%s', but was '%s'", locator,
+				message = String.format("Text area '%s' should not have contained text '%s', but was '%s'", control,
 						text, actual);
 			}
 			throw new ABTLibraryNonFatalException(message);
 		}
-		logging.info(String.format("Text field '%s' contains text '%s'.", locator, text));
+		logging.info(String.format("Text field '%s' contains text '%s'.", control, text));
 	}
 
 	@RobotKeywordOverload
-	public void textareaValueShouldBe(String locator, String text) {
-		textareaValueShouldBe(locator, text, "");
+	public void checkTextareaValue(String window, String control, String text) {
+		checkTextareaValue(window, control, text, "");
 	}
 
 	/**
-	 * Verify the text area identified by <b>locator</b> is exactly
-	 * <b>text</b>.<br>
+	 * Verify the text area identified by <b>control</b> is exactly <b>text</b>.
+	 * <br>
 	 * <br>
 	 * Key attributes for text area are id and name. See `Introduction` for
-	 * details about log levels and locators.<br>
+	 * details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the text area.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the text area.
 	 * @param text
 	 *            The text to verify.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * 
-	 * @see FormElement#textareaShouldContain
-	 * @see FormElement#textareaShouldNotContain
+	 * @see FormElement#checkTextareaContains
+	 * @see FormElement#checkTextareaNotContain
 	 * @see FormElement#textareaValueShouldNotBe
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "text", "message=NONE" })
-	public void textareaValueShouldBe(String locator, String text, String message) {
-		String actual = element.getValue(locator, "text area");
+	@ArgumentNames({ "window", "control", "text", "message=NONE" })
+	public void checkTextareaValue(String window, String control, String text, String message) {
+		String actual = element.getValue(window, control, "text area");
 		if (!actual.contains(text)) {
 			if (message == null) {
-				message = String.format("Value of text area '%s' should have been '%s' but was '%s'", locator, text,
+				message = String.format("Value of text area '%s' should have been '%s' but was '%s'", control, text,
 						actual);
 			}
 			throw new ABTLibraryNonFatalException(message);
 		}
-		logging.info(String.format("Content of text area '%s' is '%s'.", locator, text));
+		logging.info(String.format("Content of text area '%s' is '%s'.", control, text));
 	}
 
 	@RobotKeywordOverload
-	public void textareaValueShouldNotBe(String locator, String text) {
-		textareaValueShouldNotBe(locator, text, "");
+	public void textareaValueShouldNotBe(String window, String control, String text) {
+		textareaValueShouldNotBe(window, control, text, "");
 	}
 
 	/**
-	 * Verify the text area identified by <b>locator</b> is not exactly
+	 * Verify the text area identified by <b>control</b> is not exactly
 	 * <b>text</b>.<br>
 	 * <br>
 	 * Key attributes for text area are id and name. See `Introduction` for
-	 * details about log levels and locators.<br>
+	 * details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the text area.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the text area.
 	 * @param text
 	 *            The text to verify.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * 
-	 * @see FormElement#textareaShouldContain
-	 * @see FormElement#textareaShouldNotContain
-	 * @see FormElement#textareaValueShouldBe
+	 * @see FormElement#checkTextareaContains
+	 * @see FormElement#checkTextareaNotContain
+	 * @see FormElement#checkTextareaValue
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "text", "message=NONE" })
-	public void textareaValueShouldNotBe(String locator, String text, String message) {
-		String actual = element.getValue(locator, "text area");
+	@ArgumentNames({ "window", "control", "text", "message=NONE" })
+	public void textareaValueShouldNotBe(String window, String control, String text, String message) {
+		String actual = element.getValue(window, control, "text area");
 		if (actual.contains(text)) {
 			if (message == null) {
-				message = String.format("Value of text area '%s' should not have been '%s' but was '%s'", locator, text,
+				message = String.format("Value of text area '%s' should not have been '%s' but was '%s'", control, text,
 						actual);
 			}
 			throw new ABTLibraryNonFatalException(message);
 		}
-		logging.info(String.format("Content of text area '%s' is '%s'.", locator, text));
+		logging.info(String.format("Content of text area '%s' is '%s'.", control, text));
 	}
 
 	/**
-	 * Click on the button identified by <b>locator</b>.<br>
+	 * Click on the button identified by <b>control</b>.<br>
 	 * <br>
 	 * Key attributes for buttons are id, name and value. See `Introduction` for
-	 * details about locators.<br>
+	 * details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the link.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the link.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void clickButton(String locator) {
-		logging.info(String.format("Clicking button '%s'.", locator));
-		List<WebElement> elements = element.elementFind(locator, true, false, "input");
+	@ArgumentNames({ "window", "control" })
+	public void clickButton(String window, String control) {
+		logging.info(String.format("Clicking button '%s'.", control));
+		List<WebElement> elements = element.elementFind(window, control, true, false, "input");
 		if (elements.size() == 0) {
-			elements = element.elementFind(locator, true, true, "button");
+			elements = element.elementFind(window, control, true, true, "button");
 		}
 		elements.get(0).click();
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldContainButton(String locator) {
-		pageShouldContainButton(locator, "");
+	public void checkPageContainsButton(String window, String control) {
+		checkPageContainsButton(window, control, "");
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldContainButton(String locator, String message) {
-		pageShouldContainButton(locator, message, "INFO");
+	public void checkPageContainsButton(String window, String control, String message) {
+		checkPageContainsButton(window, control, message, "INFO");
 	}
 
 	/**
-	 * Verify the button identified by <b>locator</b> is found on the current
+	 * Verify the button identified by <b>control</b> is found on the current
 	 * page.<br>
 	 * <br>
 	 * Key attributes for buttons are id, name and value. See `Introduction` for
-	 * details about log levels and locators.<br>
+	 * details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the button.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the button.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * @param logLevel
 	 *            Default=INFO. Optional log level.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE", "logLevel=INFO" })
-	public void pageShouldContainButton(String locator, String message, String logLevel) {
+	@ArgumentNames({ "window", "control", "message=NONE", "logLevel=INFO" })
+	public void checkPageContainsButton(String window, String control, String message, String logLevel) {
 		try {
-			element.pageShouldContainElement(locator, "input", message, logLevel);
+			element.checkPageContainsControl(window, control, "input", message, logLevel);
 		} catch (ABTLibraryNonFatalException e) {
-			element.pageShouldContainElement(locator, "button", message, logLevel);
+			element.checkPageContainsControl(window, control, "button", message, logLevel);
 		}
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldNotContainButton(String locator) {
-		pageShouldNotContainButton(locator, "");
+	public void checkPageNotContainButton(String window, String control) {
+		checkPageNotContainButton(window, control, "");
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldNotContainButton(String locator, String message) {
-		pageShouldNotContainButton(locator, message, "INFO");
+	public void checkPageNotContainButton(String window, String control, String message) {
+		checkPageNotContainButton(window, control, message, "INFO");
 	}
 
 	/**
-	 * Verify the button identified by <b>locator</b> is not found on the
+	 * Verify the button identified by <b>control</b> is not found on the
 	 * current page.<br>
 	 * <br>
 	 * Key attributes for buttons are id, name and value. See `Introduction` for
-	 * details about log levels and locators.<br>
+	 * details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the button.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the button.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * @param logLevel
 	 *            Default=INFO. Optional log level.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE", "logLevel=INFO" })
-	public void pageShouldNotContainButton(String locator, String message, String logLevel) {
-		element.pageShouldNotContainElement(locator, "input", message, logLevel);
-		element.pageShouldNotContainElement(locator, "button", message, logLevel);
+	@ArgumentNames({ "window", "control", "message=NONE", "logLevel=INFO" })
+	public void checkPageNotContainButton(String window, String control, String message, String logLevel) {
+		element.checkPageNotContainControl(window, control, "input", message, logLevel);
+		element.checkPageNotContainControl(window, control, "button", message, logLevel);
 	}
 
 	// ##############################
 	// Internal Methods
 	// ##############################
 
-	protected WebElement getCheckbox(String locator) {
-		return element.elementFind(locator, true, true, "input").get(0);
+	protected WebElement getCheckbox(String window, String control) {
+		return element.elementFind(window, control, true, true, "input").get(0);
 	}
 
 	protected List<WebElement> getRadioButtons(String groupName) {
 		String xpath = String.format("xpath=//input[@type='radio' and @name='%s']", groupName);
-		logging.debug("Radio group locator: " + xpath);
-		return element.elementFind(xpath, false, true);
+		logging.debug("Radio group control: " + xpath);
+		return element.elementFind("", xpath, false, true);
 	}
 
 	protected WebElement getRadioButtonWithValue(String groupName, String value) {
 		String xpath = String.format("xpath=//input[@type='radio' and @name='%s' and (@value='%s' or @id='%s')]",
 				groupName, value, value);
-		logging.debug("Radio group locator: " + xpath);
-		return element.elementFind(xpath, true, true).get(0);
+		logging.debug("Radio group control: " + xpath);
+		return element.elementFind("", xpath, true, true).get(0);
 	}
 
 	protected String getValueFromRadioButtons(List<WebElement> elements) {
@@ -893,18 +967,17 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 		return null;
 	}
 
-	protected void inputTextIntoTextField(String locator, String text) {
-		WebElement webElement = element.elementFind(locator, true, true).get(0);
+	protected void inputTextIntoTextField(String window, String control, String text) {
+		WebElement webElement = element.elementFind(window, control, true, true).get(0);
 		webElement.clear();
-		if(browsermanagement.getCurrentPlatform().equalsIgnoreCase("ios")){
+		if (browsermanagement.getCurrentPlatform().equalsIgnoreCase("ios")) {
 			((IOSElement) webElement).setValue(text);
-		}else{
+		} else {
 			webElement.sendKeys(text);
 		}
 		try {
 			((AppiumDriver<?>) element.browserManagement.getCurrentWebDriver()).hideKeyboard();
-			
-			
+
 		} catch (Exception e) {
 
 		}

@@ -119,16 +119,21 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	 */
 	public List<File> getFiles(String directorPath) {
 		File folder = new File(directorPath);
-		File[] listOfFiles = folder.listFiles();
-		List<File> files = new ArrayList<File>();
-		for (File file : listOfFiles) {
-			if (file.isFile()) {
-				files.add(file);
-			} else if (file.isDirectory()) {
-				files.addAll(getFiles(file.getAbsolutePath()));
+		if (folder.exists()) {
+			File[] listOfFiles = folder.listFiles();
+			List<File> files = new ArrayList<File>();
+			for (File file : listOfFiles) {
+				if (file.isFile()) {
+					files.add(file);
+				} else if (file.isDirectory()) {
+					files.addAll(getFiles(file.getAbsolutePath()));
+				}
 			}
+			return files;
+		} else {
+			return null;
 		}
-		return files;
+
 	}
 
 	@RobotKeyword
@@ -223,8 +228,8 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Retrieves list of text between start and end text from specified
-	 * text.<br>
+	 * Retrieves list of text between start and end text from specified text.
+	 * <br>
 	 * Split specified text by end text, if start text does not exist.<br>
 	 * Split specified text by start text and retrieve a text list without first
 	 * item if end text does not exist.<br>
@@ -245,7 +250,7 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	public List<String> getMidText(String originalText, String startText, String endText) {
 		List<String> midTextList = new ArrayList<String>();
 		String[] tempList = originalText.split(startText);
-		if(endText.equals("")){
+		if (endText.equals("")) {
 			endText = "<glna>";
 		}
 		for (int i = 1; i < tempList.length; i++) {

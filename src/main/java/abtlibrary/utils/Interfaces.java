@@ -19,6 +19,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.io.FilenameUtils;
+import org.robotframework.javalib.annotation.Autowired;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -26,10 +27,19 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import abtlibrary.ABTLibraryFatalException;
+import abtlibrary.ABTLibraryNonFatalException;
 import abtlibrary.Constant;
+import abtlibrary.RunOnFailureKeywordsAdapter;
 import abtlibrary.keywords.operatinglibrary.OperatingSystem;
+import abtlibrary.keywords.selenium2library.Logging;
 
-public class Interfaces {
+public class Interfaces extends RunOnFailureKeywordsAdapter {
+	/**
+	 * Instantiated Logging keyword bean
+	 */
+	@Autowired
+	protected Logging logging;
+
 	String fileName;
 	List<String[]> elements1;
 
@@ -62,15 +72,29 @@ public class Interfaces {
 
 	public void initInterface(String interfaceDirectory, String subDirectory) {
 		File xmlFile = new File(Constant.tempInterfaceDir + "/Interface.xml");
-		List<Interfaces> interfaces;
-		List<File> interfaceFiles;
+		List<Interfaces> interfaces = new ArrayList<Interfaces>();
+		List<File> interfaceFiles = new ArrayList<File>();
 		Boolean updated = false;
 		if (!subDirectory.equals("")) {
 			interfaceFiles = os.getFiles(interfaceDirectory + "/" + subDirectory);
 		} else {
 			interfaceFiles = os.getFiles(interfaceDirectory);
 		}
-		interfaces = getInterfaces(interfaceFiles);
+		if (interfaceFiles == null) {
+			throw new ABTLibraryNonFatalException(
+					String.format("Could not find interface in '%s'.", interfaceDirectory));
+		}
+		// Remove files that are in unsupported extension.
+		for (int i = 0; i < interfaceFiles.size(); i++) {
+			String ext = FilenameUtils.getExtension(interfaceFiles.get(i).getAbsolutePath());
+			if (!ext.equals("txt") && !ext.equals("robot")) {
+				interfaceFiles.remove(i);
+			}
+		}
+
+		for (File file : interfaceFiles) {
+			interfaces.add(parseInterface(file.getAbsolutePath()));
+		}
 
 		if (xmlFile.exists()) {
 			for (File interfaceFile : interfaceFiles) {
@@ -94,42 +118,68 @@ public class Interfaces {
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
-			// root elements1
+			// root elements
 			Document doc = docBuilder.newDocument();
-			Element rootNode = doc.createElement("interface");
+			Element rootNode = doc.createElement("interfaces");
 			doc.appendChild(rootNode);
 
 			for (Interfaces interfaceInstant : interfaces) {
 				// ##################
-				// File Node
+				// interface Node
 				// ##################
-				Element fileNode = doc.createElement("file");
-				rootNode.appendChild(fileNode);
+				Element interfaceNode = doc.createElement("interface");
+				rootNode.appendChild(interfaceNode);
 
-				// set attribute to file element
-				Attr attr = doc.createAttribute("name");
-				attr.setValue(interfaceInstant.fileName);
-				fileNode.setAttributeNode(attr);
+				// set attribute to interfaceNode
+				Attr name = doc.createAttribute("name");
+				name.setValue(interfaceInstant.name);
+				Attr platform = doc.createAttribute("platform");
+				platform.setValue(interfaceInstant.platform);
+				interfaceNode.setAttributeNode(name);
+				interfaceNode.setAttributeNode(platform);
 
-				for (String[] element : interfaceInstant.elements1) {
+				for (Map<String, String> element : interfaceInstant.elements) {
 					// ##################
 					// Element Node
 					// ##################
 					Element elementNode = doc.createElement("element");
-					fileNode.appendChild(elementNode);
+					interfaceNode.appendChild(elementNode);
 
 					// ##################
 					// Name Node
 					// ##################
 					Element nameNode = doc.createElement("name");
-					nameNode.appendChild(doc.createTextNode(element[0]));
+					nameNode.appendChild(doc.createTextNode(element.get("control name")));
 					elementNode.appendChild(nameNode);
 
 					// ##################
 					// Name Node
 					// ##################
+					String attName = "";
+					String locator = "";
+					List<String> attributes = new ArrayList<String>();
+					List<String> keys = new ArrayList<String>();
+					keys.addAll(element.keySet());
+					for (String key : keys) {
+						if (!key.equals("control name") && !key.equals("class")) {
+							attName = key;
+							if (key.equalsIgnoreCase("description") | key.equalsIgnoreCase("content_desc")) {
+								attName = "content-desc";
+							}
+
+							attributes.add(attName + "=\"" + element.get(key) + "\"");
+
+						}
+					}
+					if (!element.get("class").equals("*") | attributes.size() > 1) {
+						locator = "//" + element.get("class") + "[@" + Python.join(" and @", attributes) + "]";
+					} else if (element.get("xpath") != null) {
+						locator = element.get("xpath");
+					} else {
+						locator = attributes.get(0);
+					}
 					Element locatorNode = doc.createElement("locator");
-					locatorNode.appendChild(doc.createTextNode(element[1]));
+					locatorNode.appendChild(doc.createTextNode(locator));
 					elementNode.appendChild(locatorNode);
 				}
 			}
@@ -308,17 +358,12 @@ public class Interfaces {
 	public Interfaces parseInterface(String filePath) {
 		OperatingSystem os = new OperatingSystem();
 		List<String> lines = os.readFile(filePath);
-		System.out.println(lines);
-
 		String nameTag = "INTERFACE ENTITY";
 		String elementTag = "interface element";
 
 		String interfaceName = "";
 		List<Map<String, String>> elements = new ArrayList<Map<String, String>>();
 
-		/**
-		 * Read each lines and parse to items of robot framework
-		 */
 		for (int i = 0; i < lines.size(); i++) {
 			// Get interface name
 			if (lines.get(i).contains(nameTag)) {
@@ -396,6 +441,38 @@ public class Interfaces {
 
 			}
 		} catch (Exception e) {
+			throw new ABTLibraryFatalException(
+					String.format("File '%s' is not well-formatted. Please re-format and run again!", xmlInterfaceFile));
+		}
+		return capturedElements;
+
+	}
+
+	public List<Element> getDefinedElements(String xmlInterfaceFile, String interfaceName, String platform) {
+		List<Element> capturedElements = new ArrayList<Element>();
+		try {
+			NodeList nodes = os.getXMLNodes(xmlInterfaceFile);
+			// Get all file nodes
+			NodeList interfaceNodes = nodes.item(0).getChildNodes();
+			for (int i = 0; i < interfaceNodes.getLength(); i++) {
+				String attName = interfaceNodes.item(i).getAttributes().getNamedItem("name").getNodeValue();
+				String attPlatform = interfaceNodes.item(i).getAttributes().getNamedItem("platform").getNodeValue();
+
+				if ((attName.equalsIgnoreCase(interfaceName) | interfaceName.equals("*"))  && (attPlatform.equalsIgnoreCase(platform) | attPlatform.equalsIgnoreCase("default"))) {
+					// Get all element nodes
+					NodeList elements = interfaceNodes.item(i).getChildNodes();
+
+					for (int n = 0; n < elements.getLength(); n++) {
+						if (elements.item(n).getNodeType() == Node.ELEMENT_NODE) {
+							Element element = (Element) elements.item(n);
+							capturedElements.add(element);
+						}
+					}
+
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 			throw new ABTLibraryFatalException(
 					String.format("File '%s' is not well-format. Please re-format and run again!", xmlInterfaceFile));
 		}

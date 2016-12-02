@@ -19,7 +19,7 @@ import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
 import abtlibrary.RunOnFailureKeywordsAdapter;
-import abtlibrary.keywords.frameworklibrary.InterfaceManagement;
+import abtlibrary.keywords.frameworklibrary.UserInterface;
 import abtlibrary.ABTLibraryNonFatalException;
 import abtlibrary.locators.ElementFinder;
 import abtlibrary.utils.Python;
@@ -36,7 +36,8 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	/**
 	 * Instantiated InterfaceManagement keyword bean
 	 */
-	protected InterfaceManagement interfaceManagement = new InterfaceManagement();
+	@Autowired
+	protected UserInterface userInterface;
 
 	/**
 	 * Instantiated FormElement keyword bean
@@ -55,17 +56,20 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	// ##############################
 
 	/**
-	 * Check if Element identified by <b>locator</b> exists.<br>
+	 * Check if control identified by <b>locator</b> exists.<br>
 	 * <br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the select element.
-	 * @return True if element exist and False if element not exist.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name of select control.
+	 * @return True if control exist and False if control not exist.
 	 */
 	@RobotKeyword
-	@ArgumentNames({"locator"})
-	public Boolean doesElementExist(String locator) {
-		List<WebElement> elements = elementFind(locator, true, false);
+	@ArgumentNames({ "window", "control" })
+	public Boolean doesControlExist(String window, String control) {
+		List<WebElement> elements = elementFind(window, control, true, false);
 		if (elements.size() == 0) {
 			return false;
 		} else {
@@ -74,45 +78,51 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Returns the first Web Element identified by <b>locator</b>.<br>
+	 * Returns the first Web Element.<br>
 	 * <br>
-	 * Fails if there is no element matched with <b>locator</b>.<br>
+	 * Fails if there is no control matched with <b>control</b>.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * Key attributes for arbitrary controls are id and name. See `Introduction`
+	 * for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the select list.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the select list.
 	 * @return the Web Element
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public WebElement getWebElement(String locator) {
+	@ArgumentNames({ "window", "control" })
+	public WebElement getWebElement(String window, String control) {
 
-		return elementFind(locator, true, true).get(0);
+		return elementFind(window, control, true, true).get(0);
 	}
 
 	/**
-	 * Returns list of Web Elements identified by <b>locator</b>.<br>
+	 * Returns list of Web Elements.<br>
 	 * <br>
-	 * Fails if there is no element matched with <b>locator</b>.<br>
+	 * Fails if there is no control matched with <b>control</b>.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * Key attributes for arbitrary controls are id and name. See `Introduction`
+	 * for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the select list.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the select list.
 	 * @return the of Web Elements
 	 */
-	public List<WebElement> getWebElements(String locator) {
+	public List<WebElement> getWebElements(String window, String control) {
 
-		return elementFind(locator, false, true);
+		return elementFind(window, control, false, true);
 	}
 
 	@RobotKeywordOverload
 	@ArgumentNames({ "text" })
-	public void currentFrameContains(String text) {
-		currentFrameContains(text, "INFO");
+	public void checkCurrentFrameContains(String text) {
+		checkCurrentFrameContains(text, "INFO");
 	}
 
 	/**
@@ -127,7 +137,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "text", "logLevel=INFO" })
-	public void currentFrameContains(String text, String logLevel) {
+	public void checkCurrentFrameContains(String text, String logLevel) {
 		if (!isTextPresent(text)) {
 			logging.log(String.format("Current Frame Contains: %s => FAILED", text), logLevel);
 			throw new ABTLibraryNonFatalException(
@@ -138,8 +148,8 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void currentFrameShouldNotContain(String text) {
-		currentFrameShouldNotContain(text, "INFO");
+	public void checkCurrentFrameNotContain(String text) {
+		checkCurrentFrameNotContain(text, "INFO");
 	}
 
 	/**
@@ -154,7 +164,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "text", "logLevel=INFO" })
-	public void currentFrameShouldNotContain(String text, String logLevel) {
+	public void checkCurrentFrameNotContain(String text, String logLevel) {
 		if (isTextPresent(text)) {
 			logging.log(String.format("Current Frame Should Not Contain: %s => FAILED", text), logLevel);
 			throw new ABTLibraryNonFatalException(
@@ -165,89 +175,97 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void checkElementContains(String locator, String text) {
-		checkElementContains(locator, text, "");
+	public void checkControlContains(String window, String control, String text) {
+		checkControlContains(window, control, text, "");
 	}
 
 	/**
-	 * Verify the element identified by <b>locator</b> contains <b>text</b>.<br>
+	 * Verify the control contains <b>text</b>.<br>
 	 * <br>
-	 * See `Introduction` for details about locators.
+	 * See `Introduction` for details about controls.
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the control.
 	 * @param text
 	 *            The text to verify.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "text", "message=NONE" })
-	public void checkElementContains(String locator, String text, String message) {
-		String actual = getText(locator);
+	@ArgumentNames({ "window", "control", "text", "message=NONE" })
+	public void checkControlContains(String window, String control, String text, String message) {
+		String actual = getText(window, control);
 
 		if (!actual.toLowerCase().contains(text.toLowerCase())) {
-			logging.info(String.format("Element Should Contain: %s => FAILED", text));
+			logging.info(String.format("control should contain: %s => FAILED", text));
 			throw new ABTLibraryNonFatalException(
-					String.format("Element should have contained text '%s', but its text was '%s'.", text, actual));
+					String.format("control should have contained text '%s', but its text was '%s'.", text, actual));
 		} else {
-			logging.info(String.format("Element Should Contain: %s => OK", text));
+			logging.info(String.format("control should contain: %s => OK", text));
 		}
 	}
 
 	@RobotKeywordOverload
-	public void checkElementDoesNotContain(String locator, String text) {
-		checkElementDoesNotContain(locator, text, "");
+	public void checkControlDoesNotContain(String window, String control, String text) {
+		checkControlDoesNotContain(window, control, text, "");
 	}
 
 	/**
-	 * Verify the element identified by <b>locator</b> does not contain
-	 * <b>text</b>.<br>
+	 * Verify the control does not contain <b>text</b>.<br>
 	 * <br>
-	 * See `Introduction` for details about locators.
+	 * See `Introduction` for details about controls.
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the control.
 	 * @param text
 	 *            The text to verify.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "text", "message=NONE" })
-	public void checkElementDoesNotContain(String locator, String text, String message) {
-		String actual = getText(locator);
+	@ArgumentNames({ "window", "control", "text", "message=NONE" })
+	public void checkControlDoesNotContain(String window, String control, String text, String message) {
+		String actual = getText(window, control);
 
 		if (actual.toLowerCase().contains(text.toLowerCase())) {
-			logging.info(String.format("Element Should Not Contain: %s => FAILED", text));
+			logging.info(String.format("control should not contain: %s => FAILED", text));
 			throw new ABTLibraryNonFatalException(
-					String.format("Element should not have contained text '%s', but its text was %s.", text, actual));
+					String.format("control should not have contained text '%s', but its text was %s.", text, actual));
 		} else {
-			logging.info(String.format("Element Should Not Contain: %s => OK", text));
+			logging.info(String.format("control Should Not Contain: %s => OK", text));
 		}
 	}
 
 	@RobotKeywordOverload
-	public void frameShouldContain(String locator, String text) {
-		frameShouldContain(locator, text, "INFO");
+	public void checkFrameContains(String window, String control, String text) {
+		checkFrameContains(window, control, text, "INFO");
 	}
 
 	/**
-	 * Verify the frame identified by <b>locator</b> contains <b>text</b>.<br>
+	 * Verify the frame contains <b>text</b>.<br>
 	 * <br>
-	 * See `Introduction` for details about locators.
+	 * See `Introduction` for details about controls.
 	 * 
-	 * @param locator
-	 *            The locator to locate the frame.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the frame.
 	 * @param text
 	 *            The text to verify.
 	 * @param logLevel
 	 *            Default=INFO. Optional log level.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "text", "logLevel=INFO" })
-	public void frameShouldContain(String locator, String text, String logLevel) {
-		if (!frameContains(locator, text)) {
+	@ArgumentNames({ "window", "control", "text", "logLevel=INFO" })
+	public void checkFrameContains(String window, String control, String text, String logLevel) {
+		if (!frameContains(window, control, text)) {
 			logging.log(String.format("Frame Should Contain: %s => FAILED", text), logLevel);
 			throw new ABTLibraryNonFatalException(
 					String.format("Frame should have contained text '%s', but did not.", text));
@@ -257,22 +275,24 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Verify the frame identified by <b>locator</b> does not contain
-	 * <b>text</b>.<br>
+	 * Verify the frame does not contain <b>text</b>.<br>
 	 * <br>
-	 * See `Introduction` for details about locators.
+	 * See `Introduction` for details about controls.
 	 * 
-	 * @param locator
-	 *            The locator to locate the frame.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the frame.
 	 * @param text
 	 *            The text to verify.
 	 * @param logLevel
 	 *            Default=INFO. Optional log level.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "text", "logLevel=INFO" })
-	public void frameShouldNotContain(String locator, String text, String logLevel) {
-		if (frameContains(locator, text)) {
+	@ArgumentNames({ "window", "control", "text", "logLevel=INFO" })
+	public void checkFrameNotContain(String window, String control, String text, String logLevel) {
+		if (frameContains(window, control, text)) {
 			logging.log(String.format("Frame Should Not Contain: %s => FAILED", text), logLevel);
 			throw new ABTLibraryNonFatalException(
 					String.format("Frame should not have contained text '%s', but did.", text));
@@ -282,8 +302,8 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldContain(String text) {
-		pageShouldContain(text, "INFO");
+	public void checkTextInPage(String text) {
+		checkTextInPage(text, "INFO");
 	}
 
 	/**
@@ -298,7 +318,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "text", "logLevel=INFO" })
-	public void pageShouldContain(String text, String logLevel) {
+	public void checkTextInPage(String text, String logLevel) {
 		if (!pageContains(text)) {
 			logging.log(String.format("Page Should Contain: %s => FAILED", text), logLevel);
 			throw new ABTLibraryNonFatalException(
@@ -309,8 +329,8 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldNotContain(String text) {
-		pageShouldNotContain(text, "INFO");
+	public void checkTextNotInPage(String text) {
+		checkTextNotInPage(text, "INFO");
 	}
 
 	/**
@@ -325,7 +345,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "text", "logLevel=INFO" })
-	public void pageShouldNotContain(String text, String logLevel) {
+	public void checkTextNotInPage(String text, String logLevel) {
 		if (pageContains(text)) {
 			logging.log(String.format("Page Should Not Contain: %s => FAILED", text), logLevel);
 			throw new ABTLibraryNonFatalException(
@@ -336,88 +356,92 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldContainElement(String locator) {
-		pageShouldContainElement(locator, "", "INFO");
+	public void checkPageContainsControl(String window, String control) {
+		checkPageContainsControl(window, control, "", "INFO");
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldContainElement(String locator, String message) {
-		pageShouldContainElement(locator, message, "INFO");
+	public void checkPageContainsControl(String window, String control, String message) {
+		checkPageContainsControl(window, control, message, "INFO");
 	}
 
 	/**
-	 * Verify the element identified by <b>locator</b> is found on the current
-	 * page.<br>
+	 * Verify the control is found on the current page.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about log levels and locators.<br>
+	 * See `Introduction` for details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * @param logLevel
 	 *            Default=INFO. Optional log level.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE", "logLevel=INFO" })
-	public void pageShouldContainElement(String locator, String message, String logLevel) {
-		pageShouldContainElement(locator, null, message, "INFO");
+	@ArgumentNames({ "window", "control", "message=NONE", "logLevel=INFO" })
+	public void checkPageContainsControl(String window, String control, String message, String logLevel) {
+		checkPageContainsControl(window, control, null, message, "INFO");
 	}
 
-	protected void pageShouldContainElement(String locator, String tag, String message, String logLevel) {
+	protected void checkPageContainsControl(String window, String control, String tag, String message,
+			String logLevel) {
 		String name = tag != null ? tag : "element";
-		if (!isElementPresent(locator, tag)) {
+		if (!isElementPresent(window, control, tag)) {
 			if (message == null || message.equals("")) {
-				message = String.format("Page should have contained %s '%s' but did not", name, locator);
+				message = String.format("Page should have contained %s '%s' but did not", name, control);
 			}
 			logging.log(message, logLevel);
 			throw new ABTLibraryNonFatalException(message);
 		} else {
-			logging.log(String.format("Current page contains %s '%s'.", name, locator), logLevel);
+			logging.log(String.format("Current page contains %s '%s'.", name, control), logLevel);
 		}
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldNotContainElement(String locator) {
-		pageShouldNotContainElement(locator, "", "INFO");
+	public void checkPageNotContainControl(String window, String control) {
+		checkPageNotContainControl(window, control, "", "INFO");
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldNotContainElement(String locator, String message) {
-		pageShouldNotContainElement(locator, message, "INFO");
+	public void checkPageNotContainControl(String window, String control, String message) {
+		checkPageNotContainControl(window, control, message, "INFO");
 	}
 
 	/**
-	 * Verify the element identified by <b>locator</b> is not found on the
-	 * current page.<br>
+	 * Verify the control is not found on the current page.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about log levels and locators.<br>
+	 * See `Introduction` for details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * @param logLevel
 	 *            Default=INFO. Optional log level.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE", "logLevel=INFO" })
-	public void pageShouldNotContainElement(String locator, String message, String logLevel) {
-		pageShouldNotContainElement(locator, null, message, "INFO");
+	@ArgumentNames({ "window", "control", "message=NONE", "logLevel=INFO" })
+	public void checkPageNotContainControl(String window, String control, String message, String logLevel) {
+		checkPageNotContainControl(window, control, null, message, "INFO");
 	}
 
-	protected void pageShouldNotContainElement(String locator, String tag, String message, String logLevel) {
+	protected void checkPageNotContainControl(String window, String control, String tag, String message,
+			String logLevel) {
 		String name = tag != null ? tag : "element";
-		if (isElementPresent(locator, tag)) {
+		if (isElementPresent(window, control, tag)) {
 			if (message == null || message.equals("")) {
-				message = String.format("Page should not have contained %s '%s' but did", name, locator);
+				message = String.format("Page should not have contained %s '%s' but did", name, control);
 			}
 			logging.log(message, logLevel);
 			throw new ABTLibraryNonFatalException(message);
 		} else {
-			logging.log(String.format("Current page does not contain %s '%s'.", name, locator), logLevel);
+			logging.log(String.format("Current page does not contain %s '%s'.", name, control), logLevel);
 		}
 	}
 
@@ -426,10 +450,10 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	// ##############################
 
 	/**
-	 * Assigns a temporary identifier to the element identified by
-	 * <b>locator</b><br>
+	 * Assigns a temporary identifier to the control identified by
+	 * <b>control</b><br>
 	 * <br>
-	 * This is mainly useful, when the locator is a complicated and slow XPath
+	 * This is mainly useful, when the control is a complicated and slow XPath
 	 * expression. The identifier expires when the page is reloaded.<br>
 	 * <br>
 	 * Example:
@@ -446,277 +470,296 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * </tr>
 	 * </table>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @param id
 	 *            The id to assign.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "id" })
-	public void assignIdToElement(String locator, String id) {
-		logging.info(String.format("Assigning temporary id '%s' to element '%s'", id, locator));
-		List<WebElement> elements = elementFind(locator, true, true);
+	@ArgumentNames({ "window", "control", "id" })
+	public void assignIdToControl(String window, String control, String id) {
+		logging.info(String.format("Assigning temporary id '%s' to control '%s'", id, control));
+		List<WebElement> elements = elementFind(window, control, true, true);
 
 		((JavascriptExecutor) browserManagement.getCurrentWebDriver())
 				.executeScript(String.format("arguments[0].id = '%s';", id), elements.get(0));
 	}
 
 	/**
-	 * Verify the element identified by <b>locator</b> is enabled.<br>
+	 * Verify the control is enabled.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void checkElementIsEnabled(String locator) {
-		if (!isEnabled(locator)) {
-			throw new ABTLibraryNonFatalException(String.format("Element %s is disabled.", locator));
+	@ArgumentNames({ "window", "control" })
+	public void checkControlEnabled(String window, String control) {
+		if (!isEnabled(window, control)) {
+			throw new ABTLibraryNonFatalException(String.format("Element %s is disabled.", control));
 		}
 	}
 
 	/**
-	 * Verify the element identified by <b>locator</b> is disabled.<br>
+	 * Verify the control is disabled.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void checkElementIsDisabled(String locator) {
-		if (isEnabled(locator)) {
-			throw new ABTLibraryNonFatalException(String.format("Element %s is enabled.", locator));
+	@ArgumentNames({ "window", "control" })
+	public void checkControlDisabled(String window, String control) {
+		if (isEnabled(window, control)) {
+			throw new ABTLibraryNonFatalException(String.format("Element %s is enabled.", control));
 		}
 	}
 
 	@RobotKeywordOverload
-	public void checkElementIsSelected(String locator) {
-		checkElementIsSelected(locator, "");
+	public void checkControlSelected(String window, String control) {
+		checkControlSelected(window, control, "");
 	}
 
 	/**
-	 * Verify the element identified by <b>locator</b> is selected.<br>
+	 * Verify the control is selected.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE" })
-	public void checkElementIsSelected(String locator, String message) {
-		logging.info(String.format("Verifying element '%s' is selected.", locator));
-		boolean selected = isSelected(locator);
+	@ArgumentNames({ "window", "control", "message=NONE" })
+	public void checkControlSelected(String window, String control, String message) {
+		logging.info(String.format("Verifying control '%s' is selected.", control));
+		boolean selected = isSelected(window, control);
 
 		if (!selected) {
 			if (message == null || message.equals("")) {
-				message = String.format("Element '%s' should be selected, but it is not.", locator);
+				message = String.format("Element '%s' should be selected, but it is not.", control);
 			}
 			throw new ABTLibraryNonFatalException(message);
 		}
 	}
 
 	@RobotKeywordOverload
-	public void checkElementIsNotSelected(String locator) {
-		checkElementIsNotSelected(locator, "");
+	public void checkControlNotSelected(String window, String control) {
+		checkControlNotSelected(window, control, "");
 	}
 
 	/**
-	 * Verify the element identified by <b>locator</b> is not selected.<br>
+	 * Verify the control is not selected.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE" })
-	public void checkElementIsNotSelected(String locator, String message) {
-		logging.info(String.format("Verifying element '%s' is not selected.", locator));
-		boolean selected = isSelected(locator);
+	@ArgumentNames({ "window", "control", "message=NONE" })
+	public void checkControlNotSelected(String window, String control, String message) {
+		logging.info(String.format("Verifying control '%s' is not selected.", control));
+		boolean selected = isSelected(window, control);
 
 		if (selected) {
 			if (message == null || message.equals("")) {
-				message = String.format("Element '%s' should not be selected, but it is.", locator);
+				message = String.format("Element '%s' should not be selected, but it is.", control);
 			}
 			throw new ABTLibraryNonFatalException(message);
 		}
 	}
 
 	@RobotKeywordOverload
-	public void checkElementIsVisible(String locator) {
-		checkElementIsVisible(locator, "");
+	public void checkControlVisible(String window, String control) {
+		checkControlVisible(window, control, "");
 	}
 
 	/**
-	 * Verify the element identified by <b>locator</b> is visible.<br>
+	 * Verify the control is visible.<br>
 	 * <br>
-	 * Herein, visible means that the element is logically visible, not
+	 * Herein, visible means that the control is logically visible, not
 	 * optically visible in the current browser viewport. For example, an
-	 * element that carries display:none is not logically visible, so using this
-	 * keyword on that element would fail.<br>
+	 * control that carries display:none is not logically visible, so using this
+	 * keyword on that control would fail.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE" })
-	public void checkElementIsVisible(String locator, String message) {
-		logging.info(String.format("Verifying element '%s' is visible.", locator));
-		boolean visible = isVisible(locator);
+	@ArgumentNames({ "window", "control", "message=NONE" })
+	public void checkControlVisible(String window, String control, String message) {
+		logging.info(String.format("Verifying control '%s' is visible.", control));
+		boolean visible = isVisible(window, control);
 
 		if (!visible) {
 			if (message == null || message.equals("")) {
-				message = String.format("Element '%s' should be visible, but it is not.", locator);
+				message = String.format("Element '%s' should be visible, but it is not.", control);
 			}
 			throw new ABTLibraryNonFatalException(message);
 		}
 	}
 
 	@RobotKeywordOverload
-	public void checkElementIsNotVisible(String locator) {
-		checkElementIsNotVisible(locator, "");
+	public void checkControlNotVisible(String window, String control) {
+		checkControlNotVisible(window, control, "");
 	}
 
 	/**
-	 * Verify the element identified by <b>locator</b> is not visible.<br>
+	 * Verify the control is not visible.<br>
 	 * <br>
-	 * Herein, visible means that the element is logically visible, not
+	 * Herein, visible means that the control is logically visible, not
 	 * optically visible in the current browser viewport. For example, an
-	 * element that carries display:none is not logically visible, so using this
-	 * keyword on that element would fail.<br>
+	 * control that carries display:none is not logically visible, so using this
+	 * keyword on that control would fail.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE" })
-	public void checkElementIsNotVisible(String locator, String message) {
-		logging.info(String.format("Verifying element '%s' is not visible.", locator));
-		boolean visible = isVisible(locator);
+	@ArgumentNames({ "window", "control", "message=NONE" })
+	public void checkControlNotVisible(String window, String control, String message) {
+		logging.info(String.format("Verifying control '%s' is not visible.", control));
+		boolean visible = isVisible(window, control);
 
 		if (visible) {
 			if (message == null || message.equals("")) {
-				message = String.format("Element '%s' should not be visible, but it is.", locator);
+				message = String.format("Element '%s' should not be visible, but it is.", control);
 			}
 			throw new ABTLibraryNonFatalException(message);
 		}
 	}
 
 	@RobotKeywordOverload
-	public void checkElementIsClickable(String locator) {
-		checkElementIsClickable(locator, "");
+	public void checkControlClickable(String window, String control) {
+		checkControlClickable(window, control, "");
 	}
 
 	/**
-	 * Verify the element identified by <b>locator</b> is clickable.<br>
+	 * Verify the control is clickable.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE" })
-	public void checkElementIsClickable(String locator, String message) {
-		logging.info(String.format("Verifying element '%s' is clickable.", locator));
-		boolean clickable = isClickable(locator);
+	@ArgumentNames({ "window", "control", "message=NONE" })
+	public void checkControlClickable(String window, String control, String message) {
+		logging.info(String.format("Verifying control '%s' is clickable.", control));
+		boolean clickable = isClickable(window, control);
 
 		if (!clickable) {
 			if (message == null || message.equals("")) {
-				message = String.format("Element '%s' should be clickable, but it is not.", locator);
+				message = String.format("Element '%s' should be clickable, but it is not.", control);
 			}
 			throw new ABTLibraryNonFatalException(message);
 		}
 	}
 
 	@RobotKeywordOverload
-	public void checkElementIsNotClickable(String locator) {
-		checkElementIsNotClickable(locator, "");
+	public void checkControlNotClickable(String window, String control) {
+		checkControlNotClickable(window, control, "");
 	}
 
 	/**
-	 * Verify the element identified by <b>locator</b> is not clickable.<br>
+	 * Verify the control is not clickable.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE" })
-	public void checkElementIsNotClickable(String locator, String message) {
-		logging.info(String.format("Verifying element '%s' is not clickable.", locator));
-		boolean clickable = isClickable(locator);
+	@ArgumentNames({ "window", "control", "message=NONE" })
+	public void checkControlNotClickable(String window, String control, String message) {
+		logging.info(String.format("Verifying control '%s' is not clickable.", control));
+		boolean clickable = isClickable(window, control);
 
 		if (clickable) {
 			if (message == null || message.equals("")) {
-				message = String.format("Element '%s' should not be clickable, but it is.", locator);
+				message = String.format("Element '%s' should not be clickable, but it is.", control);
 			}
 			throw new ABTLibraryNonFatalException(message);
 		}
 	}
 
 	@RobotKeywordOverload
-	public void checkTextInElement(String locator, String expected) {
-		checkTextInElement(locator, expected, "");
+	public void checkTextInControl(String window, String control, String expected) {
+		checkTextInControl(window, control, expected, "");
 	}
 
 	/**
-	 * Verify the text of the element identified by <b>locator</b> is exactly
-	 * <b>text</b>.<br>
+	 * Verify the text of the control is exactly <b>text</b>.<br>
 	 * <br>
 	 * In contrast to `Element Should Contain`, this keyword does not try a
-	 * substring match but an exact match on the element identified by locator.
+	 * substring match but an exact match on the control. <br>
 	 * <br>
-	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @param text
 	 *            The text to verify.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "text", "message=NONE" })
-	public void checkTextInElement(String locator, String text, String message) {
-		List<WebElement> elements = elementFind(locator, true, true);
+	@ArgumentNames({ "window", "control", "text", "message=NONE" })
+	public void checkTextInControl(String window, String control, String text, String message) {
+		List<WebElement> elements = elementFind(window, control, true, true);
 		String actual = elements.get(0).getText();
 
 		if (!text.equals(actual)) {
 			if (message == null || message.equals("")) {
-				message = String.format("The text of element '%s' should have been '%s', but it was '%s'.", locator,
+				message = String.format("The text of control '%s' should have been '%s', but it was '%s'.", control,
 						text, actual);
 			}
 			throw new ABTLibraryNonFatalException(message);
@@ -724,37 +767,37 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void checkTextIsNotInElement(String locator, String expected) {
-		checkTextIsNotInElement(locator, expected, "");
+	public void checkTextNotInControl(String window, String control, String expected) {
+		checkTextNotInControl(window, control, expected, "");
 	}
 
 	/**
-	 * Verify the text of the element identified by <b>locator</b> is not
-	 * exactly <b>text</b>.<br>
+	 * Verify the text of the control is not exactly <b>text</b>.<br>
 	 * <br>
-	 * In contrast to `Element Should Not Contain`, this keyword does not try a
-	 * substring match but an exact match on the element identified by locator.
+	 * In contrast to `Check Control Not Contain`, this keyword does not try a
+	 * substring match but an exact match on the control. <br>
 	 * <br>
-	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @param text
 	 *            The text to verify.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "text", "message=NONE" })
-	public void checkTextIsNotInElement(String locator, String text, String message) {
-		List<WebElement> elements = elementFind(locator, true, true);
+	@ArgumentNames({ "window", "control", "text", "message=NONE" })
+	public void checkTextNotInControl(String window, String control, String text, String message) {
+		List<WebElement> elements = elementFind(window, control, true, true);
 		String actual = elements.get(0).getText();
 
 		if (text.equals(actual)) {
 			if (message == null || message.equals("")) {
-				message = String.format("The text of element '%s' should have been '%s', but it was '%s'.", locator,
+				message = String.format("The text of control '%s' should have been '%s', but it was '%s'.", control,
 						text, actual);
 			}
 			throw new ABTLibraryNonFatalException(message);
@@ -762,24 +805,23 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Returns the value of an element attribute.<br>
+	 * Returns the value of an control attribute.<br>
 	 * <br>
-	 * The <b>attribute_locator</b> consists of element locator followed by an @
-	 * sign and attribute name. Example: element_id@class<br>
+	 * The <b>attribute_control</b> consists of control followed by an @ sign
+	 * and attribute name. Example: element_id@class<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param attributeLocator
-	 *            The attribute locator.
+	 * @param attributecontrol
+	 *            The attribute control.
 	 * @return The attribute value.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "attributeLocator" })
-	public String getElementAttribute(String attributeLocator) {
-		String[] parts = parseAttributeLocator(attributeLocator);
+	@ArgumentNames({ "attributecontrol" })
+	public String getElementAttribute(String attributecontrol) {
+		String[] parts = parseAttributecontrol(attributecontrol);
 
-		List<WebElement> elements = elementFind(parts[0], true, false);
+		List<WebElement> elements = elementFind("", parts[0], true, false);
 
 		if (elements.size() == 0) {
 			throw new ABTLibraryNonFatalException(String.format("Element '%s' not found.", parts[0]));
@@ -789,7 +831,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Clears the text from element identified by <b>locator</b>.<br>
+	 * Clears the text from control.<br>
 	 * <br>
 	 * This keyword does not execute any checks on whether or not the clear
 	 * method has succeeded, so if any subsequent checks are needed, they should
@@ -797,48 +839,52 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * <br>
 	 * Also, this method will use WebDriver's internal _element.clear()_ method,
 	 * i.e. it will not send any keypresses, and it will not have any effect
-	 * whatsoever on elements1 other than input textfields or input textareas.
+	 * whatsoever on elements other than input textfields or input textareas.
 	 * Clients relying on keypresses should implement their own methods.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void clearElementText(String locator) {
-		List<WebElement> elements = elementFind(locator, true, true);
+	@ArgumentNames({ "window", "control" })
+	public void clearText(String window, String control) {
+		List<WebElement> elements = elementFind(window, control, true, true);
 
 		elements.get(0).clear();
 	}
 
 	/**
-	 * Returns inner element id by index<b></b> of element identified by
-	 * <b>locator</b> which is matched by <b>matchid</b>.<br>
+	 * Returns inner control id by index<b></b> of control identified by
+	 * <b>control</b> which is matched by <b>matchid</b>.<br>
 	 * <br>
 	 * The position is returned in pixels off the left side of the page, as an
-	 * integer. Fails if the matching element is not found.<br>
+	 * integer. Fails if the matching control is not found.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
-	 *
-	 * @param locator
-	 *            The locator to locate the element.
+	 * See `Introduction` for details about controls.<br>
+	 * 
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @param matchid
-	 *            partial inner element id to match
+	 *            partial inner control id to match
 	 * @param index
-	 *            position of the inner element to match
-	 * @return The element id
+	 *            position of the inner control to match
+	 * @return The control id
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "matchid", "index" })
-	public String getInnerElementId(String locator, String matchid, int index) {
-		List<WebElement> elements = elementFind(locator, true, true);
+	@ArgumentNames({ "window", "control", "matchid", "index" })
+	public String getInnerElementId(String window, String control, String matchid, int index) {
+		List<WebElement> elements = elementFind(window, control, true, true);
 
 		if (elements.size() == 0) {
-			throw new ABTLibraryNonFatalException(String.format("get Inner element '%s' not found.", locator));
+			throw new ABTLibraryNonFatalException(String.format("get Inner control '%s' not found.", control));
 		}
 
 		String xpathId = ".//*[contains(@id," + matchid + ")]";
@@ -846,60 +892,63 @@ public class Element extends RunOnFailureKeywordsAdapter {
 		List<WebElement> tmpe = elements.get(0).findElements((By.xpath(xpathId)));
 		if (tmpe.size() == 0) {
 			throw new ABTLibraryNonFatalException(
-					String.format("No Inner element '%s' not found by '%s'", locator, matchid));
+					String.format("No Inner control '%s' not found by '%s'", control, matchid));
 		}
 		String eId = tmpe.get(index).getAttribute("id");
 
-		logging.info(String.format("Found element ID: '%s'.", eId));
+		logging.info(String.format("Found control ID: '%s'.", eId));
 
 		return eId;
 
 	}
 
 	/**
-	 * Returns horizontal position of element identified by <b>locator</b>.<br>
+	 * Returns horizontal position of control.<br>
 	 * <br>
 	 * The position is returned in pixels off the left side of the page, as an
-	 * integer. Fails if the matching element is not found.<br>
+	 * integer. Fails if the matching control is not found.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @return The horizontal position
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public int getHorizontalPosition(String locator) {
-		List<WebElement> elements = elementFind(locator, true, false);
+	@ArgumentNames({ "window", "control" })
+	public int getHorizontalPosition(String window, String control) {
+		List<WebElement> elements = elementFind(window, control, true, false);
 
 		if (elements.size() == 0) {
-			throw new ABTLibraryNonFatalException(String.format("Could not determine position for '%s'.", locator));
+			throw new ABTLibraryNonFatalException(String.format("Could not determine position for '%s'.", control));
 		}
 
 		return elements.get(0).getLocation().getX();
 	}
 
 	/**
-	 * Returns the value attribute of the element identified by <b>locator</b>.
+	 * Returns the value attribute of the control. <br>
 	 * <br>
-	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @return The value attribute of the element.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public String getValue(String locator) {
-		return getValue(locator, null);
+	@ArgumentNames({ "window", "control" })
+	public String getValue(String window, String control) {
+		return getValue(window, control, null);
 	}
 
-	protected String getValue(String locator, String tag) {
-		List<WebElement> elements = elementFind(locator, true, false, tag);
+	protected String getValue(String window, String control, String tag) {
+		List<WebElement> elements = elementFind(window, control, true, false, tag);
 
 		if (elements.size() == 0) {
 			return null;
@@ -909,19 +958,21 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Returns the text of the element identified by <b>locator</b>.<br>
+	 * Returns the text of the control.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @return The text of the element.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public String getText(String locator) {
-		List<WebElement> elements = elementFind(locator, true, true);
+	@ArgumentNames({ "window", "control" })
+	public String getText(String window, String control) {
+		List<WebElement> elements = elementFind(window, control, true, true);
 
 		if (elements.size() == 0) {
 			return null;
@@ -930,25 +981,27 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Returns vertical position of element identified by <b>locator</b>.<br>
+	 * Returns vertical position of control.<br>
 	 * <br>
 	 * The position is returned in pixels off the top of the page, as an
-	 * integer. Fails if the matching element is not found.<br>
+	 * integer. Fails if the matching control is not found.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @return The vertical position
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public int getVerticalPosition(String locator) {
-		List<WebElement> elements = elementFind(locator, true, false);
+	@ArgumentNames({ "window", "control" })
+	public int getVerticalPosition(String window, String control) {
+		List<WebElement> elements = elementFind(window, control, true, false);
 
 		if (elements.size() == 0) {
-			throw new ABTLibraryNonFatalException(String.format("Could not determine position for '%s'.", locator));
+			throw new ABTLibraryNonFatalException(String.format("Could not determine position for '%s'.", control));
 		}
 
 		return elements.get(0).getLocation().getY();
@@ -959,37 +1012,41 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	// ##############################
 
 	/**
-	 * Click on the element identified by <b>locator</b>.<br>
+	 * Click on the control.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void clickElement(String locator) {
-		logging.info(String.format("Clicking element '%s'.", locator));
-		List<WebElement> elements = elementFind(locator, true, true);
+	@ArgumentNames({ "window", "control" })
+	public void click(String window, String control) {
+		logging.info(String.format("Clicking control '%s'.", control));
+		List<WebElement> elements = elementFind(window, control, true, true);
 
 		elements.get(0).click();
 	}
 
 	/**
-	 * Click on the element identified by <b>locator</b> at the coordinates
-	 * <b>xOffset</b> and <b>yOffset</b>.<br>
+	 * Click on the control at the coordinates <b>xOffset</b> and <b>yOffset</b>
+	 * .<br>
 	 * <br>
-	 * The cursor is moved at the center of the element and the to the given x/y
+	 * The cursor is moved at the center of the control and the to the given x/y
 	 * offset from that point. Both offsets are specified as negative (left/up)
 	 * or positive (right/down) number.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * <br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @param xOffset
 	 *            The horizontal offset in pixel. Negative means left, positive
 	 *            right.
@@ -998,10 +1055,10 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 *            down.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "xOffset", "yOffset" })
-	public void clickElementAtCoordinates(String locator, String xOffset, String yOffset) {
-		logging.info(String.format("Clicking element '%s'in coordinates '%s', '%s'.", locator, xOffset, yOffset));
-		List<WebElement> elements = elementFind(locator, true, true);
+	@ArgumentNames({ "window", "control", "xOffset", "yOffset" })
+	public void clickAtCoordinates(String window, String control, String xOffset, String yOffset) {
+		logging.info(String.format("Clicking control '%s'in coordinates '%s', '%s'.", control, xOffset, yOffset));
+		List<WebElement> elements = elementFind(window, control, true, true);
 
 		WebElement element = elements.get(0);
 		Actions action = new Actions(browserManagement.getCurrentWebDriver());
@@ -1009,48 +1066,51 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Double-Click on the element identified by <b>locator</b>.<br>
+	 * Double-Click on the control.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void doubleClickElement(String locator) {
-		logging.info(String.format("Double clicking element '%s'.", locator));
+	@ArgumentNames({ "window", "control" })
+	public void doubleClick(String window, String control) {
+		logging.info(String.format("Double clicking control '%s'.", control));
 
-		List<WebElement> elements = elementFind(locator, true, true);
+		List<WebElement> elements = elementFind(window, control, true, true);
 		Actions action = new Actions(browserManagement.getCurrentWebDriver());
 
 		action.doubleClick(elements.get(0)).perform();
 	}
 
 	/**
-	 * Set the focus to the element identified by <b>locator</b>.<br>
+	 * Set the focus to the control.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void focus(String locator) {
-		List<WebElement> elements = elementFind(locator, true, true);
+	@ArgumentNames({ "window", "control" })
+	public void focus(String window, String control) {
+		List<WebElement> elements = elementFind(window, control, true, true);
 		((JavascriptExecutor) browserManagement.getCurrentWebDriver()).executeScript("arguments[0].focus();",
 				elements.get(0));
 	}
 
 	/**
-	 * Drag the element identified by the locator <b>source</b> and move it on
-	 * top of the element identified by the locator <b>target</b>.<br>
+	 * Drag the control identified by the control <b>source</b> and move it on
+	 * top of the control identified by the control <b>target</b>.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * <br>
 	 * Example:
 	 * <table border="1" cellspacing="0" summary="">
@@ -1063,30 +1123,29 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * </table>
 	 * 
 	 * @param source
-	 *            The locator to locate the element to drag.
+	 *            The control to locate the control to drag.
 	 * @param target
-	 *            The locator to locate the element where to drop the dragged
+	 *            The control to locate the control where to drop the dragged
 	 *            element.
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "source", "target" })
 	public void dragAndDrop(String source, String target) {
-		List<WebElement> sourceElements = elementFind(source, true, true);
-		List<WebElement> targetElements = elementFind(target, true, true);
+		List<WebElement> sourceElements = elementFind("", source, true, true);
+		List<WebElement> targetElements = elementFind("", target, true, true);
 
 		Actions action = new Actions(browserManagement.getCurrentWebDriver());
 		action.dragAndDrop(sourceElements.get(0), targetElements.get(0)).perform();
 	}
 
 	/**
-	 * Drag the element identified by the locator <b>source</b> and move it by
+	 * Drag the control identified by the control <b>source</b> and move it by
 	 * <b>xOffset</b> and <b>yOffset</b>.<br>
 	 * <br>
 	 * Both offsets are specified as negative (left/up) or positive (right/down)
 	 * number.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * <br>
 	 * Example:
 	 * <table border="1" cellspacing="0" summary="">
@@ -1100,7 +1159,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * </table>
 	 * 
 	 * @param source
-	 *            The locator to locate the element to drag.
+	 *            The control to locate the control to drag.
 	 * @param xOffset
 	 *            The horizontal offset in pixel. Negative means left, positive
 	 *            right.
@@ -1111,34 +1170,36 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	@RobotKeyword
 	@ArgumentNames({ "source", "xOffset", "yOffset" })
 	public void dragAndDropByOffset(String source, int xOffset, int yOffset) {
-		List<WebElement> elements = elementFind(source, true, true);
+		List<WebElement> elements = elementFind("", source, true, true);
 
 		Actions action = new Actions(browserManagement.getCurrentWebDriver());
 		action.dragAndDropBy(elements.get(0), xOffset, yOffset).perform();
 	}
 
 	/**
-	 * Simulates pressing the left mouse button on the element identified by
-	 * <b>locator</b>.<br>
+	 * Simulates pressing the left mouse button on the control identified by
+	 * <b>control</b>.<br>
 	 * <br>
-	 * The element is pressed without releasing the mouse button.<br>
+	 * The control is pressed without releasing the mouse button.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @see Element#mouseDownOnImage
 	 * @see Element#mouseDownOnLink
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void mouseDown(String locator) {
-		logging.info(String.format("Simulating Mouse Down on element '%s'.", locator));
-		List<WebElement> elements = elementFind(locator, true, false);
+	@ArgumentNames({ "window", "control" })
+	public void mouseDown(String window, String control) {
+		logging.info(String.format("Simulating Mouse Down on control '%s'.", control));
+		List<WebElement> elements = elementFind(window, control, true, false);
 
 		if (elements.size() == 0) {
-			throw new ABTLibraryNonFatalException(String.format("ERROR: Element %s not found.", locator));
+			throw new ABTLibraryNonFatalException(String.format("ERROR: control %s not found.", control));
 		}
 
 		Actions action = new Actions(browserManagement.getCurrentWebDriver());
@@ -1146,23 +1207,25 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Simulates moving the mouse away from the element identified by
-	 * <b>locator</b>.<br>
+	 * Simulates moving the mouse away from the control identified by
+	 * <b>control</b>.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void mouseOut(String locator) {
-		logging.info(String.format("Simulating Mouse Out on element '%s'.", locator));
-		List<WebElement> elements = elementFind(locator, true, false);
+	@ArgumentNames({ "window", "control" })
+	public void mouseOut(String window, String control) {
+		logging.info(String.format("Simulating Mouse Out on control '%s'.", control));
+		List<WebElement> elements = elementFind(window, control, true, false);
 
 		if (elements.size() == 0) {
-			throw new ABTLibraryNonFatalException(String.format("ERROR: Element %s not found.", locator));
+			throw new ABTLibraryNonFatalException(String.format("ERROR: control %s not found.", control));
 		}
 
 		WebElement element = elements.get(0);
@@ -1175,23 +1238,24 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Simulates moving the mouse over the element identified by <b>locator</b>.
+	 * Simulates moving the mouse over the control. <br>
 	 * <br>
-	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void mouseOver(String locator) {
-		logging.info(String.format("Simulating Mouse Over on element '%s'.", locator));
-		List<WebElement> elements = elementFind(locator, true, false);
+	@ArgumentNames({ "window", "control" })
+	public void mouseOver(String window, String control) {
+		logging.info(String.format("Simulating Mouse Over on control '%s'.", control));
+		List<WebElement> elements = elementFind(window, control, true, false);
 
 		if (elements.size() == 0) {
-			throw new ABTLibraryNonFatalException(String.format("ERROR: Element %s not found.", locator));
+			throw new ABTLibraryNonFatalException(String.format("ERROR: control %s not found.", control));
 		}
 
 		WebElement element = elements.get(0);
@@ -1200,23 +1264,25 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Simulates releasing the left mouse button on the element identified by
-	 * <b>locator</b>.<br>
+	 * Simulates releasing the left mouse button on the control identified by
+	 * <b>control</b>.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void mouseUp(String locator) {
-		logging.info(String.format("Simulating Mouse Up on element '%s'.", locator));
-		List<WebElement> elements = elementFind(locator, true, false);
+	@ArgumentNames({ "window", "control" })
+	public void mouseUp(String window, String control) {
+		logging.info(String.format("Simulating Mouse Up on control '%s'.", control));
+		List<WebElement> elements = elementFind(window, control, true, false);
 
 		if (elements.size() == 0) {
-			throw new ABTLibraryNonFatalException(String.format("ERROR: Element %s not found.", locator));
+			throw new ABTLibraryNonFatalException(String.format("ERROR: control %s not found.", control));
 		}
 
 		WebElement element = elements.get(0);
@@ -1225,42 +1291,46 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Opens the context menu on the element identified by <b>locator</b>.<br>
+	 * Opens the context menu on the control.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void openContextMenu(String locator) {
-		List<WebElement> elements = elementFind(locator, true, true);
+	@ArgumentNames({ "window", "control" })
+	public void openContextMenu(String window, String control) {
+		List<WebElement> elements = elementFind(window, control, true, true);
 
 		Actions action = new Actions(browserManagement.getCurrentWebDriver());
 		action.contextClick(elements.get(0)).perform();
 	}
 
 	/**
-	 * Simulates the given <b>event</b> on the element identified by
-	 * <b>locator</b>.<br>
+	 * Simulates the given <b>event</b> on the control identified by
+	 * <b>control</b>.<br>
 	 * <br>
-	 * This keyword is especially useful, when the element has an OnEvent
+	 * This keyword is especially useful, when the control has an OnEvent
 	 * handler that needs to be explicitly invoked.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @param event
 	 *            The event to invoke.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "event" })
-	public void simulate(String locator, String event) {
-		List<WebElement> elements = elementFind(locator, true, true);
+	@ArgumentNames({ "window", "control", "event" })
+	public void simulate(String window, String control, String event) {
+		List<WebElement> elements = elementFind(window, control, true, true);
 		String script = "element = arguments[0];" + "eventName = arguments[1];" + "if (document.createEventObject) {"
 				+ "return element.fireEvent('on' + eventName, document.createEventObject());" + "}"
 				+ "var evt = document.createEvent(\"HTMLEvents\");" + "evt.initEvent(eventName, true, true);"
@@ -1270,14 +1340,12 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	/**
-	 * Simulates pressing <b>key</b> on the element identified by <b>locator</b>
-	 * .<br>
+	 * Simulates pressing <b>key</b> on the control .<br>
 	 * <br>
 	 * Key is either a single character, or a numerical ASCII code of the key
 	 * lead by '\\'.<br>
 	 * <br>
-	 * Key attributes for arbitrary elements1 are id and name. See `Introduction`
-	 * for details about locators.<br>
+	 * See `Introduction` for details about controls.<br>
 	 * <br>
 	 * Example:
 	 * <table border="1" cellspacing="0" summary="">
@@ -1295,18 +1363,21 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 * </tr>
 	 * </table>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @param key
 	 *            The key to press.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "key" })
-	public void pressKey(String locator, String key) {
+	@ArgumentNames({ "window", "control", "key" })
+	public void pressKey(String window, String control, String key) {
 		if (key.startsWith("\\") && key.length() > 1) {
 			key = mapAsciiKeyCodeToKey(Integer.parseInt(key.substring(1))).toString();
 		}
-		List<WebElement> element = elementFind(locator, true, true);
+		List<WebElement> element = elementFind(window, control, true, true);
 		element.get(0).sendKeys(key);
 	}
 
@@ -1315,19 +1386,22 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	// ##############################
 
 	/**
-	 * Click on the link identified by <b>locator</b>.<br>
+	 * Click on the link.<br>
 	 * <br>
 	 * Key attributes for links are id, name, href and link text. See
-	 * `Introduction` for details about locators.<br>
+	 * `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the link.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void clickLink(String locator) {
-		logging.info(String.format("Clicking link '%s'.", locator));
-		List<WebElement> elements = elementFind(locator, true, true, "a");
+	@ArgumentNames({ "window", "control" })
+	public void clickLink(String window, String control) {
+		logging.info(String.format("Clicking link '%s'.", control));
+		List<WebElement> elements = elementFind(window, control, true, true, "a");
 
 		elements.get(0).click();
 	}
@@ -1343,7 +1417,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	public ArrayList<String> getAllLinks() {
 		ArrayList<String> ret = new ArrayList<String>();
 
-		List<WebElement> elements = elementFind("tag=a", false, false, "a");
+		List<WebElement> elements = elementFind("", "tag=a", false, false, "a");
 		for (WebElement element : elements) {
 			ret.add(element.getAttribute("id"));
 		}
@@ -1353,87 +1427,94 @@ public class Element extends RunOnFailureKeywordsAdapter {
 
 	/**
 	 * Simulates pressing the left mouse button on the link identified by
-	 * <b>locator</b>.<br>
+	 * <b>control</b>.<br>
 	 * <br>
-	 * The element is pressed without releasing the mouse button.<br>
+	 * The control is pressed without releasing the mouse button.<br>
 	 * <br>
 	 * Key attributes for links are id, name, href and link text. See
-	 * `Introduction` for details about locators.<br>
+	 * `Introduction` for details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @see Element#mouseDown
 	 * @see Element#mouseDownOnImage
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void mouseDownOnLink(String locator) {
-		List<WebElement> elements = elementFind(locator, true, true, "link");
+	@ArgumentNames({ "window", "control" })
+	public void mouseDownOnLink(String window, String control) {
+		List<WebElement> elements = elementFind(window, control, true, true, "link");
 
 		Actions action = new Actions(browserManagement.getCurrentWebDriver());
 		action.clickAndHold(elements.get(0)).perform();
 	}
 
 	@RobotKeywordOverload
-	@ArgumentNames({ "locator" })
-	public void pageShouldContainLink(String locator) {
-		pageShouldContainLink(locator, "", "INFO");
+	@ArgumentNames({ "window", "control" })
+	public void checkPageContainsLink(String window, String control) {
+		checkPageContainsLink(window, control, "", "INFO");
 	}
 
 	@RobotKeywordOverload
-	@ArgumentNames({ "locator", "message=NONE" })
-	public void pageShouldContainLink(String locator, String message) {
-		pageShouldContainLink(locator, message, "INFO");
+	@ArgumentNames({ "window", "control", "message=NONE" })
+	public void checkPageContainsLink(String window, String control, String message) {
+		checkPageContainsLink(window, control, message, "INFO");
 	}
 
 	/**
-	 * Verify the link identified by <b>locator</b> is found on the current
-	 * page.<br>
+	 * Verify the link is found on the current page.<br>
 	 * <br>
 	 * Key attributes for links are id, name, href and link text. See
-	 * `Introduction` for details about log levels and locators.<br>
+	 * `Introduction` for details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the link.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the link.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * @param logLevel
 	 *            Default=INFO. Optional log level.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE", "logLevel=INFO" })
-	public void pageShouldContainLink(String locator, String message, String logLevel) {
-		pageShouldContainElement(locator, "link", message, logLevel);
+	@ArgumentNames({ "window", "control", "message=NONE", "logLevel=INFO" })
+	public void checkPageContainsLink(String window, String control, String message, String logLevel) {
+		checkPageContainsControl(window, control, "link", message, logLevel);
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldNotContainLink(String locator) {
-		pageShouldNotContainLink(locator, "", "INFO");
+	public void checkPageNotContainLink(String window, String control) {
+		checkPageNotContainLink(window, control, "", "INFO");
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldNotContainLink(String locator, String message) {
-		pageShouldNotContainLink(locator, message, "INFO");
+	public void checkPageNotContainLink(String window, String control, String message) {
+		checkPageNotContainLink(window, control, message, "INFO");
 	}
 
 	/**
-	 * Verify the link identified by <b>locator</b> is not found on the current
-	 * page.<br>
+	 * Verify the link is not found on the current page.<br>
 	 * <br>
 	 * Key attributes for links are id, name, href and link text. See
-	 * `Introduction` for details about log levels and locators.<br>
+	 * `Introduction` for details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the link.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the link.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * @param logLevel
 	 *            Default=INFO. Optional log level.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE", "logLevel=INFO" })
-	public void pageShouldNotContainLink(String locator, String message, String logLevel) {
-		pageShouldNotContainElement(locator, "link", message, logLevel);
+	@ArgumentNames({ "window", "control", "message=NONE", "logLevel=INFO" })
+	public void checkPageNotContainLink(String window, String control, String message, String logLevel) {
+		checkPageNotContainControl(window, control, "link", message, logLevel);
 	}
 
 	// ##############################
@@ -1441,23 +1522,26 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	// ##############################
 
 	/**
-	 * Click on the image identified by <b>locator</b>.<br>
+	 * Click on the image.<br>
 	 * <br>
 	 * Key attributes for images are id, src and alt. See `Introduction` for
-	 * details about locators.<br>
+	 * details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void clickImage(String locator) {
-		logging.info(String.format("Clicking image '%s'.", locator));
+	@ArgumentNames({ "window", "control" })
+	public void clickImage(String window, String control) {
+		logging.info(String.format("Clicking image '%s'.", control));
 
-		List<WebElement> elements = elementFind(locator, true, false, "image");
+		List<WebElement> elements = elementFind(window, control, true, false, "image");
 
 		if (elements.size() == 0) {
-			elements = elementFind(locator, true, true, "input");
+			elements = elementFind(window, control, true, true, "input");
 		}
 		WebElement element = elements.get(0);
 		element.click();
@@ -1465,89 +1549,98 @@ public class Element extends RunOnFailureKeywordsAdapter {
 
 	/**
 	 * Simulates pressing the left mouse button on the image identified by
-	 * <b>locator</b>.<br>
+	 * <b>control</b>.<br>
 	 * <br>
-	 * The element is pressed without releasing the mouse button.<br>
+	 * The control is pressed without releasing the mouse button.<br>
 	 * <br>
 	 * Key attributes for images are id, src and alt. See `Introduction` for
-	 * details about locators.<br>
+	 * details about controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the element.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The name or locator of select control.
 	 * @see Element#mouseDown
 	 * @see Element#mouseDownOnLink
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void mouseDownOnImage(String locator) {
-		List<WebElement> elements = elementFind(locator, true, true, "image");
+	@ArgumentNames({ "window", "control" })
+	public void mouseDownOnImage(String window, String control) {
+		List<WebElement> elements = elementFind(window, control, true, true, "image");
 
 		Actions action = new Actions(browserManagement.getCurrentWebDriver());
 		action.clickAndHold(elements.get(0)).perform();
 	}
 
 	@RobotKeywordOverload
-	@ArgumentNames({ "locator" })
-	public void pageShouldContainImage(String locator) {
-		pageShouldContainImage(locator, "", "INFO");
+	@ArgumentNames({ "window", "control" })
+	public void checkPageContainsImage(String window, String control) {
+		checkPageContainsImage(window, control, "", "INFO");
 	}
 
 	@RobotKeywordOverload
-	@ArgumentNames({ "locator", "message=NONE" })
-	public void pageShouldContainImage(String locator, String message) {
-		pageShouldContainImage(locator, message, "INFO");
+	@ArgumentNames({ "window", "control", "message=NONE" })
+	public void checkPageContainsImage(String window, String control, String message) {
+		checkPageContainsImage(window, control, message, "INFO");
 	}
 
 	/**
-	 * Verify the image identified by <b>locator</b> is found on the current
-	 * page.<br>
+	 * Verify the image is found on the current page.<br>
 	 * <br>
 	 * Key attributes for images are id, src and alt. See `Introduction` for
-	 * details about log levels and locators.<br>
+	 * details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the link.
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
+	 *            The control to locate the link.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * @param logLevel
 	 *            Default=INFO. Optional log level.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE", "logLevel=INFO" })
-	public void pageShouldContainImage(String locator, String message, String logLevel) {
-		pageShouldContainElement(locator, "image", message, logLevel);
+	@ArgumentNames({ "window", "control", "message=NONE", "logLevel=INFO" })
+	public void checkPageContainsImage(String window, String control, String message, String logLevel) {
+		checkPageContainsControl(window, control, "image", message, logLevel);
 	}
 
 	@RobotKeywordOverload
-	@ArgumentNames({ "locator" })
-	public void pageShouldNotContainImage(String locator) {
-		pageShouldNotContainImage(locator, "", "INFO");
+	@ArgumentNames({ "window", "control" })
+	public void checkPageNotContainImage(String window, String control) {
+		checkPageNotContainImage(window, control, "", "INFO");
 	}
 
 	@RobotKeywordOverload
-	@ArgumentNames({ "locator", "message=NONE" })
-	public void pageShouldNotContainImage(String locator, String message) {
-		pageShouldNotContainImage(locator, message, "INFO");
+	@ArgumentNames({ "window", "control", "message=NONE" })
+	public void checkPageNotContainImage(String window, String control, String message) {
+		checkPageNotContainImage(window, control, message, "INFO");
 	}
 
 	/**
-	 * Verify the image identified by <b>locator</b> is not found on the current
-	 * page.<br>
+	 * Verify the image is not found on the current page.<br>
 	 * <br>
 	 * Key attributes for images are id, src and alt. See `Introduction` for
-	 * details about log levels and locators.<br>
+	 * details about log levels and controls.<br>
 	 * 
-	 * @param locator
-	 *            The locator to locate the link.
+	 * @param window
+	 *            The interface contains the link. If the link has not defined
+	 *            in any interfaces, input "*" for window.
+	 * @param control
+	 *            The test name of the link captured in <b>window</b>. If the
+	 *            link has not defined in any interfaces, input locator/xpath
+	 *            for control.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * @param logLevel
 	 *            Default=INFO. Optional log level.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE", "logLevel=INFO" })
-	public void pageShouldNotContainImage(String locator, String message, String logLevel) {
-		pageShouldNotContainElement(locator, "image", message, logLevel);
+	@ArgumentNames({ "window", "control", "message=NONE", "logLevel=INFO" })
+	public void checkPageNotContainImage(String window, String control, String message, String logLevel) {
+		checkPageNotContainControl(window, control, "image", message, logLevel);
 	}
 
 	// ##############################
@@ -1555,14 +1648,14 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	// ##############################
 
 	/**
-	 * Returns the number of elements1 located the given <b>xpath</b>.<br>
+	 * Returns the number of controls located the given <b>xpath</b>.<br>
 	 * <br>
-	 * If you wish to assert the number of located elements1, use `Xpath Should
+	 * If you wish to assert the number of located controls, use `Xpath Should
 	 * Match X Times`.<br>
 	 * 
 	 * @param xpath
-	 *            The XPath to match page elements1
-	 * @return The number of located elements1
+	 *            The XPath to match page controls
+	 * @return The number of located controls
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "xpath" })
@@ -1570,31 +1663,31 @@ public class Element extends RunOnFailureKeywordsAdapter {
 		if (!xpath.startsWith("xpath=")) {
 			xpath = "xpath=" + xpath;
 		}
-		List<WebElement> elements = elementFind(xpath, false, false);
+		List<WebElement> elements = elementFind("", xpath, false, false);
 
 		return elements.size();
 	}
 
 	@RobotKeywordOverload
 	@ArgumentNames({ "xpath", "expectedXpathCount" })
-	public void xpathShouldMatchXTimes(String xpath, int expectedXpathCount) {
-		xpathShouldMatchXTimes(xpath, expectedXpathCount, "");
+	public void checkXpattMatchsXTimes(String xpath, int expectedXpathCount) {
+		checkXpattMatchsXTimes(xpath, expectedXpathCount, "");
 	}
 
 	@RobotKeywordOverload
 	@ArgumentNames({ "xpath", "expectedXpathCount", "message=NONE" })
-	public void xpathShouldMatchXTimes(String xpath, int expectedXpathCount, String message) {
-		xpathShouldMatchXTimes(xpath, expectedXpathCount, message, "INFO");
+	public void checkXpattMatchsXTimes(String xpath, int expectedXpathCount, String message) {
+		checkXpattMatchsXTimes(xpath, expectedXpathCount, message, "INFO");
 	}
 
 	/**
-	 * Verify that the page contains the <b>expectedXpathCount</b> of elements1
+	 * Verify that the page contains the <b>expectedXpathCount</b> of controls
 	 * located by the given <b>xpath</b>.<br>
 	 * 
 	 * @param xpath
-	 *            The XPath to match page elements1
+	 *            The XPath to match page controls
 	 * @param expectedXpathCount
-	 *            The expected number of located elements1
+	 *            The expected number of located controls
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
 	 * @param logLevel
@@ -1602,11 +1695,11 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "xpath", "expectedXpathCount", "message=NONE", "logLevel=INFO" })
-	public void xpathShouldMatchXTimes(String xpath, int expectedXpathCount, String message, String logLevel) {
+	public void checkXpattMatchsXTimes(String xpath, int expectedXpathCount, String message, String logLevel) {
 		if (!xpath.startsWith("xpath=")) {
 			xpath = "xpath=" + xpath;
 		}
-		List<WebElement> elements = elementFind(xpath, false, false);
+		List<WebElement> elements = elementFind("", xpath, false, false);
 		int actualXpathCount = elements.size();
 
 		if (actualXpathCount != expectedXpathCount) {
@@ -1617,7 +1710,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 			throw new ABTLibraryNonFatalException(message);
 		}
 
-		logging.log(String.format("Current page contains %s elements1 matching '%s'.", actualXpathCount, xpath),
+		logging.log(String.format("Current page contains %s controls matching '%s'.", actualXpathCount, xpath),
 				logLevel);
 	}
 
@@ -1625,37 +1718,41 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	// Internal Methods
 	// ##############################
 
-	public List<WebElement> elementFind(String locator, boolean firstOnly, boolean required) {
-		return elementFind(locator, firstOnly, required, null);
+	public List<WebElement> elementFind(String window, String control, boolean firstOnly, boolean required) {
+		return elementFind(window, control, firstOnly, required, null);
 	}
 
-	protected List<WebElement> elementFind(String locator, boolean firstOnly, boolean required, String tag) {
+	protected List<WebElement> elementFind(String window, String control, boolean firstOnly, boolean required,
+			String tag) {
 		List<WebElement> elements = new ArrayList<WebElement>();
 		/**
-		 * Updated by Khoi Date: Sep 05, 2016
+		 * Updated by Khoi Date: Nov 20, 2016 Add argument window. Change name
+		 * control to element
 		 */
 		String orgImplicitWait = "";
-		// Check if input user data for locator is name of defined elements1.
-		List<String> tempLocators = interfaceManagement.getLocators(locator);
-
-		for (String tempLocator : tempLocators) {
-			elements.addAll(ElementFinder.find(browserManagement, tempLocator, tag));
-			if (elements.size() > 0) {
-				break;
-			} else {
-				/**
-				 * Decrease wait time to find elements1 faster.
-				 */
-				orgImplicitWait = browserManagement.setSeleniumImplicitWait("0.0");
+		// Check if input user data for control is name of defined control.
+		if (!window.equals("")) {
+			List<String> tempcontrols = userInterface.getLocators(window, control);
+			System.out.println(tempcontrols);
+			for (String tempcontrol : tempcontrols) {
+				elements.addAll(ElementFinder.find(browserManagement, tempcontrol, tag));
+				if (elements.size() > 0) {
+					break;
+				} else {
+					/**
+					 * Decrease wait time to find elements faster.
+					 */
+					orgImplicitWait = browserManagement.setSeleniumImplicitWait("0.0");
+				}
 			}
 		}
-		// If there is no element defined with name matched input locator.
+		// If there is no control defined with name matched input control.
 		if (elements.size() == 0) {
-			elements.addAll(ElementFinder.find(browserManagement, locator, tag));
+			elements.addAll(ElementFinder.find(browserManagement, control, tag));
 		}
 		if (required && elements.size() == 0) {
 			throw new ABTLibraryNonFatalException(
-					String.format("Element locator '%s' did not match any elements1.", locator));
+					String.format("Element control '%s' did not match any elements.", control));
 		}
 
 		if (firstOnly) {
@@ -1672,12 +1769,12 @@ public class Element extends RunOnFailureKeywordsAdapter {
 		return elements;
 	}
 
-	protected boolean frameContains(String locator, String text) {
+	protected boolean frameContains(String window, String control, String text) {
 		WebDriver current = browserManagement.getCurrentWebDriver();
-		List<WebElement> elements = elementFind(locator, true, true);
+		List<WebElement> elements = elementFind(window, control, true, true);
 
 		current.switchTo().frame(elements.get(0));
-		logging.info(String.format("Searching for text from frame '%s'.", locator));
+		logging.info(String.format("Searching for text from frame '%s'.", control));
 		boolean found = isTextPresent(text);
 		current.switchTo().defaultContent();
 
@@ -1685,17 +1782,17 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	protected boolean isTextPresent(String text) {
-		String locator = String.format("xpath=//*[contains(., %s)]", escapeXpathValue(text));
+		String control = String.format("xpath=//*[contains(., %s)]", escapeXpathValue(text));
 
-		return isElementPresent(locator);
+		return isElementPresent("", control);
 	}
 
-	protected boolean isEnabled(String locator) {
-		List<WebElement> elements = elementFind(locator, true, true);
+	protected boolean isEnabled(String window, String control) {
+		List<WebElement> elements = elementFind(window, control, true, true);
 		WebElement element = elements.get(0);
 
 		if (!formElement.isFormElement(element)) {
-			throw new ABTLibraryNonFatalException(String.format("ERROR: Element %s is not an input.", locator));
+			throw new ABTLibraryNonFatalException(String.format("ERROR: control %s is not an input.", control));
 		}
 		if (!element.isEnabled()) {
 			return false;
@@ -1708,8 +1805,8 @@ public class Element extends RunOnFailureKeywordsAdapter {
 		return true;
 	}
 
-	protected boolean isVisible(String locator) {
-		List<WebElement> elements = elementFind(locator, true, false);
+	protected boolean isVisible(String window, String control) {
+		List<WebElement> elements = elementFind(window, control, true, false);
 		if (elements.size() == 0) {
 			return false;
 		}
@@ -1717,8 +1814,8 @@ public class Element extends RunOnFailureKeywordsAdapter {
 		return element.isDisplayed();
 	}
 
-	protected boolean isClickable(String locator) {
-		List<WebElement> webElements = elementFind(locator, true, false);
+	protected boolean isClickable(String window, String control) {
+		List<WebElement> webElements = elementFind(window, control, true, false);
 		if (webElements.size() == 0) {
 			return false;
 		}
@@ -1726,8 +1823,8 @@ public class Element extends RunOnFailureKeywordsAdapter {
 		return element.isDisplayed() && element.isEnabled();
 	}
 
-	protected boolean isSelected(String locator) {
-		List<WebElement> webElements = elementFind(locator, true, false);
+	protected boolean isSelected(String window, String control) {
+		List<WebElement> webElements = elementFind(window, control, true, false);
 		if (webElements.size() == 0) {
 			return false;
 		}
@@ -1735,29 +1832,29 @@ public class Element extends RunOnFailureKeywordsAdapter {
 		return element.isSelected();
 	}
 
-	protected String[] parseAttributeLocator(String attributeLocator) {
-		int index = attributeLocator.lastIndexOf('@');
+	protected String[] parseAttributecontrol(String attributecontrol) {
+		int index = attributecontrol.lastIndexOf('@');
 		if (index <= 0) {
 			throw new ABTLibraryNonFatalException(
-					String.format("Attribute locator '%s' does not contain an element locator.", attributeLocator));
+					String.format("Attribute control '%s' does not contain an control.", attributecontrol));
 		}
-		if (index + 1 == attributeLocator.length()) {
+		if (index + 1 == attributecontrol.length()) {
 			throw new ABTLibraryNonFatalException(
-					String.format("Attribute locator '%s' does not contain an attribute name.", attributeLocator));
+					String.format("Attribute control '%s' does not contain an attribute name.", attributecontrol));
 		}
 		String[] parts = new String[2];
-		parts[0] = attributeLocator.substring(0, index);
-		parts[1] = attributeLocator.substring(index + 1);
+		parts[0] = attributecontrol.substring(0, index);
+		parts[1] = attributecontrol.substring(index + 1);
 
 		return parts;
 	}
 
-	protected boolean isElementPresent(String locator) {
-		return isElementPresent(locator, null);
+	protected boolean isElementPresent(String window, String control) {
+		return isElementPresent(window, control, null);
 	}
 
-	protected boolean isElementPresent(String locator, String tag) {
-		return elementFind(locator, true, false, tag).size() != 0;
+	protected boolean isElementPresent(String window, String control, String tag) {
+		return elementFind(window, control, true, false, tag).size() != 0;
 	}
 
 	protected boolean pageContains(String text) {
@@ -1768,7 +1865,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 			return true;
 		}
 
-		List<WebElement> elements = elementFind("xpath=//frame|//iframe", false, false);
+		List<WebElement> elements = elementFind("", "xpath=//frame|//iframe", false, false);
 		Iterator<WebElement> it = elements.iterator();
 		while (it.hasNext()) {
 			current.switchTo().frame(it.next());

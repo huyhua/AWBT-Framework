@@ -14,7 +14,7 @@ public class test {
 	
 	
 	public static void main(String[] args) throws InterruptedException{
-		applicationManagement.openApplication("http://localhost:4723/wd/hub", "Android","/Users/huyhua/Downloads/ImmoScout24.apk", "192.168.57.101:5555", "5.1");
+	/*	applicationManagement.openApplication("http://localhost:4723/wd/hub", "Android","/Users/huyhua/Downloads/ImmoScout24.apk", "192.168.57.101:5555", "5.1");
 		element.clickElement("android=text(\"English\")");
 		element.clickElement("android=text(\"Dismiss\")");
 		element.clickElement("content_desc=ContentText");
@@ -23,6 +23,6 @@ public class test {
 		element.clickElement("content_desc=Search_BtnSearch");
 		Thread.sleep(5000);
 		List<String> results = mobile.scrollAndGetItemNames("//android.support.v7.widget.RecyclerView/android.widget.FrameLayout");
-		System.out.println(results.toString());
+		System.out.println(results.toString());*/
 	}
 }

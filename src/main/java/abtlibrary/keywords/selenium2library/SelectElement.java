@@ -42,14 +42,17 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	 * for select lists are id and name. See `Introduction` for details about
 	 * locators.<br>
 	 * 
-	 * @param locator
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
 	 *            The locator to locate the select list.
 	 * @return The select list values
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public List<String> getListItems(String locator) {
-		List<WebElement> options = getSelectListOptions(locator);
+	@ArgumentNames({ "window", "locator" })
+	public List<String> getListItems(String window, String control) {
+		List<WebElement> options = getSelectListOptions(window, control);
 
 		return getLabelsForOptions(options);
 	}
@@ -62,14 +65,17 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	 * for select lists are id and name. See `Introduction` for details about
 	 * locators.<br>
 	 * 
-	 * @param locator
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
 	 *            The locator to locate the select list.
 	 * @return The first visible select list label
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public String getSelectedListLabel(String locator) {
-		Select select = getSelectList(locator);
+	@ArgumentNames({ "window", "locator" })
+	public String getSelectedListLabel(String window, String control) {
+		Select select = getSelectList(window, control);
 
 		return select.getFirstSelectedOption().getText();
 	}
@@ -84,18 +90,21 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	 * for select lists are id and name. See `Introduction` for details about
 	 * locators.<br>
 	 * 
-	 * @param locator
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
 	 *            The locator to locate the select list.
 	 * @return The list of visible select list labels
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public List<String> getSelectedListLabels(String locator) {
-		List<WebElement> options = getSelectListOptionsSelected(locator);
+	@ArgumentNames({ "window", "locator" })
+	public List<String> getSelectedListLabels(String window, String control) {
+		List<WebElement> options = getSelectListOptionsSelected(window, control);
 
 		if (options.size() == 0) {
-			throw new ABTLibraryNonFatalException(String.format(
-					"Select list with locator '%s' does not have any selected values.", locator));
+			throw new ABTLibraryNonFatalException(
+					String.format("Select list with locator '%s' does not have any selected values.", control));
 		}
 
 		return getLabelsForOptions(options);
@@ -112,14 +121,17 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	 * for select lists are id and name. See `Introduction` for details about
 	 * locators.<br>
 	 * 
-	 * @param locator
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
 	 *            The locator to locate the select list.
 	 * @return The first select list value
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public String getSelectedListValue(String locator) {
-		Select select = getSelectList(locator);
+	@ArgumentNames({ "window", "locator" })
+	public String getSelectedListValue(String window, String control) {
+		Select select = getSelectList(window, control);
 
 		return select.getFirstSelectedOption().getAttribute("value");
 	}
@@ -135,18 +147,21 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	 * for select lists are id and name. See `Introduction` for details about
 	 * locators.<br>
 	 * 
-	 * @param locator
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
 	 *            The locator to locate the select list.
 	 * @return The list of select list values
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public List<String> getSelectedListValues(String locator) {
-		List<WebElement> options = getSelectListOptionsSelected(locator);
+	@ArgumentNames({ "window", "locator" })
+	public List<String> getSelectedListValues(String window, String control) {
+		List<WebElement> options = getSelectListOptionsSelected(window, control);
 
 		if (options.size() == 0) {
-			throw new ABTLibraryNonFatalException(String.format(
-					"Select list with locator '%s' does not have any selected values.", locator));
+			throw new ABTLibraryNonFatalException(
+					String.format("Select list with locator '%s' does not have any selected values.", control));
 		}
 
 		return getValuesForOptions(options);
@@ -162,23 +177,26 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	 * for select lists are id and name. See `Introduction` for details about
 	 * locators.<br>
 	 * 
-	 * @param locator
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
 	 *            The locator to locate the select list.
 	 * @param items
 	 *            The list of items to verify
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "*items" })
-	public void listSelectionShouldBe(String locator, String... items) {
+	@ArgumentNames({ "window", "locator", "*items" })
+	public void listSelectionShouldBe(String window, String control, String... items) {
 		String itemList = items.length != 0 ? String.format("option(s) [ %s ]", Python.join(" | ", items))
 				: "no options";
-		logging.info(String.format("Verifying list '%s' has %s selected.", locator, itemList));
+		logging.info(String.format("Verifying list '%s' has %s selected.", control, itemList));
 
-		pageShouldContainList(locator);
+		checkPageContainsList(window, control);
 
-		List<WebElement> options = getSelectListOptionsSelected(locator);
+		List<WebElement> options = getSelectListOptionsSelected(window, control);
 		List<String> selectedLabels = getLabelsForOptions(options);
-		String message = String.format("List '%s' should have had selection [ %s ] but it was [ %s ].", locator,
+		String message = String.format("List '%s' should have had selection [ %s ] but it was [ %s ].", control,
 				Python.join(" | ", items), Python.join(" | ", selectedLabels));
 		if (items.length != options.size()) {
 			throw new ABTLibraryNonFatalException(message);
@@ -200,31 +218,34 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	 * for select lists are id and name. See `Introduction` for details about
 	 * locators.<br>
 	 * 
-	 * @param locator
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
 	 *            The locator to locate the select list.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void listShouldHaveNoSelections(String locator) {
-		logging.info(String.format("Verifying list '%s' has no selection.", locator));
+	@ArgumentNames({ "window", "locator" })
+	public void listShouldHaveNoSelections(String window, String control) {
+		logging.info(String.format("Verifying list '%s' has no selection.", control));
 
-		List<WebElement> options = getSelectListOptionsSelected(locator);
+		List<WebElement> options = getSelectListOptionsSelected(window, control);
 		if (!options.equals(null)) {
 			List<String> selectedLabels = getLabelsForOptions(options);
 			String items = Python.join(" | ", selectedLabels);
 			throw new ABTLibraryNonFatalException(String.format(
-					"List '%s' should have had no selection (selection was [ %s ]).", locator, items.toString()));
+					"List '%s' should have had no selection (selection was [ %s ]).", control, items.toString()));
 		}
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldContainList(String locator) {
-		pageShouldContainList(locator, "");
+	public void checkPageContainsList(String window, String control) {
+		checkPageContainsList(control, "");
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldContainList(String locator, String message) {
-		pageShouldContainList(locator, message, "INFO");
+	public void checkPageContainsList(String window, String control, String message) {
+		checkPageContainsList(control, message, "INFO");
 	}
 
 	/**
@@ -235,7 +256,10 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	 * for select lists are id and name. See `Introduction` for details about
 	 * locators and log levels.<br>
 	 * 
-	 * @param locator
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
 	 *            The locator to locate the select list.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
@@ -243,19 +267,19 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	 *            Default=INFO. Optional log level.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE", "logLevel=INFO" })
-	public void pageShouldContainList(String locator, String message, String logLevel) {
-		element.pageShouldContainElement(locator, "list", message, logLevel);
+	@ArgumentNames({ "window", "locator", "message=NONE", "logLevel=INFO" })
+	public void checkPageContainsList(String window, String control, String message, String logLevel) {
+		element.checkPageContainsControl(control, "list", message, logLevel);
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldNotContainList(String locator) {
-		pageShouldNotContainList(locator, "");
+	public void checkPageNotContainList(String window, String control) {
+		checkPageNotContainList(control, "");
 	}
 
 	@RobotKeywordOverload
-	public void pageShouldNotContainList(String locator, String message) {
-		pageShouldNotContainList(locator, message, "INFO");
+	public void checkPageNotContainList(String window, String control, String message) {
+		checkPageNotContainList(control, message, "INFO");
 	}
 
 	/**
@@ -266,7 +290,10 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	 * for select lists are id and name. See `Introduction` for details about
 	 * locators and log levels.<br>
 	 * 
-	 * @param locator
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
 	 *            The locator to locate the select list.
 	 * @param message
 	 *            Default=NONE. Optional custom error message.
@@ -274,30 +301,33 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	 *            Default=INFO. Optional log level.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "message=NONE", "logLevel=INFO" })
-	public void pageShouldNotContainList(String locator, String message, String logLevel) {
-		element.pageShouldNotContainElement(locator, "list", message, logLevel);
+	@ArgumentNames({ "window", "locator", "message=NONE", "logLevel=INFO" })
+	public void checkPageNotContainList(String window, String control, String message, String logLevel) {
+		element.checkPageNotContainControl(control, "list", message, logLevel);
 	}
 
 	/**
-	 * Select all values of the multi-select list identified by <b>locator</b>.<br>
+	 * Select all values of the multi-select list identified by <b>locator</b>.
+	 * <br>
 	 * <br>
 	 * Select list keywords work on both lists and combo boxes. Key attributes
 	 * for select lists are id and name. See `Introduction` for details about
 	 * locators.<br>
 	 * 
-	 * @param locator
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
 	 *            The locator to locate the multi-select list.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator" })
-	public void selectAllFromList(String locator) {
-		logging.info(String.format("Selecting all options from list '%s'.", locator));
+	@ArgumentNames({ "window", "locator" })
+	public void selectAllFromList(String window, String control) {
+		logging.info(String.format("Selecting all options from list '%s'.", control));
 
-		Select select = getSelectList(locator);
+		Select select = getSelectList(window, control);
 		if (!isMultiselectList(select)) {
-			throw new ABTLibraryNonFatalException(
-					"Keyword 'Select all from list' works only for multiselect lists.");
+			throw new ABTLibraryNonFatalException("Keyword 'Select all from list' works only for multiselect lists.");
 		}
 
 		for (int i = 0; i < select.getOptions().size(); i++) {
@@ -318,19 +348,22 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	 * for select lists are id and name. See `Introduction` for details about
 	 * locators.<br>
 	 * 
-	 * @param locator
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
 	 *            The locator to locate the multi-select list.
 	 * @param items
 	 *            The list of items to select
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "*items" })
-	public void selectFromList(String locator, String... items) {
+	@ArgumentNames({ "window", "locator", "*items" })
+	public void selectFromList(String window, String control, String... items) {
 		String itemList = items.length != 0 ? String.format("option(s) [ %s ]", Python.join(" | ", items))
 				: "all options";
-		logging.info(String.format("Selecting %s from list '%s'.", itemList, locator));
+		logging.info(String.format("Selecting %s from list '%s'.", itemList, control));
 
-		Select select = getSelectList(locator);
+		Select select = getSelectList(window, control);
 
 		// If no items given, select all values (of in case of single select
 		// list, go through all values)
@@ -361,18 +394,18 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 		if (nonExistingItems.size() != 0) {
 			// multi-selection list => throw immediately
 			if (select.isMultiple()) {
-				throw new ABTLibraryNonFatalException(String.format("Options '%s' not in list '%s'.",
-						Python.join(", ", nonExistingItems), locator));
+				throw new ABTLibraryNonFatalException(
+						String.format("Options '%s' not in list '%s'.", Python.join(", ", nonExistingItems), control));
 			}
 
 			// single-selection list => log warning with not found items
-			logging.warn(String.format("Option%s '%s' not found within list '%s'.", nonExistingItems.size() == 0 ? ""
-					: "s", Python.join(", ", nonExistingItems), locator));
+			logging.warn(String.format("Option%s '%s' not found within list '%s'.",
+					nonExistingItems.size() == 0 ? "" : "s", Python.join(", ", nonExistingItems), control));
 
 			// single-selection list => throw if last item was not found
 			if (!lastItemFound) {
 				throw new ABTLibraryNonFatalException(String.format("Option '%s' not in list '%s'.",
-						nonExistingItems.get(nonExistingItems.size() - 1), locator));
+						nonExistingItems.get(nonExistingItems.size() - 1), control));
 			}
 		}
 	}
@@ -388,14 +421,17 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	 * for select lists are id and name. See `Introduction` for details about
 	 * locators.<br>
 	 * 
-	 * @param locator
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
 	 *            The locator to locate the multi-select list.
 	 * @param indexes
 	 *            The list of indexes to select
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "*indexes" })
-	public void selectFromListByIndex(String locator, String... indexes) {
+	@ArgumentNames({ "window", "locator", "*indexes" })
+	public void selectFromListByIndex(String window, String control, String... indexes) {
 		if (indexes.length == 0) {
 			throw new ABTLibraryNonFatalException("No index given.");
 		}
@@ -405,9 +441,9 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 			tmp.add(index);
 		}
 		String items = String.format("index(es) '%s'", Python.join(", ", tmp));
-		logging.info(String.format("Selecting %s from list '%s'.", items, locator));
+		logging.info(String.format("Selecting %s from list '%s'.", items, control));
 
-		Select select = getSelectList(locator);
+		Select select = getSelectList(window, control);
 		for (String index : indexes) {
 			select.selectByIndex(Integer.parseInt(index));
 		}
@@ -421,22 +457,25 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	 * for select lists are id and name. See `Introduction` for details about
 	 * locators.<br>
 	 * 
-	 * @param locator
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
 	 *            The locator to locate the multi-select list.
 	 * @param values
 	 *            The list of values to select
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "*values" })
-	public void selectFromListByValue(String locator, String... values) {
+	@ArgumentNames({ "window", "locator", "*values" })
+	public void selectFromListByValue(String window, String control, String... values) {
 		if (values.length == 0) {
 			throw new ABTLibraryNonFatalException("No value given.");
 		}
 
 		String items = String.format("value(s) '%s'", Python.join(", ", values));
-		logging.info(String.format("Selecting %s from list '%s'.", items, locator));
+		logging.info(String.format("Selecting %s from list '%s'.", items, control));
 
-		Select select = getSelectList(locator);
+		Select select = getSelectList(window, control);
 		for (String value : values) {
 			select.selectByValue(value);
 		}
@@ -450,22 +489,25 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	 * for select lists are id and name. See `Introduction` for details about
 	 * locators.<br>
 	 * 
-	 * @param locator
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
 	 *            The locator to locate the multi-select list.
 	 * @param labels
 	 *            The list of labels to select
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "*labels" })
-	public void selectFromListByLabel(String locator, String... labels) {
+	@ArgumentNames({ "window", "locator", "*labels" })
+	public void selectFromListByLabel(String window, String control, String... labels) {
 		if (labels.length == 0) {
 			throw new ABTLibraryNonFatalException("No value given.");
 		}
 
 		String items = String.format("label(s) '%s'", Python.join(", ", labels));
-		logging.info(String.format("Selecting %s from list '%s'.", items, locator));
+		logging.info(String.format("Selecting %s from list '%s'.", items, control));
 
-		Select select = getSelectList(locator);
+		Select select = getSelectList(window, control);
 		for (String label : labels) {
 			select.selectByVisibleText(label);
 		}
@@ -485,23 +527,25 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	 * for select lists are id and name. See `Introduction` for details about
 	 * locators.<br>
 	 * 
-	 * @param locator
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
 	 *            The locator to locate the multi-select list.
 	 * @param items
 	 *            The list of items to select
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "*items" })
-	public void unselectFromList(String locator, String... items) {
+	@ArgumentNames({ "window", "locator", "*items" })
+	public void unselectFromList(String window, String control, String... items) {
 		String itemList = items.length != 0 ? String.format("option(s) [ %s ]", Python.join(" | ", items))
 				: "all options";
-		logging.info(String.format("Unselecting %s from list '%s'.", itemList, locator));
+		logging.info(String.format("Unselecting %s from list '%s'.", itemList, control));
 
-		Select select = getSelectList(locator);
+		Select select = getSelectList(window, control);
 
 		if (!isMultiselectList(select)) {
-			throw new ABTLibraryNonFatalException(
-					"Keyword 'Unselect from list' works only for multiselect lists.");
+			throw new ABTLibraryNonFatalException("Keyword 'Unselect from list' works only for multiselect lists.");
 		}
 
 		if (items.length == 0) {
@@ -524,14 +568,17 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	 * for select lists are id and name. See `Introduction` for details about
 	 * locators.<br>
 	 * 
-	 * @param locator
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
 	 *            The locator to locate the multi-select list.
 	 * @param indexes
 	 *            The list of indexes to select
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "*indexes" })
-	public void unselectFromListByIndex(String locator, Integer... indexes) {
+	@ArgumentNames({ "window", "locator", "*indexes" })
+	public void unselectFromListByIndex(String window, String control, Integer... indexes) {
 		if (indexes.equals(null)) {
 			throw new ABTLibraryNonFatalException("No index given.");
 		}
@@ -541,13 +588,12 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 			tmp.add(index.toString());
 		}
 		String items = String.format("index(es) '%s'", Python.join(", ", tmp));
-		logging.info(String.format("Unselecting %s from list '%s'.", items, locator));
+		logging.info(String.format("Unselecting %s from list '%s'.", items, control));
 
-		Select select = getSelectList(locator);
+		Select select = getSelectList(window, control);
 
 		if (!isMultiselectList(select)) {
-			throw new ABTLibraryNonFatalException(
-					"Keyword 'Unselect from list' works only for multiselect lists.");
+			throw new ABTLibraryNonFatalException("Keyword 'Unselect from list' works only for multiselect lists.");
 		}
 
 		for (int index : indexes) {
@@ -563,26 +609,28 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	 * for select lists are id and name. See `Introduction` for details about
 	 * locators.<br>
 	 * 
-	 * @param locator
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
 	 *            The locator to locate the multi-select list.
 	 * @param values
 	 *            The list of values to select
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "*values" })
-	public void unselectFromListByValue(String locator, String... values) {
+	@ArgumentNames({ "window", "locator", "*values" })
+	public void unselectFromListByValue(String window, String control, String... values) {
 		if (values.equals(null)) {
 			throw new ABTLibraryNonFatalException("No value given.");
 		}
 
 		String items = String.format("value(s) '%s'", Python.join(", ", values));
-		logging.info(String.format("Unselecting %s from list '%s'.", items, locator));
+		logging.info(String.format("Unselecting %s from list '%s'.", items, control));
 
-		Select select = getSelectList(locator);
+		Select select = getSelectList(window, control);
 
 		if (!isMultiselectList(select)) {
-			throw new ABTLibraryNonFatalException(
-					"Keyword 'Unselect from list' works only for multiselect lists.");
+			throw new ABTLibraryNonFatalException("Keyword 'Unselect from list' works only for multiselect lists.");
 		}
 
 		for (String value : values) {
@@ -598,26 +646,28 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 	 * for select lists are id and name. See `Introduction` for details about
 	 * locators.<br>
 	 * 
-	 * @param locator
+	 * @param window
+	 *            The interface name that contains control. If control has not
+	 *            been defined, using <b>*</b> for window.
+	 * @param control
 	 *            The locator to locate the multi-select list.
 	 * @param labels
 	 *            The list of labels to select
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "locator", "*labels" })
-	public void unselectFromListByLabel(String locator, String... labels) {
+	@ArgumentNames({ "window", "locator", "*labels" })
+	public void unselectFromListByLabel(String window, String control, String... labels) {
 		if (labels.equals(null)) {
 			throw new ABTLibraryNonFatalException("No value given.");
 		}
 
 		String items = String.format("label(s) '%s'", Python.join(", ", labels));
-		logging.info(String.format("Unselecting %s from list '%s'.", items, locator));
+		logging.info(String.format("Unselecting %s from list '%s'.", items, control));
 
-		Select select = getSelectList(locator);
+		Select select = getSelectList(window, control);
 
 		if (!isMultiselectList(select)) {
-			throw new ABTLibraryNonFatalException(
-					"Keyword 'Unselect from list' works only for multiselect lists.");
+			throw new ABTLibraryNonFatalException("Keyword 'Unselect from list' works only for multiselect lists.");
 		}
 
 		for (String label : labels) {
@@ -639,8 +689,8 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 		return labels;
 	}
 
-	protected Select getSelectList(String locator) {
-		List<WebElement> webElements = element.elementFind(locator, true, true, "select");
+	protected Select getSelectList(String window, String control) {
+		List<WebElement> webElements = element.elementFind(window, control, true, true, "select");
 
 		return new Select(webElements.get(0));
 	}
@@ -649,14 +699,14 @@ public class SelectElement extends RunOnFailureKeywordsAdapter {
 		return new ArrayList<WebElement>(select.getOptions());
 	}
 
-	protected List<WebElement> getSelectListOptions(String locator) {
-		Select select = getSelectList(locator);
+	protected List<WebElement> getSelectListOptions(String window, String control) {
+		Select select = getSelectList(window, control);
 
 		return getSelectListOptions(select);
 	}
 
-	protected List<WebElement> getSelectListOptionsSelected(String locator) {
-		Select select = getSelectList(locator);
+	protected List<WebElement> getSelectListOptionsSelected(String window, String control) {
+		Select select = getSelectList(window, control);
 
 		return new ArrayList<WebElement>(select.getAllSelectedOptions());
 	}
