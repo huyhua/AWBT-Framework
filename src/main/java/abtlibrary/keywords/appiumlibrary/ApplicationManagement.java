@@ -242,23 +242,23 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	}
 	
 	@RobotKeywordOverload
-	public void downloadFromHockeyApp(String appId){
-		downloadFromHockeyApp(appId, null);
+	public String downloadFromHockeyApp(String appId){
+		return downloadFromHockeyApp(appId, null);
 	}
 	
 	@RobotKeywordOverload
-	public void downloadFromHockeyApp(String appId, String versionId){
-		downloadFromHockeyApp(appId, versionId, null);
+	public String downloadFromHockeyApp(String appId, String versionId){
+		return downloadFromHockeyApp(appId, versionId, null);
 	}
 	
 	@RobotKeywordOverload
-	public void downloadFromHockeyApp(String appId, String versionId, String appPath){
-		downloadFromHockeyApp(appId, versionId, appPath, null);
+	public String downloadFromHockeyApp(String appId, String versionId, String appPath){
+		return downloadFromHockeyApp(appId, versionId, appPath, null);
 	}
 
 	@RobotKeywordOverload
-	public void downloadFromHockeyApp(String appId, String versionId, String appPath, String appFileName){
-		downloadFromHockeyApp(appId, versionId, appPath, appFileName, null);
+	public String downloadFromHockeyApp(String appId, String versionId, String appPath, String appFileName){
+		return downloadFromHockeyApp(appId, versionId, appPath, appFileName, null);
 	}
 	
 	/**
@@ -275,10 +275,11 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	 *            Default=NONE. Name of the app file. If not specified it will be the first word of the app title retrieved from HockeyApps.
 	 * @param apiToken
 	 *            Default=19c4f87dde6444e89388a33b1077624e. Optional apiKey.
+	 * @return The appPath + appName
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "appId", "versionId=NONE", "appPath=NONE", "appFileName=NONE","apiToken=19c4f87dde6444e89388a33b1077624e" })
-	public void downloadFromHockeyApp(String appId, String versionId, String appPath, String appFileName, String apiToken) {
+	public String downloadFromHockeyApp(String appId, String versionId, String appPath, String appFileName, String apiToken) {
 		FileOutputStream fos;
 		
 		if(apiToken == null || apiToken.isEmpty()){
@@ -326,7 +327,7 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 				appFile.getParentFile().mkdirs();
 				
 				if(appFile.exists() && !appFile.isDirectory() && appFile.length() == downloadVersion.fileSize) { 
-				    return;
+				    return appFile.getCanonicalPath();
 				}
 				
 				ReadableByteChannel rbc = Channels.newChannel(con
@@ -340,7 +341,7 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 				if(appFile.length() != downloadVersion.fileSize){
 					logging.warn("App size different! Downloaded size is " + appFile.length() + ". Expected size is " + downloadVersion.fileSize);
 				}
-				
+				return appFile.getCanonicalPath();
 			} else {
 				throw new ABTLibraryFatalException("No file to download. Server replied HTTP code: " + responseCode);
 			}
@@ -348,6 +349,7 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 	
 	@SuppressWarnings("unchecked")
