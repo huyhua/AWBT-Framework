@@ -1,9 +1,5 @@
 package abtlibrary.keywords.appiumlibrary;
 
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,7 +9,6 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import org.json.simple.JSONArray;
@@ -27,14 +22,17 @@ import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
+import com.applitools.eyes.Eyes;
+import com.applitools.eyes.MatchLevel;
+
 import abtlibrary.ABTLibraryFatalException;
 import abtlibrary.RunOnFailureKeywordsAdapter;
 import abtlibrary.keywords.selenium2library.BrowserManagement;
 import abtlibrary.keywords.selenium2library.Logging;
 import abtlibrary.utils.HttpRequestUtils;
-
-import com.applitools.eyes.Eyes;
-import com.applitools.eyes.MatchLevel;
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 
 @SuppressWarnings("deprecation")
 @RobotKeywords

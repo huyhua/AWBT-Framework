@@ -1,19 +1,12 @@
 package abtlibrary.keywords.appiumlibrary;
 
-import io.appium.java_client.MobileBy;
-import io.appium.java_client.MobileDriver;
-import io.appium.java_client.TouchAction;
-import io.appium.java_client.android.AndroidDriver;
-
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.tools.ant.types.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -21,9 +14,6 @@ import org.robotframework.javalib.annotation.ArgumentNames;
 import org.robotframework.javalib.annotation.Autowired;
 import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywords;
-
-import com.applitools.eyes.EyesException;
-import com.applitools.eyes.TestResults;
 
 import abtlibrary.ABTLibraryNonFatalException;
 import abtlibrary.keywords.selenium2library.Element;
@@ -33,8 +23,6 @@ import io.appium.java_client.MobileBy;
 import io.appium.java_client.MobileDriver;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
-
-import com.applitools.eyes.TestResults;
 
 @RobotKeywords
 public class MobileElement {

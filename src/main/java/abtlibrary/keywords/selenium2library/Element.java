@@ -8,7 +8,6 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -18,9 +17,9 @@ import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
+import abtlibrary.ABTLibraryNonFatalException;
 import abtlibrary.RunOnFailureKeywordsAdapter;
 import abtlibrary.keywords.frameworklibrary.UserInterface;
-import abtlibrary.ABTLibraryNonFatalException;
 import abtlibrary.locators.ElementFinder;
 import abtlibrary.utils.Python;
 
@@ -1339,48 +1338,6 @@ public class Element extends RunOnFailureKeywordsAdapter {
 		((JavascriptExecutor) browserManagement.getCurrentWebDriver()).executeScript(script, elements.get(0), event);
 	}
 
-	/**
-	 * Simulates pressing <b>key</b> on the control .<br>
-	 * <br>
-	 * Key is either a single character, or a numerical ASCII code of the key
-	 * lead by '\\'.<br>
-	 * <br>
-	 * See `Introduction` for details about controls.<br>
-	 * <br>
-	 * Example:
-	 * <table border="1" cellspacing="0" summary="">
-	 * <tr>
-	 * <td>Press Key</td>
-	 * <td>text_field</td>
-	 * <td>q</td>
-	 * <td># Press 'q'</td>
-	 * </tr>
-	 * <tr>
-	 * <td>Press Key</td>
-	 * <td>login_button</td>
-	 * <td>\\13</td>
-	 * <td># ASCII code for enter key</td>
-	 * </tr>
-	 * </table>
-	 * 
-	 * @param window
-	 *            The interface name that contains control. If control has not
-	 *            been defined, using <b>*</b> for window.
-	 * @param control
-	 *            The name or locator of select control.
-	 * @param key
-	 *            The key to press.
-	 */
-	@RobotKeyword
-	@ArgumentNames({ "window", "control", "key" })
-	public void pressKey(String window, String control, String key) {
-		if (key.startsWith("\\") && key.length() > 1) {
-			key = mapAsciiKeyCodeToKey(Integer.parseInt(key.substring(1))).toString();
-		}
-		List<WebElement> element = elementFind(window, control, true, true);
-		element.get(0).sendKeys(key);
-	}
-
 	// ##############################
 	// Keywords - Links
 	// ##############################
@@ -1733,7 +1690,6 @@ public class Element extends RunOnFailureKeywordsAdapter {
 		// Check if input user data for control is name of defined control.
 		if (!window.equals("")) {
 			List<String> tempcontrols = userInterface.getLocators(window, control);
-			System.out.println(tempcontrols);
 			for (String tempcontrol : tempcontrols) {
 				elements.addAll(ElementFinder.find(browserManagement, tempcontrol, tag));
 				if (elements.size() > 0) {
@@ -1751,6 +1707,10 @@ public class Element extends RunOnFailureKeywordsAdapter {
 			elements.addAll(ElementFinder.find(browserManagement, control, tag));
 		}
 		if (required && elements.size() == 0) {
+			if(!window.equals("") && !window.equals("*")){
+				throw new ABTLibraryNonFatalException(
+						String.format("Element control '%s - %s' did not match any elements.", window, control));
+			}
 			throw new ABTLibraryNonFatalException(
 					String.format("Element control '%s' did not match any elements.", control));
 		}
@@ -1879,46 +1839,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 		return false;
 	}
 
-	protected CharSequence mapAsciiKeyCodeToKey(int keyCode) {
-		switch (keyCode) {
-		case 0:
-			return Keys.NULL;
-		case 8:
-			return Keys.BACK_SPACE;
-		case 9:
-			return Keys.TAB;
-		case 10:
-			return Keys.RETURN;
-		case 13:
-			return Keys.ENTER;
-		case 24:
-			return Keys.CANCEL;
-		case 27:
-			return Keys.ESCAPE;
-		case 32:
-			return Keys.SPACE;
-		case 42:
-			return Keys.MULTIPLY;
-		case 43:
-			return Keys.ADD;
-		case 44:
-			return Keys.SEPARATOR;
-		case 45:
-			return Keys.SUBTRACT;
-		case 56:
-			return Keys.DECIMAL;
-		case 57:
-			return Keys.DIVIDE;
-		case 59:
-			return Keys.SEMICOLON;
-		case 61:
-			return Keys.EQUALS;
-		case 127:
-			return Keys.DELETE;
-		default:
-			return new StringBuffer((char) keyCode);
-		}
-	}
+	
 
 	public static String escapeXpathValue(String value) {
 		if (value.contains("\"") && value.contains("'")) {

@@ -81,9 +81,13 @@ public class ElementFinder {
 
 			@Override
 			public List<WebElement> findBy(BrowserManagement browserManagement, FindByCoordinates findByCoordinates) {
-				return filterElements(
-						browserManagement.getCurrentWebDriver().findElements(By.id(findByCoordinates.criteria)),
-						findByCoordinates);
+				List<WebElement> elements = browserManagement.getCurrentWebDriver()
+						.findElements(By.id(findByCoordinates.criteria));
+				if (browserManagement.getCurrentPlatform().equalsIgnoreCase("android") && elements.size() == 0) {
+					elements = scrollToFind(browserManagement, findByCoordinates, "resourceId");
+				}
+
+				return filterElements(elements, findByCoordinates);
 			}
 		},
 
@@ -401,8 +405,6 @@ public class ElementFinder {
 				if (os.getMidText(xpathCriteria, className, "]").size() > 0) {
 					attributeString = os.getMidText(xpathCriteria, className, "]").get(0);
 				}
-				System.out.println(className);
-				System.out.println(os.getMidText(xpathCriteria, className, "]"));
 			} else {
 				attributeString = os.getMidText(xpathCriteria, "\\*", "]").get(0);
 			}
@@ -456,11 +458,16 @@ public class ElementFinder {
 			FindByCoordinates findByCoordinates, String strategy) {
 		AndroidDriver<WebElement> androidDriver = (AndroidDriver<WebElement>) browserManagement.getCurrentWebDriver();
 		List<WebElement> scroll = androidDriver.findElementsByAndroidUIAutomator(".scrollable(true)");
-
-		List<WebElement> elements = androidDriver
-				.findElementsByAndroidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance("
-						+ (scroll.size() - 1) + ")).scrollIntoView(new UiSelector()." + strategy + "(\""
-						+ findByCoordinates.criteria + "\"))");
+		List<WebElement> elements = new ArrayList<>();
+		for (int i = scroll.size() - 1; i >= 0; i--) {
+			elements = androidDriver
+					.findElementsByAndroidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance("
+							+ (i) + ")).scrollIntoView(new UiSelector()." + strategy + "(\""
+							+ findByCoordinates.criteria + "\"))");
+			if (elements.size() > 0) {
+				break;
+			}
+		}
 
 		if (elements.size() == 0) {
 			scrollDown(browserManagement.getCurrentWebDriver(), 1);
