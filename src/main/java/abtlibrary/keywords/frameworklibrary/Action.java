@@ -1,10 +1,10 @@
 package abtlibrary.keywords.frameworklibrary;
 
 import java.io.File;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
 import org.robotframework.javalib.annotation.ArgumentNames;
 import org.robotframework.javalib.annotation.Autowired;
 import org.robotframework.javalib.annotation.RobotKeyword;
@@ -52,10 +52,22 @@ public class Action extends RunOnFailureKeywordsAdapter {
 
 		OperatingSystem os = new OperatingSystem();
 		List<File> fActions = os.getFiles(init.getActionDirectory() + "/" + folder);
+		List<File> valueToRemove = new ArrayList<>();
+		
 		if (fActions == null) {
 			throw new ABTLibraryNonFatalException(
 					String.format("Could not find action directory '%s'.", init.getActionDirectory() + "/" + folder));
 		}
+		
+		
+		fActions.forEach(file -> {
+			String ext = FilenameUtils.getExtension(file.getName());
+			if(!ext.equalsIgnoreCase("robot") && !ext.equalsIgnoreCase("txt")){
+				valueToRemove.add(file);
+			}
+		});
+		fActions.removeAll(valueToRemove);
+		
 		List<String> actions = new ArrayList<>();
 		for (File fAction : fActions) {
 

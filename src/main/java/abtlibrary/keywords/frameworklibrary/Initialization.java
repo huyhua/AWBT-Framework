@@ -14,8 +14,9 @@ import abtlibrary.RunOnFailureKeywordsAdapter;
 public class Initialization extends RunOnFailureKeywordsAdapter {
 	public static void main(String[] args) {
 		Initialization initialization = new Initialization();
-		initialization.setProjectDirectory("/Users/mac/git/anisapp");
-		System.out.println(Constant.projectDir);
+		initialization.setProjectDirectory("/Users/huyhua/HuyHua/IS24App");
+		System.out.println(initialization.getProjectDirectory());
+		System.out.println(initialization.getActionDirectory());
 	}
 
 	private String projectDir = "";
@@ -60,7 +61,7 @@ public class Initialization extends RunOnFailureKeywordsAdapter {
 		return projectDir + "/" + datasetDir;
 	}
 
-	public String getConfgiurationDirectory() {
+	public String getConfigurationDirectory() {
 		return projectDir + "/" + configurationDir;
 	}
 }
