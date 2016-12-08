@@ -208,8 +208,8 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void checkControlDoesNotContain(String window, String control, String text) {
-		checkControlDoesNotContain(window, control, text, "");
+	public void checkControlNotContain(String window, String control, String text) {
+		checkControlNotContain(window, control, text, "");
 	}
 
 	/**
@@ -229,7 +229,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "window", "control", "text", "message=NONE" })
-	public void checkControlDoesNotContain(String window, String control, String text, String message) {
+	public void checkControlNotContain(String window, String control, String text, String message) {
 		String actual = getText(window, control);
 
 		if (actual.toLowerCase().contains(text.toLowerCase())) {

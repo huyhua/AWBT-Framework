@@ -62,8 +62,7 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	@RobotKeyword
 	public void closeApplication() {
 		if (browserManagement.webDriverCache.getCurrentSessionId() != null) {
-			logging.debug(String.format(
-					"Closing application with session id %s",
+			logging.debug(String.format("Closing application with session id %s",
 					browserManagement.webDriverCache.getCurrentSessionId()));
 			browserManagement.webDriverCache.close();
 		}
@@ -82,114 +81,101 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	 * Opens a new application to given Appium server. <br>
 	 * Capabilities of appium server, Android and iOS, Please check
 	 * http://appium.io/slate/en/master/?python#appium-server-capabilities<br>
-	 * <table border="1" cellspacing="0" summary="">
-	 * <tr>
-	 * <td><b>Option</b></td>
-	 * <td><b>Man.<b></td>
-	 * <td><b>Description</b></td>
-	 * </tr>
-	 * <tr>
-	 * <td>remoteUrl</td>
-	 * <td>Yes</td>
-	 * <td>appium server url</td>
-	 * </tr>
-	 * <tr>
-	 * <td>alias</td>
-	 * <td>No</td>
-	 * <td>alias</td>
-	 * </tr>
-	 * <tr>
-	 * <td>appPath</td>
-	 * <td>Yes</td>
-	 * <td>path to application under test</td>
-	 * </tr>
-	 * <tr>
-	 * <td>deviceName</td>
-	 * <td>Yes</td>
-	 * <td>device name of android device or udid of iOS device</td>
-	 * </tr>
-	 * <tr>
-	 * <td>platformVersion</td>
-	 * <td>Yes</td>
-	 * <td>OS version</td>
-	 * </tr>
-	 * </table>
 	 * <br>
 	 * <b>Example</b>
 	 * <table border="1" cellspacing="0" summary="">
 	 * <tr>
-	 * <td>Open Application</td>
-	 * <td>http://localhost:4723/wd/hub</td>
-	 * <td>MyAndroidApp</td>
-	 * <td>${CURDIR}/demoapp/Android.apk</td>
+	 * <td></td>
+	 * <td><b>device</b></td>
+	 * <td><b>version</b></td>
+	 * <td><b>alias</b></td>
+	 * <td><b>file path</b></td>
+	 * <td><b>appium server</b></td>
+	 * </tr>
+	 * <tr>
+	 * <td><b>Open Application</b></td>
 	 * <td>16f48745</td>
 	 * <td>5.0</td>
+	 * <td>/demoapp/Android.apk</td>
+	 * <td>MyAndApp</td>
+	 * <td>http://localhost:4723/wd/hub</td>
 	 * </tr>
 	 * </table>
+	 * <br>
 	 * <table border="1" cellspacing="0" summary="">
 	 * <tr>
-	 * <td>Open Application</td>
+	 * <td></td>
+	 * <td><b>device</b></td>
+	 * <td><b>version</b></td>
+	 * <td><b>alias</b></td>
+	 * <td><b>file path</b></td>
+	 * <td><b>appium server</b></td>
+	 * </tr>
+	 * <tr>
+	 * <td><b>Open Application</b></td>
+	 * <td>16f48745</td>
+	 * <td>9.0.3</td>
+	 * <td>/demoapp/iOS.ipa</td>
+	 * <td>MyiOSApp</td>
 	 * <td>http://localhost:4723/wd/hub</td>
-	 * <td>${CURDIR}/demoapp/iOS.app</td>
-	 * <td>16f48745456323</td>
-	 * <td>5.0</td>
 	 * </tr>
 	 * </table>
+	 * <br>
 	 * 
-	 * @param remoteUrl
-	 *            remoteURl
+	 * @param device
+	 *            Name of android device or udid of ios device.
+	 * @param version
+	 *            Android or iOS version.
+	 * @param filePath
+	 *            Absolute path to application file. application instance.
 	 * @param alias
-	 *            alias of application instance
-	 * @param appPath
-	 *            Absolute path to apk file
-	 * @param deviceName
-	 *            Device name or udid
-	 * @param platformVersion
-	 *            Platform version
-	 * @return Session Id
+	 *            Alias of application instance. This alias is used to switch to
+	 * @param appiumServer
+	 *            Address of appium server.
+	 * @return Application session id.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "remoteUrl", "alias", "appPath", "deviceName",
-			"platformVersion" })
-	public String openApplication(String remoteUrl, String alias,
-			String appPath, String deviceName, String platformVersion) {
+	@ArgumentNames({ "device", "version", "filePath", "alias=NONE", "appiumServer=NONE" })
+	public String openApplication(String device, String version, String filePath, String alias, String appiumServer) {
 		WebDriver driver;
-		String platformName = appPath.contains(".apk") ? "Android" : "iOS";
+		String platform = filePath.contains(".apk") ? "Android" : "iOS";
 
 		DesiredCapabilities cap = new DesiredCapabilities();
-		cap.setCapability("app", appPath);
-		cap.setCapability("platformName", platformName);
-		cap.setCapability("platformVersion", platformVersion);
-		cap.setCapability("deviceName", deviceName);
+		cap.setCapability("app", filePath);
+		cap.setCapability("platformName", platform);
+		cap.setCapability("platformVersion", version);
+		cap.setCapability("deviceName", device);
 
 		try {
-			if (platformName.equals("Android")) {
-				driver = new AndroidDriver<>(new URL(remoteUrl), cap);
+			if (platform.equals("Android")) {
+				driver = new AndroidDriver<>(new URL(appiumServer), cap);
 
 			} else {
 				cap.setCapability("autoAcceptAlerts", false);
-				driver = new IOSDriver<>(new URL(remoteUrl), cap);
+				driver = new IOSDriver<>(new URL(appiumServer), cap);
 			}
 
-			String sessionId = browserManagement.webDriverCache.register(
-					driver, alias, platformName);
-			logging.debug(String.format(
-					"Openning '%s' driver to base application '%s'",
-					platformName, appPath));
-			driver.manage()
-					.timeouts()
-					.implicitlyWait(
-							(int) (browserManagement.implicitWait * 1000.0),
-							TimeUnit.MILLISECONDS);
+			String sessionId = browserManagement.webDriverCache.register(driver, alias, platform);
+			logging.debug(String.format("Openning '%s' driver to base application '%s'", platform, filePath));
+			driver.manage().timeouts().implicitlyWait((int) (browserManagement.implicitWait * 1000.0),
+					TimeUnit.MILLISECONDS);
 			return sessionId;
 		} catch (Throwable t) {
-			logging.warn(String.format(
-					"Openning '%s' driver to base application '%s' failed",
-					platformName, appPath));
+			logging.warn(String.format("Openning '%s' driver to base application '%s' failed", platform, filePath));
 			throw new ABTLibraryFatalException(t);
 		}
 	}
 
+	@RobotKeywordOverload
+	public String openApplication(String device, String version, String filePath, String alias) {
+		return openApplication(device, version, filePath, alias, "http://localhost:4723/wd/hub");
+	}
+
+	@RobotKeywordOverload
+	public String openApplication(String device, String version, String filePath) {
+		return openApplication(device, version, filePath, "", "http://localhost:4723/wd/hub");
+	}
+	
 	/**
 	 * Scroll screen to the specified text.
 	 * 
@@ -199,8 +185,7 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	@RobotKeyword
 	@ArgumentNames({ "text" })
 	public WebElement scrollTo(String text) {
-		return ((AppiumDriver<?>) browserManagement.getCurrentWebDriver())
-				.scrollTo(text);
+		return ((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).scrollTo(text);
 	}
 
 	/**
@@ -212,109 +197,117 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	@RobotKeyword
 	@ArgumentNames({ "text" })
 	public WebElement scrollToExact(String text) {
-		return ((AppiumDriver<?>) browserManagement.getCurrentWebDriver())
-				.scrollToExact(text);
+		return ((AppiumDriver<?>) browserManagement.getCurrentWebDriver()).scrollToExact(text);
 	}
-	
-	
-	
+
 	/**
-	 * Enable applitool to run cloud server 
+	 * Enable applitool to run cloud server
 	 * 
-	 * @param APIKey 
-	 * 				test
-	 * @param matchLevel 
-	 * 					test
-	 * @param deviceName 
-	 * 					test
+	 * @param APIKey
+	 *            test
+	 * @param matchLevel
+	 *            test
+	 * @param deviceName
+	 *            test
 	 */
 	@RobotKeyword
-	@ArgumentNames({"APIKey", "matchLevel", "deviceName"})
-	public void enableApplitool(String APIKey, String matchLevel, String deviceName){
-				eyes = new Eyes();
-				//eyes.setApiKey("Eyt18cF9exK4109txbzzE2ij0isWh8D2zFdts3vYVOhIg110");
-				eyes.setApiKey(APIKey);
-				eyes.setMatchLevel(MatchLevel.valueOf(matchLevel));
-				//eyes.setMatchLevel(MatchLevel.LAYOUT2);
-				eyes.setHostOS(deviceName);
+	@ArgumentNames({ "APIKey", "matchLevel", "deviceName" })
+	public void enableApplitool(String APIKey, String matchLevel, String deviceName) {
+		eyes = new Eyes();
+		// eyes.setApiKey("Eyt18cF9exK4109txbzzE2ij0isWh8D2zFdts3vYVOhIg110");
+		eyes.setApiKey(APIKey);
+		eyes.setMatchLevel(MatchLevel.valueOf(matchLevel));
+		// eyes.setMatchLevel(MatchLevel.LAYOUT2);
+		eyes.setHostOS(deviceName);
 	}
-	
+
 	@RobotKeywordOverload
-	public String downloadFromHockeyApp(String appId){
+	public String downloadFromHockeyApp(String appId) {
 		return downloadFromHockeyApp(appId, null);
 	}
-	
+
 	@RobotKeywordOverload
-	public String downloadFromHockeyApp(String appId, String versionId){
+	public String downloadFromHockeyApp(String appId, String versionId) {
 		return downloadFromHockeyApp(appId, versionId, null);
 	}
-	
+
 	@RobotKeywordOverload
-	public String downloadFromHockeyApp(String appId, String versionId, String appPath){
+	public String downloadFromHockeyApp(String appId, String versionId, String appPath) {
 		return downloadFromHockeyApp(appId, versionId, appPath, null);
 	}
 
 	@RobotKeywordOverload
-	public String downloadFromHockeyApp(String appId, String versionId, String appPath, String appFileName){
+	public String downloadFromHockeyApp(String appId, String versionId, String appPath, String appFileName) {
 		return downloadFromHockeyApp(appId, versionId, appPath, appFileName, null);
 	}
-	
+
 	/**
-	 * Fetch the app file from Hockeyapps using the <b>appId</b> and <b>versionId</b> <br>
+	 * Fetch the app file from Hockeyapps using the <b>appId</b> and
+	 * <b>versionId</b> <br>
 	 * <br>
 	 * 
 	 * @param appId
-	 *            The id of the app as specified in the manage page of HockeyApps
+	 *            The id of the app as specified in the manage page of
+	 *            HockeyApps
 	 * @param versionId
-	 *            Default=NONE. The absolute version id of the app, as seen in the "code" column on HockeyApps manage site. If empty get latest.
+	 *            Default=NONE. The absolute version id of the app, as seen in
+	 *            the "code" column on HockeyApps manage site. If empty get
+	 *            latest.
 	 * @param appPath
-	 *            Default=NONE. Location of the download app. If not specify it will be located in the target folder inside the project.
+	 *            Default=NONE. Location of the download app. If not specify it
+	 *            will be located in the target folder inside the project.
 	 * @param appFileName
-	 *            Default=NONE. Name of the app file. If not specified it will be the first word of the app title retrieved from HockeyApps.
+	 *            Default=NONE. Name of the app file. If not specified it will
+	 *            be the first word of the app title retrieved from HockeyApps.
 	 * @param apiToken
 	 *            Default=19c4f87dde6444e89388a33b1077624e. Optional apiKey.
 	 * @return The appPath + appName
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "appId", "versionId=NONE", "appPath=NONE", "appFileName=NONE","apiToken=19c4f87dde6444e89388a33b1077624e" })
-	public String downloadFromHockeyApp(String appId, String versionId, String appPath, String appFileName, String apiToken) {
+	@ArgumentNames({ "appId", "versionId=NONE", "appPath=NONE", "appFileName=NONE",
+			"apiToken=19c4f87dde6444e89388a33b1077624e" })
+	public String downloadFromHockeyApp(String appId, String versionId, String appPath, String appFileName,
+			String apiToken) {
 		FileOutputStream fos;
-		
-		if(apiToken == null || apiToken.isEmpty()){
+
+		if (apiToken == null || apiToken.isEmpty()) {
 			apiToken = "19c4f87dde6444e89388a33b1077624e";
 		}
-		
+
 		HockeyAppVersionItem downloadVersion = getHockeyAppVersion(appId, versionId, apiToken);
-		
+
 		try {
 			String fileExtension = "";
-			if (appFileName == null || appFileName.isEmpty()){
-				if(downloadVersion.title.contains("Android")){
+			if (appFileName == null || appFileName.isEmpty()) {
+				if (downloadVersion.title.contains("Android")) {
 					fileExtension = "apk";
-				}else{
+				} else {
 					fileExtension = "ipa";
 				}
-			}else{
+			} else {
 				fileExtension = appFileName.substring(appFileName.lastIndexOf(".") + 1);
 			}
-			
-			//Change the download link to direct download link that contains the actual file
-			String baseURL = downloadVersion.downloadURL.replace("/apps/", "/api/2/apps/") + "?format="+fileExtension+"&avtoken=" + apiToken;
+
+			// Change the download link to direct download link that contains
+			// the actual file
+			String baseURL = downloadVersion.downloadURL.replace("/apps/", "/api/2/apps/") + "?format=" + fileExtension
+					+ "&avtoken=" + apiToken;
 			HttpURLConnection con = (HttpURLConnection) new URL(baseURL).openConnection();
 			int responseCode = con.getResponseCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
-				
+
 				// If appPath is not specified
 				if (appPath == null || appPath.isEmpty()) {
 					appPath = System.getProperty("user.dir") + File.separator + "target";
 				}
-				
+
 				// If filename is not specified
 				if (appFileName == null || appFileName.isEmpty()) {
 					String redirect = con.getURL().toString();
 					if (redirect == null) {
 						// extracts file name from downloadVersion
-						appFileName = downloadVersion.title.substring(0, downloadVersion.title.indexOf(" ")) + "-"+ downloadVersion.version+ "." + fileExtension;
+						appFileName = downloadVersion.title.substring(0, downloadVersion.title.indexOf(" ")) + "-"
+								+ downloadVersion.version + "." + fileExtension;
 					} else {
 						// extracts file name from URL
 						int index = redirect.lastIndexOf("/");
@@ -323,21 +316,21 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 				}
 				File appFile = new File(appPath + File.separator + appFileName);
 				appFile.getParentFile().mkdirs();
-				
-				if(appFile.exists() && !appFile.isDirectory() && appFile.length() == downloadVersion.fileSize) { 
-				    return appFile.getCanonicalPath();
+
+				if (appFile.exists() && !appFile.isDirectory() && appFile.length() == downloadVersion.fileSize) {
+					return appFile.getCanonicalPath();
 				}
-				
-				ReadableByteChannel rbc = Channels.newChannel(con
-						.getInputStream());
+
+				ReadableByteChannel rbc = Channels.newChannel(con.getInputStream());
 				fos = new FileOutputStream(appFile);
 				fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 				fos.close();
 				rbc.close();
-				
-				//check file size and log a warning if the size is different
-				if(appFile.length() != downloadVersion.fileSize){
-					logging.warn("App size different! Downloaded size is " + appFile.length() + ". Expected size is " + downloadVersion.fileSize);
+
+				// check file size and log a warning if the size is different
+				if (appFile.length() != downloadVersion.fileSize) {
+					logging.warn("App size different! Downloaded size is " + appFile.length() + ". Expected size is "
+							+ downloadVersion.fileSize);
 				}
 				return appFile.getCanonicalPath();
 			} else {
@@ -349,26 +342,23 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 		}
 		return null;
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	private HockeyAppVersionItem getHockeyAppVersion(String appId, String appVersion,
-			String apiToken) {
-		String request = "https://rink.hockeyapp.net/api/2/apps/" + appId
-				+ "/app_versions";
+	private HockeyAppVersionItem getHockeyAppVersion(String appId, String appVersion, String apiToken) {
+		String request = "https://rink.hockeyapp.net/api/2/apps/" + appId + "/app_versions";
 
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("X-HockeyAppToken", apiToken);
 
-		String jsonResponse = HttpRequestUtils.getResponse(request, "GET",
-				headers);
+		String jsonResponse = HttpRequestUtils.getResponse(request, "GET", headers);
 		JSONObject doc = HttpRequestUtils.parseStringIntoJson(jsonResponse);
 		JSONArray arr = (JSONArray) doc.get("app_versions");
-		
-		//Get latest item if appVersion is empty
-		if(appVersion == null || appVersion.isEmpty()){
+
+		// Get latest item if appVersion is empty
+		if (appVersion == null || appVersion.isEmpty()) {
 			return new HockeyAppVersionItem((JSONObject) arr.get(0));
 		}
-		
+
 		Iterator<JSONObject> it = arr.iterator();
 		while (it.hasNext()) {
 			HockeyAppVersionItem item = new HockeyAppVersionItem(it.next());
@@ -376,10 +366,11 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 				return item;
 			}
 		}
-		throw new ABTLibraryFatalException("Could not get download link. Probably app id or app version is not correct");
+		throw new ABTLibraryFatalException(
+				"Could not get download link. Probably app id or app version is not correct");
 	}
-	
-	protected static class HockeyAppVersionItem{
+
+	protected static class HockeyAppVersionItem {
 		String version;
 		String shortVersion;
 		String title;
@@ -387,9 +378,8 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 		String appId;
 		String downloadURL;
 		Long fileSize;
-		
-		
-		public HockeyAppVersionItem(JSONObject item){
+
+		public HockeyAppVersionItem(JSONObject item) {
 			version = (String) item.get("version");
 			shortVersion = (String) item.get("shortversion");
 			title = (String) item.get("title");

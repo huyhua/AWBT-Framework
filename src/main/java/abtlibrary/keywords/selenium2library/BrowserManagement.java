@@ -990,7 +990,7 @@ public class BrowserManagement extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "url" })
-	public void goTo(String url) {
+	public void navigate(String url) {
 		logging.info(String.format("Opening url '%s'", url));
 		webDriverCache.getCurrent().get(url);
 	}
