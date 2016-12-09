@@ -143,7 +143,7 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 		DesiredCapabilities cap = new DesiredCapabilities();
 		cap.setCapability("app", filePath);
 		cap.setCapability("platformName", platform);
-		cap.setCapability("platformVersion", version);
+		//cap.setCapability("platformVersion", version);
 		cap.setCapability("deviceName", device);
 
 		try {
