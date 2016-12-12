@@ -89,8 +89,8 @@ public class TableElement extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void tableCellShouldContain(String tableLocator, int row, int column, String text) {
-		tableCellShouldContain(tableLocator, row, column, text, "INFO");
+	public void checkTableCellContains(String tableLocator, int row, int column, String text) {
+		checkTableCellContains(tableLocator, row, column, text, "INFO");
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class TableElement extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "tableLocator", "row", "column", "text", "logLevel=INFO" })
-	public void tableCellShouldContain(String tableLocator, int row, int column, String text, String logLevel) {
+	public void checkTableCellContains(String tableLocator, int row, int column, String text, String logLevel) {
 		String message = String.format("Cell in table '%s' in row #%d and column #%d should have contained text '%s'.",
 				tableLocator, row, column, text);
 
@@ -138,8 +138,8 @@ public class TableElement extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void tableColumnShouldContain(String tableLocator, int col, String text) {
-		tableColumnShouldContain(tableLocator, col, text, "INFO");
+	public void checkTableColumnContains(String tableLocator, int col, String text) {
+		checkTableColumnContains(tableLocator, col, text, "INFO");
 	}
 
 	/**
@@ -181,7 +181,7 @@ public class TableElement extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "tableLocator", "col", "text", "logLevel=INFO" })
-	public void tableColumnShouldContain(String tableLocator, int col, String text, String logLevel) {
+	public void checkTableColumnContains(String tableLocator, int col, String text, String logLevel) {
 		WebElement element = TableElementFinder.findByCol(browserManagement, tableLocator, col,
 				text);
 		if (element == null) {
@@ -192,8 +192,8 @@ public class TableElement extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void tableFooterShouldContain(String tableLocator, String text) {
-		tableFooterShouldContain(tableLocator, text, "INFO");
+	public void checkTableFooterContains(String tableLocator, String text) {
+		checkTableFooterContains(tableLocator, text, "INFO");
 	}
 
 	/**
@@ -212,7 +212,7 @@ public class TableElement extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "tableLocator", "text", "logLevel=INFO" })
-	public void tableFooterShouldContain(String tableLocator, String text, String logLevel) {
+	public void checkTableFooterContains(String tableLocator, String text, String logLevel) {
 		WebElement element = TableElementFinder.findByFooter(browserManagement, tableLocator,
 				text);
 		if (element == null) {
@@ -223,8 +223,8 @@ public class TableElement extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void tableHeaderShouldContain(String tableLocator, String text) {
-		tableHeaderShouldContain(tableLocator, text, "INFO");
+	public void checkTableHeaderContains(String tableLocator, String text) {
+		checkTableHeaderContains(tableLocator, text, "INFO");
 	}
 
 	/**
@@ -243,7 +243,7 @@ public class TableElement extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "tableLocator", "text", "logLevel=INFO" })
-	public void tableHeaderShouldContain(String tableLocator, String text, String logLevel) {
+	public void checkTableHeaderContains(String tableLocator, String text, String logLevel) {
 		WebElement element = TableElementFinder.findByHeader(browserManagement, tableLocator,
 				text);
 		if (element == null) {
@@ -254,8 +254,8 @@ public class TableElement extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void tableRowShouldContain(String tableLocator, int row, String text) {
-		tableRowShouldContain(tableLocator, row, text, "INFO");
+	public void checkTableRowContains(String tableLocator, int row, String text) {
+		checkTableRowContains(tableLocator, row, text, "INFO");
 	}
 
 	/**
@@ -284,7 +284,7 @@ public class TableElement extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "tableLocator", "row", "text", "logLevel=INFO" })
-	public void tableRowShouldContain(String tableLocator, int row, String text, String logLevel) {
+	public void checkTableRowContains(String tableLocator, int row, String text, String logLevel) {
 		WebElement element = TableElementFinder.findByRow(browserManagement, tableLocator, row,
 				text);
 		if (element == null) {
@@ -295,8 +295,8 @@ public class TableElement extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void tableShouldContain(String tableLocator, String text) {
-		tableShouldContain(tableLocator, text, "INFO");
+	public void checkTableContains(String tableLocator, String text) {
+		checkTableContains(tableLocator, text, "INFO");
 	}
 
 	/**
@@ -315,7 +315,7 @@ public class TableElement extends RunOnFailureKeywordsAdapter {
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "tableLocator", "text", "logLevel=INFO" })
-	public void tableShouldContain(String tableLocator, String text, String logLevel) {
+	public void checkTableContains(String tableLocator, String text, String logLevel) {
 		WebElement element = TableElementFinder.findByContent(browserManagement, tableLocator,
 				text);
 		if (element == null) {

@@ -336,59 +336,6 @@ public class ElementFinder {
 		return attrs;
 	}
 
-	public static void main(String[] args) {
-		List<String> selectors = new ArrayList<String>();
-
-		String[] androidAttr = { "@resource-id", "@content-desc", "@text" };
-		String xpathCriteria = "//*[@resource-id='ch.anibis.anibis.beta:id/contactType']//android.widget.EditText";
-
-		OperatingSystem os = new OperatingSystem();
-
-		List<String> classNames = os.getMidText(xpathCriteria, "/", "[");
-
-		for (String className : classNames) {
-			String attributeString = "";
-			if (!className.equals("*")) {
-				selectors.add("className(\"" + className + "\")");
-				if (os.getMidText(xpathCriteria, className, "]").size() > 0) {
-					attributeString = os.getMidText(xpathCriteria, className, "]").get(0);
-				}
-				System.out.println(className);
-				System.out.println(os.getMidText(xpathCriteria, className, "]"));
-			} else {
-				attributeString = os.getMidText(xpathCriteria, "\\*", "]").get(0);
-			}
-
-			for (String attr : androidAttr) {
-				String attValue = "";
-				String regex = "(" + attr + ".?=.?['|\"](.*?)['|\"]|contains\\(.?" + attr + ".*?\\))";
-
-				if (!os.getSubString(attributeString, regex).equals("")) {
-					String temp = os.getSubString(attributeString, regex);
-					temp = os.getSubString(temp, "(\"|')(.*?)(\"|')");
-					attValue = temp.substring(1, temp.length() - 1);
-				}
-
-				if (!attValue.equals("")) {
-					if (attr.equals("@resource-id")) {
-						selectors.add("resourceIdMatches(\"" + attValue + "\")");
-					} else if (attr.equals("@content-desc")) {
-						selectors.add("descriptionContains(\"" + attValue + "\")");
-					} else {
-						selectors.add("textContains(\"" + attValue + "\")");
-					}
-				}
-			}
-		}
-
-		String uiSelector = String.format(
-				"new UiScrollable(new UiSelector().scrollable(true).instance(1)).scrollIntoView(new UiSelector().%s)",
-				Python.join(".", selectors));
-
-		System.out.println(uiSelector);
-
-	}
-
 	protected static List<WebElement> findByUiSelector(WebDriver webDriver, FindByCoordinates findByCoordinates) {
 		List<String> selectors = new ArrayList<String>();
 		String[] androidAttr = { "@resource-id", "@content-desc", "@text" };
@@ -457,6 +404,8 @@ public class ElementFinder {
 	protected static List<WebElement> scrollToFind(BrowserManagement browserManagement,
 			FindByCoordinates findByCoordinates, String strategy) {
 		AndroidDriver<WebElement> androidDriver = (AndroidDriver<WebElement>) browserManagement.getCurrentWebDriver();
+		String implicitWait = browserManagement.getSeleniumImplicitWait();
+		browserManagement.setSeleniumImplicitWait("0.5");
 		List<WebElement> scroll = androidDriver.findElementsByAndroidUIAutomator(".scrollable(true)");
 		List<WebElement> elements = new ArrayList<>();
 		for (int i = scroll.size() - 1; i >= 0; i--) {
@@ -464,17 +413,16 @@ public class ElementFinder {
 					.findElementsByAndroidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance("
 							+ (i) + ")).scrollIntoView(new UiSelector()." + strategy + "(\""
 							+ findByCoordinates.criteria + "\"))");
+			if (elements.size() == 0) {
+				scrollDown(browserManagement.getCurrentWebDriver(), 1);
+				elements = androidDriver.findElementsByAndroidUIAutomator(
+						"new UiSelector()." + strategy + "(\"" + findByCoordinates.criteria + "\")");
+			}
 			if (elements.size() > 0) {
 				break;
 			}
 		}
-
-		if (elements.size() == 0) {
-			scrollDown(browserManagement.getCurrentWebDriver(), 1);
-			elements = androidDriver.findElementsByAndroidUIAutomator(
-					"new UiSelector()." + strategy + "(\"" + findByCoordinates.criteria + "\")");
-		}
-
+		browserManagement.setSeleniumImplicitWait(implicitWait);
 		return elements;
 	}
 
