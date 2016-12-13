@@ -7,7 +7,6 @@ import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
 import abtlibrary.ABTLibraryNonFatalException;
-import abtlibrary.Constant;
 import abtlibrary.RunOnFailureKeywordsAdapter;
 
 @RobotKeywords

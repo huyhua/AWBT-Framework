@@ -23,7 +23,8 @@ public class Action extends RunOnFailureKeywordsAdapter {
 
 	public static void main(String[] args) {
 		Action action = new Action();
-		System.out.println(action.parseToRFKeyword("/Users/khoivo/git/ABTLibrary/src/test/robotframework/temp/test_action.robot"));
+		System.out.println(
+				action.parseToRFKeyword("/Users/khoivo/git/ABTLibrary/src/test/robotframework/temp/test_action.robot"));
 	}
 
 	@Autowired
@@ -76,6 +77,19 @@ public class Action extends RunOnFailureKeywordsAdapter {
 		String content = "*** Keywords ***\n" + Python.join("\n", actions);
 		os.createTextFile(Constant.tempActionDir + "/Action.robot", content);
 		return Constant.tempActionDir + "/Action.robot";
+	}
+
+	/**
+	 * Execute block of actions between If and End if actions if
+	 * <b>condition</b> is true <br>
+	 * If action is only valid in actions, invalid in test module.
+	 * @param condition
+	 *            Condition for If clause.
+	 */
+	@RobotKeyword
+	@ArgumentNames({"condition"})
+	public void If(String condition) {
+
 	}
 
 	// ##############################
@@ -141,9 +155,9 @@ public class Action extends RunOnFailureKeywordsAdapter {
 		} else {
 			throw new ABTLibraryFatalException(String.format("Could not find 'end if' in '%s'.", filePath));
 		}
-
-		if (!actionLines.contains("*** Keywords ***") | !actionLines.contains("* Keywords *")
-				| !actionLines.contains("* Keywords")) {
+		
+		if (!actionLines.contains("*** Keywords ***") && !actionLines.contains("* Keywords *")
+				&& !actionLines.contains("* Keywords")) {
 			rfKeyword += actionName + "\n";
 			rfKeyword += "\t[Documentation]\n\t...\t" + description + "\n";
 			rfKeyword += "\t[Arguments]\t";
@@ -163,7 +177,7 @@ public class Action extends RunOnFailureKeywordsAdapter {
 			}
 		} else {
 			for (String line : actionLines) {
-				if (!line.contains("*** Keywords") | !line.contains("* Keywords")) {
+				if (!line.contains("*** Keywords") && !line.contains("* Keywords")) {
 					rfKeyword += line + "\n";
 				}
 			}
@@ -186,9 +200,18 @@ public class Action extends RunOnFailureKeywordsAdapter {
 		if (startIf < endIf) {
 			originalBlock.set(startIf, originalBlock.get(startIf).toLowerCase().replace("if", "run keyword if"));
 			originalBlock.add(startIf + 1, "...\trun keywords");
-			originalBlock.set(startIf + 2, "...\t" + originalBlock.get(startIf + 2));
-			for (int i = startIf + 3; i < endIf + 1; i++) {
-				originalBlock.set(i, "...\tand\t" + originalBlock.get(i));
+			Boolean first = false;
+			for (int i = startIf + 2; i < endIf + 1; i++) {
+				String temp = originalBlock.get(i).replaceAll("\t", "");
+				if (!temp.startsWith("#") && !temp.startsWith("*") && !temp.trim().equals("")) {
+					if (first == false) {
+						originalBlock.set(i, "...\t" + originalBlock.get(i));
+						first = true;
+					} else {
+						originalBlock.set(i, "...\tAND\t" + originalBlock.get(i));
+					}
+				}
+
 			}
 			originalBlock.remove(endIf + 1);
 		}
