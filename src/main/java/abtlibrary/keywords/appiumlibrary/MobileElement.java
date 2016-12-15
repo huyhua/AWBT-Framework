@@ -236,12 +236,12 @@ public class MobileElement {
 	
 	@RobotKeywordOverload
 	public void scrollAndClickItemName(String name, String window, String control){
-		scrollAndClickItemName(name, window, control, null);
+		scrollAndClickItemName(name, window, control, 99);
 	}
 	
 	@RobotKeyword
-	@ArgumentNames({"name", "window", "control", "scrollLimit"})
-	public void scrollAndClickItemName(String name, String window, String control, Integer scrollLimit){
+	@ArgumentNames({"name", "window", "control", "scrollLimit=99"})
+	public void scrollAndClickItemName(String name, String window, String control, int scrollLimit){
 		List<String> results = new ArrayList<>();
 
 		// WebElement scrollable = element.elementFind(scrollablecontrol, true,
@@ -263,10 +263,9 @@ public class MobileElement {
 
 		int safeRetry = 0;
 		int scroll = 0;
-		boolean noLimit = scrollLimit == null;
 		
-		while (scroll++ < scrollLimit | noLimit) {
-			itemOnScreen.forEach(item -> {
+		do {
+			for(WebElement item : itemOnScreen){
 				String id = item.getAttribute("name");
 				if (!id.equals(""))
 					results.add(id);
@@ -274,7 +273,7 @@ public class MobileElement {
 					item.click();
 					return;
 				}
-			});
+			}
 			
 			touch.swipe(start.getX(), start.getY(), stop.getX(), stop.getY(), 1500);
 			itemOnScreen = element.elementFind(window, control, false, true);
@@ -287,19 +286,20 @@ public class MobileElement {
 			if (currentLastElement.equals(previousLastElement) && safeRetry++ == 2) {
 				break;
 			}
-		}
+		} while(scroll++ < scrollLimit);
+		
 		throw new ABTLibraryNonFatalException("item with name not found");
 	}
 	
 	@RobotKeywordOverload
 	public List<String> scrollAndGetItemNames(String window, String control){
-		return scrollAndGetItemNames(window, control, null);
+		return scrollAndGetItemNames(window, control, 99);
 	}
 	
 
 	@RobotKeyword
-	@ArgumentNames({ "window", "control" })
-	public List<String> scrollAndGetItemNames(String window, String control, Integer scrollLimit) {
+	@ArgumentNames({ "window", "control", "scrollLimit=99"})
+	public List<String> scrollAndGetItemNames(String window, String control, int scrollLimit) {
 		try {
 			List<String> results = new ArrayList<>();
 
@@ -322,14 +322,13 @@ public class MobileElement {
 
 		int safeRetry = 0;
 		int scroll = 0;
-		boolean noLimit = scrollLimit == null;
 		
-		while (scroll++ < scrollLimit | noLimit) {
-			itemOnScreen.forEach(item -> {
+		do {
+			for (WebElement item : itemOnScreen){
 				String id = item.getAttribute("name");
 				if (!id.equals(""))
 					results.add(id);
-			});
+			}
 
 			touch.swipe(start.getX(), start.getY(), stop.getX(), stop.getY(), 1500);
 			itemOnScreen = element.elementFind(window, control, false, true);
@@ -342,7 +341,7 @@ public class MobileElement {
 			if (currentLastElement.equals(previousLastElement) && safeRetry++ == 2) {
 				break;
 			}
-		}
+		} while(scroll++ < scrollLimit);
 			
 			List<String> finalResults = results.stream().distinct().collect(Collectors.toList());
 			return finalResults;

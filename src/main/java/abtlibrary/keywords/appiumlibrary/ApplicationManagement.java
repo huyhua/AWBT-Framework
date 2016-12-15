@@ -173,7 +173,7 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 
 	@RobotKeywordOverload
 	public String openApplication(String device, String version, String filePath) {
-		return openApplication(device, version, filePath, "", "http://localhost:4723/wd/hub");
+		return openApplication(device, version, filePath, "");
 	}
 	
 	/**
