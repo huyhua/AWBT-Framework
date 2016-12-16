@@ -13,7 +13,6 @@ import org.robotframework.javalib.annotation.RobotKeywords;
 
 import abtlibrary.ABTLibraryFatalException;
 import abtlibrary.ABTLibraryNonFatalException;
-import abtlibrary.Constant;
 import abtlibrary.RunOnFailureKeywordsAdapter;
 import abtlibrary.keywords.operatinglibrary.OperatingSystem;
 import abtlibrary.utils.Python;
@@ -75,19 +74,20 @@ public class Action extends RunOnFailureKeywordsAdapter {
 			actions.add(parseToRFKeyword(fAction.getAbsolutePath()));
 		}
 		String content = "*** Keywords ***\n" + Python.join("\n", actions);
-		os.createTextFile(Constant.tempActionDir + "/Action.robot", content);
-		return Constant.tempActionDir + "/Action.robot";
+		os.createTextFile(init.getTempActionDir() + "/Action.robot", content);
+		return init.getTempActionDir() + "/Action.robot";
 	}
 
 	/**
 	 * Execute block of actions between If and End if actions if
 	 * <b>condition</b> is true <br>
 	 * If action is only valid in actions, invalid in test module.
+	 * 
 	 * @param condition
 	 *            Condition for If clause.
 	 */
 	@RobotKeyword
-	@ArgumentNames({"condition"})
+	@ArgumentNames({ "condition" })
 	public void If(String condition) {
 
 	}
@@ -150,12 +150,14 @@ public class Action extends RunOnFailureKeywordsAdapter {
 		 */
 		String rfKeyword = "";
 		// Parse If block
-		if (parseIfBlock(actionLines) != null) {
-			actionLines = parseIfBlock(actionLines);
+		List<String> temp = new ArrayList<String>();
+		temp = parseIfBlock(actionLines);
+		if (temp != null) {
+			actionLines = temp;
 		} else {
 			throw new ABTLibraryFatalException(String.format("Could not find 'end if' in '%s'.", filePath));
 		}
-		
+
 		if (!actionLines.contains("*** Keywords ***") && !actionLines.contains("* Keywords *")
 				&& !actionLines.contains("* Keywords")) {
 			rfKeyword += actionName + "\n";
@@ -189,34 +191,44 @@ public class Action extends RunOnFailureKeywordsAdapter {
 	public List<String> parseIfBlock(List<String> originalBlock) {
 		int startIf = -1;
 		int endIf = -1;
+
+		List<String> start = new ArrayList<String>();
+		List<String> end = new ArrayList<String>();
+
 		for (int i = 0; i < originalBlock.size(); i++) {
 			if (originalBlock.get(i).toLowerCase().startsWith("if")) {
-				startIf = i;
+				start.add(i + "");
 			}
 			if (originalBlock.get(i).toLowerCase().startsWith("end if")) {
-				endIf = i;
+				end.add(i + "");
 			}
 		}
-		if (startIf < endIf) {
-			originalBlock.set(startIf, originalBlock.get(startIf).toLowerCase().replace("if", "run keyword if"));
-			originalBlock.add(startIf + 1, "...\trun keywords");
-			Boolean first = false;
-			for (int i = startIf + 2; i < endIf + 1; i++) {
-				String temp = originalBlock.get(i).replaceAll("\t", "");
-				if (!temp.startsWith("#") && !temp.startsWith("*") && !temp.trim().equals("")) {
-					if (first == false) {
-						originalBlock.set(i, "...\t" + originalBlock.get(i));
-						first = true;
-					} else {
-						originalBlock.set(i, "...\tAND\t" + originalBlock.get(i));
+
+		if (start.size() == end.size()) {
+			for (int n = 0; n < start.size(); n++) {
+				startIf = Integer.parseInt(start.get(n));
+				endIf = Integer.parseInt(end.get(n));
+				if (startIf < endIf) {
+					originalBlock.set(startIf,
+							originalBlock.get(startIf).toLowerCase().replace("if", "run keyword if"));
+					originalBlock.add(startIf + 1, "...\trun keywords");
+					Boolean first = false;
+					for (int i = startIf + 2; i < endIf + 1; i++) {
+						String temp = originalBlock.get(i).replaceAll("\t", "");
+						if (!temp.startsWith("#") && !temp.startsWith("*") && !temp.trim().equals("")) {
+							if (first == false) {
+								originalBlock.set(i, "...\t" + originalBlock.get(i));
+								first = true;
+							} else {
+								originalBlock.set(i, "...\tAND\t" + originalBlock.get(i));
+							}
+						}
+
 					}
+					originalBlock.remove(endIf + 1);
 				}
-
 			}
-			originalBlock.remove(endIf + 1);
-		}
-
-		if (startIf > endIf) {
+		} else {
 			return null;
 		}
 		return originalBlock;

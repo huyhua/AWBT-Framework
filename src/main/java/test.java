@@ -1,4 +1,6 @@
-import java.util.List;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 import abtlibrary.keywords.appiumlibrary.ApplicationManagement;
 import abtlibrary.keywords.appiumlibrary.KeyEvent;
@@ -13,16 +15,11 @@ public class test {
 	static KeyEvent key = new KeyEvent();
 	
 	
-	public static void main(String[] args) throws InterruptedException{
-	/*	applicationManagement.openApplication("http://localhost:4723/wd/hub", "Android","/Users/huyhua/Downloads/ImmoScout24.apk", "192.168.57.101:5555", "5.1");
-		element.clickElement("android=text(\"English\")");
-		element.clickElement("android=text(\"Dismiss\")");
-		element.clickElement("content_desc=ContentText");
-		Thread.sleep(2000);
-		key.pressKeyCode(66);
-		element.clickElement("content_desc=Search_BtnSearch");
-		Thread.sleep(5000);
-		List<String> results = mobile.scrollAndGetItemNames("//android.support.v7.widget.RecyclerView/android.widget.FrameLayout");
-		System.out.println(results.toString());*/
+	public static void main(String[] args) throws InterruptedException, ScriptException{
+		ScriptEngine engine = new ScriptEngineManager().getEngineByName("python");
+		engine.eval("from robot.libraries.BuiltIn import BuiltIn");
+		engine.eval("BuiltIn().set_variable('${platform}','Test')");
+		engine.eval("instance = BuiltIn().get_variable_value('${platform}')");
+		System.out.println(engine.get("instance"));
 	}
 }

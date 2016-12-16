@@ -63,4 +63,16 @@ public class Initialization extends RunOnFailureKeywordsAdapter {
 	public String getConfigurationDirectory() {
 		return projectDir + "/" + configurationDir;
 	}
+	
+	public String getTempDir(){
+		return projectDir + "/Temp/";
+	}
+	
+	public String getTempActionDir(){
+		return projectDir + "/Temp/" + actionDir;
+	}
+	
+	public String getTempInterfaceDir(){
+		return projectDir + "/Temp/" + interfaceDir;
+	}
 }

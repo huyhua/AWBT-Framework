@@ -10,7 +10,6 @@ import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 import org.w3c.dom.Element;
 
-import abtlibrary.Constant;
 import abtlibrary.RunOnFailureKeywordsAdapter;
 import abtlibrary.keywords.operatinglibrary.OperatingSystem;
 import abtlibrary.keywords.selenium2library.BrowserManagement;
@@ -21,12 +20,6 @@ public class UserInterface extends RunOnFailureKeywordsAdapter {
 
 	@Autowired
 	Initialization init;
-	
-	/**
-	 * Interface file path <br>
-	 * Default path: <b>{TEMPDIR}/Interface/Interface.xml</b>
-	 */
-	protected String xmlInterfaceFile = Constant.tempInterfaceDir + "/Interface.xml";
 
 	/**
 	 * Instantiated OpenrationSysteam
@@ -61,7 +54,7 @@ public class UserInterface extends RunOnFailureKeywordsAdapter {
 	@RobotKeyword
 	@ArgumentNames({ "name=NONE" })
 	public void useInterface(String name) {
-		// interfaces.installXMLInterface(Constant.interfaceDir, name);
+		interfaces.tempInterfaceDir = init.getTempInterfaceDir();
 		interfaces.initInterface(init.getInterfaceDirectory(), name);
 	}
 
@@ -73,12 +66,12 @@ public class UserInterface extends RunOnFailureKeywordsAdapter {
 	 *            element name
 	 * @return the list of locators
 	 */
-	@RobotKeyword
+	/*@RobotKeyword
 	@ArgumentNames({ "name" })
 	public List<String> getLocators(String name) {
 		List<String> locators = new ArrayList<String>();
 
-		List<Element> elements = interfaces.getDefinedElements(xmlInterfaceFile);
+		List<Element> elements = interfaces.getDefinedElements(init.getTempInterfaceDir() + "/Interface.xml");
 		for (Element element : elements) {
 			String elementName = element.getElementsByTagName("name").item(0).getTextContent();
 			if (elementName.equalsIgnoreCase(name)) {
@@ -86,7 +79,7 @@ public class UserInterface extends RunOnFailureKeywordsAdapter {
 			}
 		}
 		return locators;
-	}
+	}*/
 
 	/**
 	 * Retrieves all locators that match with specified element and window from
@@ -103,7 +96,7 @@ public class UserInterface extends RunOnFailureKeywordsAdapter {
 	public List<String> getLocators(String window, String control) {
 		List<String> locators = new ArrayList<String>();
 		String platform = browserManagement.getCurrentPlatform().toLowerCase();
-		List<Element> eleNodes = interfaces.getDefinedElements(xmlInterfaceFile, window, platform);
+		List<Element> eleNodes = interfaces.getDefinedElements(init.getTempInterfaceDir() + "/Interface.xml", window, platform);
 		for (Element eleNode : eleNodes) {
 			String elementName = eleNode.getElementsByTagName("name").item(0).getTextContent();
 			if (elementName.equalsIgnoreCase(control)) {

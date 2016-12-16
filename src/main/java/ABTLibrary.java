@@ -1,8 +1,5 @@
 import org.robotframework.remoteserver.RemoteServer;
 
-import abtlibrary.keywords.appiumlibrary.MobileElement;
-import abtlibrary.keywords.selenium2library.Element;
-
 public class ABTLibrary extends abtlibrary.ABTLibrary {
 
 	public ABTLibrary(String timeout, String implicitWait, String runOnFailure) {
