@@ -4,6 +4,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 import org.apache.commons.io.FilenameUtils;
 import org.robotframework.javalib.annotation.ArgumentNames;
 import org.robotframework.javalib.annotation.Autowired;
@@ -11,8 +15,8 @@ import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
+import abtlibrary.ABTLibraryFatalException;
 import abtlibrary.ABTLibraryNonFatalException;
-import abtlibrary.Constant;
 import abtlibrary.RunOnFailureKeywordsAdapter;
 import abtlibrary.keywords.operatinglibrary.OperatingSystem;
 import abtlibrary.utils.Python;
@@ -22,12 +26,13 @@ public class Action extends RunOnFailureKeywordsAdapter {
 
 	public static void main(String[] args) {
 		Action action = new Action();
-		action.parseAction();
+		System.out.println(
+				action.parseToRFKeyword("/Users/khoivo/git/ABTLibrary/src/test/robotframework/temp/test_action.robot"));
 	}
 
 	@Autowired
 	Initialization init;
-	
+
 	// ##############################
 	// Keywords
 	// ##############################
@@ -53,29 +58,61 @@ public class Action extends RunOnFailureKeywordsAdapter {
 		OperatingSystem os = new OperatingSystem();
 		List<File> fActions = os.getFiles(init.getActionDirectory() + "/" + folder);
 		List<File> valueToRemove = new ArrayList<>();
-		
+
 		if (fActions == null) {
 			throw new ABTLibraryNonFatalException(
 					String.format("Could not find action directory '%s'.", init.getActionDirectory() + "/" + folder));
 		}
-		
-		
+
 		fActions.forEach(file -> {
 			String ext = FilenameUtils.getExtension(file.getName());
-			if(!ext.equalsIgnoreCase("robot") && !ext.equalsIgnoreCase("txt")){
+			if (!ext.equalsIgnoreCase("robot") && !ext.equalsIgnoreCase("txt")) {
 				valueToRemove.add(file);
 			}
 		});
 		fActions.removeAll(valueToRemove);
-		
+
 		List<String> actions = new ArrayList<>();
 		for (File fAction : fActions) {
 
 			actions.add(parseToRFKeyword(fAction.getAbsolutePath()));
 		}
 		String content = "*** Keywords ***\n" + Python.join("\n", actions);
-		os.createTextFile(Constant.tempActionDir + "/Action.robot", content);
-		return Constant.tempActionDir + "/Action.robot";
+		os.createTextFile(init.getTempActionDir() + "/Action.robot", content);
+		return init.getTempActionDir() + "/Action.robot";
+	}
+
+	/**
+	 * Execute block of actions between If and End if actions if
+	 * <b>condition</b> is true <br>
+	 * If action is only valid in actions, invalid in test module.
+	 * 
+	 * @param condition
+	 *            Condition for If clause.
+	 */
+	@RobotKeyword
+	@ArgumentNames({ "condition" })
+	public void If(String condition) {
+
+	}
+
+	/**
+	 * Makes a variable available globally in all tests and suites.<br>
+	 * Variables set with this keyword are globally available in all test cases
+	 * and suites executed after setting them.
+	 * 
+	 * @param name
+	 *            Name of variable
+	 * @param value
+	 *            Value of variable
+	 * @throws ScriptException
+	 */
+	@RobotKeywordOverload
+	@ArgumentNames({"name", "value"})
+	public void setVariable(String name, String value) throws ScriptException {
+		ScriptEngine engine = new ScriptEngineManager().getEngineByName("python");
+		engine.eval("from robot.libraries.BuiltIn import BuiltIn");
+		engine.eval("BuiltIn().set_global_variable('${" + name + "}', '" + value + "')");
 	}
 
 	// ##############################
@@ -92,7 +129,7 @@ public class Action extends RunOnFailureKeywordsAdapter {
 		String actionName = "";
 		String description = "";
 		List<List<String>> arguments = new ArrayList<List<String>>();
-		List<String> codeLines = new ArrayList<String>();
+		List<String> actionLines = new ArrayList<String>();
 
 		/**
 		 * Read each lines and parse to items of robot framework
@@ -125,7 +162,7 @@ public class Action extends RunOnFailureKeywordsAdapter {
 			// Get action body
 			else {
 				if (os.getSubString(lines.get(i), "#(.*?)name(.*?)default value(.*?)description").equals("")) {
-					codeLines.add(lines.get(i));
+					actionLines.add(lines.get(i));
 				}
 			}
 
@@ -135,7 +172,17 @@ public class Action extends RunOnFailureKeywordsAdapter {
 		 * Join each items to completed keyword of robot framework
 		 */
 		String rfKeyword = "";
-		if (!codeLines.contains("*** Keywords ***")) {
+		// Parse If block
+		List<String> temp = new ArrayList<String>();
+		temp = parseIfBlock(actionLines);
+		if (temp != null) {
+			actionLines = temp;
+		} else {
+			throw new ABTLibraryFatalException(String.format("Could not find 'end if' in '%s'.", filePath));
+		}
+
+		if (!actionLines.contains("*** Keywords ***") && !actionLines.contains("* Keywords *")
+				&& !actionLines.contains("* Keywords")) {
 			rfKeyword += actionName + "\n";
 			rfKeyword += "\t[Documentation]\n\t...\t" + description + "\n";
 			rfKeyword += "\t[Arguments]\t";
@@ -149,17 +196,64 @@ public class Action extends RunOnFailureKeywordsAdapter {
 			}
 
 			rfKeyword += "\n";
-			for (String line : codeLines) {
+
+			for (String line : actionLines) {
 				rfKeyword += "\t" + line + "\n";
 			}
 		} else {
-			for (String line : codeLines) {
-				if (!line.contains("*** Keywords ***")) {
+			for (String line : actionLines) {
+				if (!line.contains("*** Keywords") && !line.contains("* Keywords")) {
 					rfKeyword += line + "\n";
 				}
 			}
 		}
 		return rfKeyword;
 
+	}
+
+	public List<String> parseIfBlock(List<String> originalBlock) {
+		int startIf = -1;
+		int endIf = -1;
+
+		List<String> start = new ArrayList<String>();
+		List<String> end = new ArrayList<String>();
+
+		for (int i = 0; i < originalBlock.size(); i++) {
+			if (originalBlock.get(i).toLowerCase().startsWith("if")) {
+				start.add(i + "");
+			}
+			if (originalBlock.get(i).toLowerCase().startsWith("end if")) {
+				end.add(i + "");
+			}
+		}
+
+		if (start.size() == end.size()) {
+			for (int n = 0; n < start.size(); n++) {
+				startIf = Integer.parseInt(start.get(n));
+				endIf = Integer.parseInt(end.get(n));
+				if (startIf < endIf) {
+					originalBlock.set(startIf,
+							originalBlock.get(startIf).toLowerCase().replace("if", "run keyword if"));
+					originalBlock.add(startIf + 1, "...\trun keywords");
+					Boolean first = false;
+					for (int i = startIf + 2; i < endIf + 1; i++) {
+						String temp = originalBlock.get(i).replaceAll("\t", "");
+						if (!temp.startsWith("#") && !temp.startsWith("*") && !temp.trim().equals("")) {
+							if (first == false) {
+								originalBlock.set(i, "...\t" + originalBlock.get(i));
+								first = true;
+							} else {
+								originalBlock.set(i, "...\tAND\t" + originalBlock.get(i));
+							}
+						}
+
+					}
+					originalBlock.remove(endIf + 1);
+				}
+			}
+		} else {
+			return null;
+		}
+		return originalBlock;
 	}
 }

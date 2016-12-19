@@ -28,7 +28,6 @@ import org.w3c.dom.NodeList;
 
 import abtlibrary.ABTLibraryFatalException;
 import abtlibrary.ABTLibraryNonFatalException;
-import abtlibrary.Constant;
 import abtlibrary.RunOnFailureKeywordsAdapter;
 import abtlibrary.keywords.operatinglibrary.OperatingSystem;
 import abtlibrary.keywords.selenium2library.Logging;
@@ -39,7 +38,8 @@ public class Interfaces extends RunOnFailureKeywordsAdapter {
 	 */
 	@Autowired
 	protected Logging logging;
-
+	
+	public String tempInterfaceDir;
 	String fileName;
 	List<String[]> elements1;
 
@@ -71,7 +71,8 @@ public class Interfaces extends RunOnFailureKeywordsAdapter {
 	}
 
 	public void initInterface(String interfaceDirectory, String subDirectory) {
-		File xmlFile = new File(Constant.tempInterfaceDir + "/Interface.xml");
+		
+		File xmlFile = new File(tempInterfaceDir + "/Interface.xml");
 		List<Interfaces> interfaces = new ArrayList<Interfaces>();
 		List<File> interfaceFiles = new ArrayList<File>();
 		Boolean updated = false;
@@ -200,7 +201,7 @@ public class Interfaces extends RunOnFailureKeywordsAdapter {
 	}
 
 	public void installXMLInterface(String interfaceDirectory, String subDirectory) {
-		File xmlFile = new File(Constant.tempInterfaceDir + "/Interface.xml");
+		File xmlFile = new File(tempInterfaceDir + "/Interface.xml");
 		List<Interfaces> interfaces;
 		List<File> interfaceFiles;
 		Boolean updated = false;

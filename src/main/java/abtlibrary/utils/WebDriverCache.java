@@ -108,7 +108,8 @@ public class WebDriverCache {
 
 	public void closeAll() {
 		for (SessionIdAliasWebDriverTuple sessionIdAliasWebDriverTuple : tupleBySessionId.values()) {
-			sessionIdAliasWebDriverTuple.webDriver.quit();
+			if(sessionIdAliasWebDriverTuple.webDriver != null)
+				sessionIdAliasWebDriverTuple.webDriver.quit();
 		}
 		maxAssignedSessionId = 0;
 		currentSessionIdAliasWebDriverTuple = null;

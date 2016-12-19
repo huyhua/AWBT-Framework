@@ -10,10 +10,10 @@ import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
+import abtlibrary.ABTLibraryNonFatalException;
 import abtlibrary.RunOnFailureKeywordsAdapter;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.ios.IOSElement;
-import abtlibrary.ABTLibraryNonFatalException;
 
 @RobotKeywords
 public class FormElement extends RunOnFailureKeywordsAdapter {
@@ -524,8 +524,8 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void checkTextfieldValue(String window, String control, String text) {
-		checkTextfieldValue(window, control, text, "");
+	public void checkValueInTextfield(String window, String control, String text) {
+		checkValueInTextfield(window, control, text, "");
 	}
 
 	/**
@@ -547,11 +547,11 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	 * 
 	 * @see FormElement#checkTextfieldContains
 	 * @see FormElement#checkTextfieldNotContain
-	 * @see FormElement#textfieldValueShouldNotBe
+	 * @see FormElement#checkValueNotInTextfield
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "window", "control", "text", "message=NONE" })
-	public void checkTextfieldValue(String window, String control, String text, String message) {
+	public void checkValueInTextfield(String window, String control, String text, String message) {
 		String actual = element.getValue(window, control, "text field");
 		if (!actual.contains(text)) {
 			if (message == null) {
@@ -564,8 +564,8 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void textfieldValueShouldNotBe(String window, String control, String text) {
-		textfieldValueShouldNotBe(window, control, text, "");
+	public void checkValueNotInTextfield(String window, String control, String text) {
+		checkValueNotInTextfield(window, control, text, "");
 	}
 
 	/**
@@ -587,11 +587,11 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	 * 
 	 * @see FormElement#checkTextfieldContains
 	 * @see FormElement#checkTextfieldNotContain
-	 * @see FormElement#checkTextfieldValue
+	 * @see FormElement#checkValueInTextfield
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "window", "control", "text", "message=NONE" })
-	public void textfieldValueShouldNotBe(String window, String control, String text, String message) {
+	public void checkValueNotInTextfield(String window, String control, String text, String message) {
 		String actual = element.getValue(window, control, "text field");
 		if (actual.contains(text)) {
 			if (message == null) {
@@ -626,8 +626,8 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	 *            Default=NONE. Optional custom error message.
 	 * 
 	 * @see FormElement#checkTextfieldNotContain
-	 * @see FormElement#checkTextfieldValue
-	 * @see FormElement#textfieldValueShouldNotBe
+	 * @see FormElement#checkValueInTextfield
+	 * @see FormElement#checkValueNotInTextfield
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "window", "control", "text", "message=NONE" })
@@ -666,8 +666,8 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	 *            Default=NONE. Optional custom error message.
 	 * 
 	 * @see FormElement#checkTextfieldContains
-	 * @see FormElement#checkTextfieldValue
-	 * @see FormElement#textfieldValueShouldNotBe
+	 * @see FormElement#checkValueInTextfield
+	 * @see FormElement#checkValueNotInTextfield
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "window", "control", "text", "message=NONE" })
@@ -706,8 +706,8 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	 *            Default=NONE. Optional custom error message.
 	 * 
 	 * @see FormElement#checkTextareaNotContain
-	 * @see FormElement#checkTextareaValue
-	 * @see FormElement#textareaValueShouldNotBe
+	 * @see FormElement#checkValueInTextarea
+	 * @see FormElement#checkValueNotInTextarea
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "window", "control", "text", "message=NONE" })
@@ -746,8 +746,8 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	 *            Default=NONE. Optional custom error message.
 	 * 
 	 * @see FormElement#checkTextareaContains
-	 * @see FormElement#checkTextareaValue
-	 * @see FormElement#textareaValueShouldNotBe
+	 * @see FormElement#checkValueInTextarea
+	 * @see FormElement#checkValueNotInTextarea
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "window", "control", "text", "message=NONE" })
@@ -764,8 +764,8 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void checkTextareaValue(String window, String control, String text) {
-		checkTextareaValue(window, control, text, "");
+	public void checkValueInTextarea(String window, String control, String text) {
+		checkValueInTextarea(window, control, text, "");
 	}
 
 	/**
@@ -787,11 +787,11 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	 * 
 	 * @see FormElement#checkTextareaContains
 	 * @see FormElement#checkTextareaNotContain
-	 * @see FormElement#textareaValueShouldNotBe
+	 * @see FormElement#checkValueNotInTextarea
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "window", "control", "text", "message=NONE" })
-	public void checkTextareaValue(String window, String control, String text, String message) {
+	public void checkValueInTextarea(String window, String control, String text, String message) {
 		String actual = element.getValue(window, control, "text area");
 		if (!actual.contains(text)) {
 			if (message == null) {
@@ -804,8 +804,8 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public void textareaValueShouldNotBe(String window, String control, String text) {
-		textareaValueShouldNotBe(window, control, text, "");
+	public void checkValueNotInTextarea(String window, String control, String text) {
+		checkValueNotInTextarea(window, control, text, "");
 	}
 
 	/**
@@ -827,11 +827,11 @@ public class FormElement extends RunOnFailureKeywordsAdapter {
 	 * 
 	 * @see FormElement#checkTextareaContains
 	 * @see FormElement#checkTextareaNotContain
-	 * @see FormElement#checkTextareaValue
+	 * @see FormElement#checkValueInTextarea
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "window", "control", "text", "message=NONE" })
-	public void textareaValueShouldNotBe(String window, String control, String text, String message) {
+	public void checkValueNotInTextarea(String window, String control, String text, String message) {
 		String actual = element.getValue(window, control, "text area");
 		if (actual.contains(text)) {
 			if (message == null) {

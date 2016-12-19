@@ -1,13 +1,26 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>nvg-automation</groupId>
+	<groupId>vn.nvg</groupId>
 	<artifactId>abtlibrary</artifactId>
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
 	<name>Action Based Testing Library</name>
 	<description>Replace all automation scripts—that often require days to code—with keyword-driven preprogrammed actions</description>
+	<url>http://nvg.vn/</url>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<url>https://github.xmedia.ch/QANVG/ABTLibrary</url>
+	</scm>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -22,11 +35,6 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>com.google.android</groupId>
-			<artifactId>android-test</artifactId>
-			<version>2.2.1</version>
-		</dependency>
 		<!-- For Excel -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
@@ -157,15 +165,22 @@
 			<version>3.0</version>
 		</dependency>
 		<dependency>
+			<groupId>com.github.mifmif</groupId>
+			<artifactId>generex</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
 			<groupId>com.applitools</groupId>
 			<artifactId>eyes-selenium-java</artifactId>
 			<version>RELEASE</version>
 		</dependency>
-		<!-- <dependency>
-            <groupId>com.applitools</groupId>
-            <artifactId>eyes-selenium-java</artifactId>
-            <version>RELEASE</version>
-        </dependency> -->
+		<!-- <dependency> <groupId>com.applitools</groupId> <artifactId>eyes-selenium-java</artifactId> 
+			<version>RELEASE</version> </dependency> -->
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.10.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -220,6 +235,10 @@
 				<groupId>org.robotframework</groupId>
 				<artifactId>robotframework-maven-plugin</artifactId>
 				<version>1.4.5</version>
+				<configuration>
+					<logLevel>debug</logLevel>
+					<testCasesDirectory>${project.basedir}/src/test/robotframework/temp</testCasesDirectory>
+				</configuration>
 				<executions>
 					<execution>
 						<id>test</id>

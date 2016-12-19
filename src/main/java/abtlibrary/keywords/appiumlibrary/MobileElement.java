@@ -13,6 +13,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.robotframework.javalib.annotation.ArgumentNames;
 import org.robotframework.javalib.annotation.Autowired;
 import org.robotframework.javalib.annotation.RobotKeyword;
+import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
 import com.applitools.eyes.EyesDriverOperationException;
@@ -238,10 +239,74 @@ public class MobileElement {
 		String locator = "text=" + text;
 		element.elementFind("", locator, true, true).get(0).click();
 	}
+	
+	
+	@RobotKeywordOverload
+	public void scrollAndClickItemName(String name, String window, String control){
+		scrollAndClickItemName(name, window, control, 99);
+	}
+	
+	@RobotKeyword
+	@ArgumentNames({"name", "window", "control", "scrollLimit=99"})
+	public void scrollAndClickItemName(String name, String window, String control, int scrollLimit){
+		List<String> results = new ArrayList<>();
+
+		// WebElement scrollable = element.elementFind(scrollablecontrol, true,
+		// true).get(0);
+
+		List<WebElement> itemOnScreen;
+		itemOnScreen = element.elementFind(window, control, false, true);
+
+		if (itemOnScreen.isEmpty()) {
+			logging.warn(String.format("List with control '%s' contains no item", control));
+			throw new ABTLibraryNonFatalException();
+		}
+
+		WebElement firstElement = itemOnScreen.get(0);
+		WebElement lastElement = itemOnScreen.get(itemOnScreen.size() - 1);
+
+		Point start = lastElement.getLocation();
+		Point stop = firstElement.getLocation();
+
+		int safeRetry = 0;
+		int scroll = 0;
+		
+		do {
+			for(WebElement item : itemOnScreen){
+				String id = item.getAttribute("name");
+				if (!id.equals(""))
+					results.add(id);
+				if (id.equals(name)){
+					item.click();
+					return;
+				}
+			}
+			
+			touch.swipe(start.getX(), start.getY(), stop.getX(), stop.getY(), 1500);
+			itemOnScreen = element.elementFind(window, control, false, true);
+			String currentLastElement = itemOnScreen.get(itemOnScreen.size() - 1).getAttribute("name");
+			String previousLastElement = results.get(results.size() - 1);
+			if (!currentLastElement.equals(previousLastElement)) {
+				safeRetry = 0;
+			}
+
+			if (currentLastElement.equals(previousLastElement) && safeRetry++ == 2) {
+				break;
+			}
+		} while(scroll++ < scrollLimit);
+		
+		throw new ABTLibraryNonFatalException("item with name not found");
+	}
+	
+	@RobotKeywordOverload
+	public List<String> scrollAndGetItemNames(String window, String control){
+		return scrollAndGetItemNames(window, control, 99);
+	}
+	
 
 	@RobotKeyword
-	@ArgumentNames({ "window", "control" })
-	public List<String> scrollAndGetItemNames(String window, String control) {
+	@ArgumentNames({ "window", "control", "scrollLimit=99"})
+	public List<String> scrollAndGetItemNames(String window, String control, int scrollLimit) {
 		try {
 			List<String> results = new ArrayList<>();
 
@@ -263,13 +328,14 @@ public class MobileElement {
 		Point stop = firstElement.getLocation();
 
 		int safeRetry = 0;
-
-		while (true) {
-			itemOnScreen.forEach(item -> {
+		int scroll = 0;
+		
+		do {
+			for (WebElement item : itemOnScreen){
 				String id = item.getAttribute("name");
 				if (!id.equals(""))
 					results.add(id);
-			});
+			}
 
 			touch.swipe(start.getX(), start.getY(), stop.getX(), stop.getY(), 1500);
 			itemOnScreen = element.elementFind(window, control, false, true);
@@ -282,7 +348,7 @@ public class MobileElement {
 			if (currentLastElement.equals(previousLastElement) && safeRetry++ == 2) {
 				break;
 			}
-		}
+		} while(scroll++ < scrollLimit);
 			
 			List<String> finalResults = results.stream().distinct().collect(Collectors.toList());
 			return finalResults;

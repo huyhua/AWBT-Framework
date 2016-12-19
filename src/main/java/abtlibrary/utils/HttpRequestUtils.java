@@ -13,7 +13,8 @@ import org.json.simple.parser.ParseException;
 import abtlibrary.ABTLibraryFatalException;
 
 public class HttpRequestUtils {
-	public static String getResponse(String url, String method, Map<String, String> headers) {
+	public static String getResponse(String url, String method,
+			Map<String, String> headers) {
 		StringBuffer response = new StringBuffer();
 
 		try {
@@ -24,21 +25,25 @@ public class HttpRequestUtils {
 			con.setRequestMethod(method);
 
 			// add request header
-			for (Map.Entry<String, String> cursor : headers.entrySet()){
-				con.setRequestProperty(cursor.getKey(), cursor.getValue());
+			if (headers != null) {
+				for (Map.Entry<String, String> cursor : headers.entrySet()) {
+					con.setRequestProperty(cursor.getKey(), cursor.getValue());
+				}
 			}
-			
+
 			int responseCode = con.getResponseCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
-				BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+				BufferedReader in = new BufferedReader(new InputStreamReader(
+						con.getInputStream()));
 				String inputLine;
-	
+
 				while ((inputLine = in.readLine()) != null) {
 					response.append(inputLine);
 				}
 				in.close();
-			}else{
-				throw new ABTLibraryFatalException("Request to:" + url + " failed with message "+ con.getResponseMessage());
+			} else {
+				throw new ABTLibraryFatalException("Request to:" + url
+						+ " failed with message " + con.getResponseMessage());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -46,8 +51,8 @@ public class HttpRequestUtils {
 
 		return response.toString();
 	}
-	
-	public static JSONObject parseStringIntoJson(String content){
+
+	public static JSONObject parseStringIntoJson(String content) {
 		JSONParser parser = new JSONParser();
 		try {
 			return (JSONObject) parser.parse(content);
@@ -57,4 +62,6 @@ public class HttpRequestUtils {
 		}
 		return null;
 	}
+	
+	
 }

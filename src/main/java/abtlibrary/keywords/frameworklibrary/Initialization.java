@@ -7,7 +7,6 @@ import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
 import abtlibrary.ABTLibraryNonFatalException;
-import abtlibrary.Constant;
 import abtlibrary.RunOnFailureKeywordsAdapter;
 
 @RobotKeywords
@@ -63,5 +62,17 @@ public class Initialization extends RunOnFailureKeywordsAdapter {
 
 	public String getConfigurationDirectory() {
 		return projectDir + "/" + configurationDir;
+	}
+	
+	public String getTempDir(){
+		return projectDir + "/Temp/";
+	}
+	
+	public String getTempActionDir(){
+		return projectDir + "/Temp/" + actionDir;
+	}
+	
+	public String getTempInterfaceDir(){
+		return projectDir + "/Temp/" + interfaceDir;
 	}
 }

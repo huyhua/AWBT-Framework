@@ -10,7 +10,6 @@ import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
 import abtlibrary.ABTLibraryNonFatalException;
-import abtlibrary.Constant;
 import abtlibrary.RunOnFailureKeywordsAdapter;
 import abtlibrary.keywords.operatinglibrary.OperatingSystem;
 import abtlibrary.keywords.selenium2library.Logging;
@@ -107,7 +106,7 @@ public class DataSet extends RunOnFailureKeywordsAdapter {
 	public String parseBlockToKeyword(String suitePath, String testcaseName) {
 		List<String> blockKeywords = getDatasetBlock(suitePath, testcaseName);
 		String timeStamp = os.getTimeStamp();
-		String tempDirectory = Constant.tempActionDir + "/" + timeStamp;
+		String tempDirectory = init.getTempActionDir() + "/" + timeStamp;
 		String content = "*** Keywords ***\n";
 		content = content + testcaseName + "\n";
 		for (String line : blockKeywords) {
