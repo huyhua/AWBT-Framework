@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
+import javax.script.ScriptException;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.openqa.selenium.WebDriver;
@@ -27,6 +29,7 @@ import com.applitools.eyes.MatchLevel;
 
 import abtlibrary.ABTLibraryFatalException;
 import abtlibrary.RunOnFailureKeywordsAdapter;
+import abtlibrary.keywords.frameworklibrary.Action;
 import abtlibrary.keywords.selenium2library.BrowserManagement;
 import abtlibrary.keywords.selenium2library.Logging;
 import abtlibrary.utils.HttpRequestUtils;
@@ -49,6 +52,9 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	 */
 	@Autowired
 	protected Logging logging;
+
+	@Autowired
+	protected Action action;
 
 	protected Eyes eyes;
 
@@ -143,7 +149,7 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 		DesiredCapabilities cap = new DesiredCapabilities();
 		cap.setCapability("app", filePath);
 		cap.setCapability("platformName", platform);
-		//cap.setCapability("platformVersion", version);
+		// cap.setCapability("platformVersion", version);
 		cap.setCapability("deviceName", device);
 
 		try {
@@ -175,7 +181,7 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	public String openApplication(String device, String version, String filePath) {
 		return openApplication(device, version, filePath, "");
 	}
-	
+
 	/**
 	 * Scroll screen to the specified text.
 	 * 
@@ -222,23 +228,25 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public String downloadFromHockeyApp(String appId) {
-		return downloadFromHockeyApp(appId, null);
+	public String downloadFromHockeyApp(String appId, String path) throws ScriptException {
+		return downloadFromHockeyApp(appId, null, path);
 	}
 
 	@RobotKeywordOverload
-	public String downloadFromHockeyApp(String appId, String versionId) {
-		return downloadFromHockeyApp(appId, versionId, null);
+	public String downloadFromHockeyApp(String appId, String versionId, String path) throws ScriptException {
+		return downloadFromHockeyApp(appId, versionId, null, path);
 	}
 
 	@RobotKeywordOverload
-	public String downloadFromHockeyApp(String appId, String versionId, String appPath) {
-		return downloadFromHockeyApp(appId, versionId, appPath, null);
+	public String downloadFromHockeyApp(String appId, String versionId, String appPath, String path)
+			throws ScriptException {
+		return downloadFromHockeyApp(appId, versionId, appPath, null, path);
 	}
 
 	@RobotKeywordOverload
-	public String downloadFromHockeyApp(String appId, String versionId, String appPath, String appFileName) {
-		return downloadFromHockeyApp(appId, versionId, appPath, appFileName, null);
+	public String downloadFromHockeyApp(String appId, String versionId, String appPath, String appFileName, String path)
+			throws ScriptException {
+		return downloadFromHockeyApp(appId, versionId, appPath, appFileName, null, path);
 	}
 
 	/**
@@ -261,15 +269,17 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	 *            be the first word of the app title retrieved from HockeyApps.
 	 * @param apiToken
 	 *            Default=19c4f87dde6444e89388a33b1077624e. Optional apiKey.
+	 * @param return
+	 *            Name of variable is used to store app path after downloading.
 	 * @return The appPath + appName
+	 * @throws ScriptException
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "appId", "versionId=NONE", "appPath=NONE", "appFileName=NONE",
-			"apiToken=19c4f87dde6444e89388a33b1077624e" })
+			"apiToken=19c4f87dde6444e89388a33b1077624e", "return=NONE" })
 	public String downloadFromHockeyApp(String appId, String versionId, String appPath, String appFileName,
-			String apiToken) {
+			String apiToken, String path) throws ScriptException {
 		FileOutputStream fos;
-
 		if (apiToken == null || apiToken.isEmpty()) {
 			apiToken = "19c4f87dde6444e89388a33b1077624e";
 		}
@@ -318,6 +328,9 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 				appFile.getParentFile().mkdirs();
 
 				if (appFile.exists() && !appFile.isDirectory() && appFile.length() == downloadVersion.fileSize) {
+					if (!path.equalsIgnoreCase("NONE")) {
+						action.setVariable(path, appFile.getCanonicalPath());
+					}
 					return appFile.getCanonicalPath();
 				}
 
@@ -332,6 +345,9 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 					logging.warn("App size different! Downloaded size is " + appFile.length() + ". Expected size is "
 							+ downloadVersion.fileSize);
 				}
+				if (!path.equalsIgnoreCase("NONE")) {
+					action.setVariable(path, appFile.getCanonicalPath());
+				}
 				return appFile.getCanonicalPath();
 			} else {
 				throw new ABTLibraryFatalException("No file to download. Server replied HTTP code: " + responseCode);
@@ -340,6 +356,7 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 		return null;
 	}
 

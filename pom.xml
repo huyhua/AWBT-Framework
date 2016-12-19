@@ -230,6 +230,10 @@
 				<groupId>org.robotframework</groupId>
 				<artifactId>robotframework-maven-plugin</artifactId>
 				<version>1.4.5</version>
+				<configuration>
+							<logLevel>debug</logLevel>
+							<testCasesDirectory>${project.basedir}/src/test/robotframework/temp</testCasesDirectory>
+						</configuration>
 				<executions>
 					<execution>
 						<id>test</id>

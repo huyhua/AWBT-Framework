@@ -3,5 +3,8 @@ Library		ABTLibrary
 
 *** Test Cases ***
 Verify android
-	my action
+	
+	download from hockeyapp	6ef82c7cc9e40b99383f18d0c7bc38ce	path
+	
+	log to console		${path}
 	

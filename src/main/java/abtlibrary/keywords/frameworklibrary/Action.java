@@ -4,6 +4,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 import org.apache.commons.io.FilenameUtils;
 import org.robotframework.javalib.annotation.ArgumentNames;
 import org.robotframework.javalib.annotation.Autowired;
@@ -90,6 +94,25 @@ public class Action extends RunOnFailureKeywordsAdapter {
 	@ArgumentNames({ "condition" })
 	public void If(String condition) {
 
+	}
+
+	/**
+	 * Makes a variable available globally in all tests and suites.<br>
+	 * Variables set with this keyword are globally available in all test cases
+	 * and suites executed after setting them.
+	 * 
+	 * @param name
+	 *            Name of variable
+	 * @param value
+	 *            Value of variable
+	 * @throws ScriptException
+	 */
+	@RobotKeywordOverload
+	@ArgumentNames({"name", "value"})
+	public void setVariable(String name, String value) throws ScriptException {
+		ScriptEngine engine = new ScriptEngineManager().getEngineByName("python");
+		engine.eval("from robot.libraries.BuiltIn import BuiltIn");
+		engine.eval("BuiltIn().set_global_variable('${" + name + "}', '" + value + "')");
 	}
 
 	// ##############################
