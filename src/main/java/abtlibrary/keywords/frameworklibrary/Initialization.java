@@ -2,7 +2,10 @@ package abtlibrary.keywords.frameworklibrary;
 
 import java.io.File;
 
+import javax.script.ScriptException;
+
 import org.robotframework.javalib.annotation.ArgumentNames;
+import org.robotframework.javalib.annotation.Autowired;
 import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
@@ -11,6 +14,8 @@ import abtlibrary.RunOnFailureKeywordsAdapter;
 
 @RobotKeywords
 public class Initialization extends RunOnFailureKeywordsAdapter {
+	@Autowired
+	protected Action action;
 	public static void main(String[] args) {
 		Initialization initialization = new Initialization();
 		initialization.setProjectDirectory("/Users/huyhua/HuyHua/IS24App");
@@ -45,34 +50,98 @@ public class Initialization extends RunOnFailureKeywordsAdapter {
 	}
 
 	public String getProjectDirectory() {
+		if(projectDir.equals("")){
+			try {
+				projectDir = action.getVariable("EXECDIR");
+			} catch (ScriptException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		return projectDir;
 	}
 
 	public String getActionDirectory() {
+		if(projectDir.equals("")){
+			try {
+				projectDir = action.getVariable("EXECDIR");
+			} catch (ScriptException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		return projectDir + "/" + actionDir;
 	}
 
 	public String getInterfaceDirectory() {
+		if(projectDir.equals("")){
+			try {
+				projectDir = action.getVariable("EXECDIR");
+			} catch (ScriptException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		return projectDir + "/" + interfaceDir;
 	}
 
 	public String getDatasetDirectory() {
+		if(projectDir.equals("")){
+			try {
+				projectDir = action.getVariable("EXECDIR");
+			} catch (ScriptException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		return projectDir + "/" + datasetDir;
 	}
 
 	public String getConfigurationDirectory() {
+		if(projectDir.equals("")){
+			try {
+				projectDir = action.getVariable("EXECDIR");
+			} catch (ScriptException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		return projectDir + "/" + configurationDir;
 	}
 	
 	public String getTempDir(){
+		if(projectDir.equals("")){
+			try {
+				projectDir = action.getVariable("EXECDIR");
+			} catch (ScriptException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		return projectDir + "/Temp/";
 	}
 	
 	public String getTempActionDir(){
+		if(projectDir.equals("")){
+			try {
+				projectDir = action.getVariable("EXECDIR");
+			} catch (ScriptException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		return projectDir + "/Temp/" + actionDir;
 	}
 	
 	public String getTempInterfaceDir(){
+		if(projectDir.equals("")){
+			try {
+				projectDir = action.getVariable("EXECDIR");
+			} catch (ScriptException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		return projectDir + "/Temp/" + interfaceDir;
 	}
 }

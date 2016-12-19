@@ -17,10 +17,12 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.script.ScriptException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.robotframework.javalib.annotation.ArgumentNames;
+import org.robotframework.javalib.annotation.Autowired;
 import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
@@ -29,9 +31,14 @@ import org.w3c.dom.NodeList;
 
 import abtlibrary.ABTLibraryFatalException;
 import abtlibrary.RunOnFailureKeywordsAdapter;
+import abtlibrary.keywords.frameworklibrary.Action;
 
 @RobotKeywords
 public class OperatingSystem extends RunOnFailureKeywordsAdapter {
+	
+	@Autowired
+	protected Action action;
+	
 	/**
 	 * For Testing
 	 * 
@@ -51,12 +58,15 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	 * @param filename
 	 *            file path.
 	 * @param key
-	 *            keyword.
+	 *            Key of property.
+	 * @param returns
+	 *            The return variable.
 	 * @return : returned value.
+	 * @throws ScriptException 
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "filename", "key" })
-	public String getPropertyFromFile(String filename, String key) {
+	@ArgumentNames({ "filename", "key", "returns=NONE"})
+	public String getPropertyFromFile(String filename, String key, String returns) throws ScriptException {
 		Properties prop = new Properties();
 		InputStream input = null;
 		String value = "";
@@ -80,9 +90,23 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 				}
 			}
 		}
+		if(!returns.equalsIgnoreCase("NONE")){
+			action.setVariable(returns, value);
+		}
 		return value;
 	}
 
+	@RobotKeywordOverload
+	public String getConfiguration(String key){
+		String property = "";
+		try {
+			property = getConfiguration(key, "NONE");
+		} catch (ScriptException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return property;
+	}
 	/**
 	 * Returns value of key from configuration file (configuration.properties)
 	 * <br>
@@ -92,12 +116,15 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	 * * (On Window)<b> C:\TestData\</b>
 	 * 
 	 * @param key
-	 *            : keyword
+	 *            Key of property.
+	 * @param returns
+	 *            Variable to store returned property.
 	 * @return return value of keyword.
+	 * @throws ScriptException 
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "key" })
-	public String getConfiguration(String key) {
+	@ArgumentNames({ "key", "returns=NONE"})
+	public String getConfiguration(String key, String returns) throws ScriptException {
 		String filename = "";
 		if (System.getProperty("os.name").contains("Mac")) {
 			filename = "/Users/" + System.getProperty("user.name") + "/Desktop/TestData/";
@@ -107,7 +134,7 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 
 		filename = filename + "configuration.properties";
 
-		return getPropertyFromFile(filename, key);
+		return getPropertyFromFile(filename, key, returns);
 	}
 
 	/**

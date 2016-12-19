@@ -108,7 +108,7 @@ public class Action extends RunOnFailureKeywordsAdapter {
 	 * @throws ScriptException
 	 */
 	@RobotKeywordOverload
-	@ArgumentNames({"name", "value"})
+	@ArgumentNames({ "name", "value" })
 	public void setVariable(String name, String value) throws ScriptException {
 		ScriptEngine engine = new ScriptEngineManager().getEngineByName("python");
 		engine.eval("from robot.libraries.BuiltIn import BuiltIn");
@@ -118,6 +118,13 @@ public class Action extends RunOnFailureKeywordsAdapter {
 	// ##############################
 	// Internal Methods
 	// ##############################
+	public String getVariable(String name) throws ScriptException {
+		ScriptEngine engine = new ScriptEngineManager().getEngineByName("python");
+		engine.eval("from robot.libraries.BuiltIn import BuiltIn");
+		engine.eval("value=BuiltIn().get_variable_value('${" + name + "}')");
+		return engine.get("value").toString();
+	}
+
 	public String parseToRFKeyword(String filePath) {
 		OperatingSystem os = new OperatingSystem();
 		List<String> lines = os.readFile(filePath);
