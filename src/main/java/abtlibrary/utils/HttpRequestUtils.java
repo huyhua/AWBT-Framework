@@ -18,6 +18,7 @@ public class HttpRequestUtils {
 		StringBuffer response = new StringBuffer();
 
 		try {
+			
 			URL obj;
 			obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
