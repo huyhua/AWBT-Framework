@@ -3,6 +3,10 @@ package abtlibrary.keywords.frameworklibrary;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 import org.robotframework.javalib.annotation.ArgumentNames;
 import org.robotframework.javalib.annotation.Autowired;
 import org.robotframework.javalib.annotation.RobotKeyword;
@@ -14,6 +18,7 @@ import abtlibrary.RunOnFailureKeywordsAdapter;
 import abtlibrary.keywords.operatinglibrary.OperatingSystem;
 import abtlibrary.keywords.selenium2library.Logging;
 import abtlibrary.utils.Excel;
+import abtlibrary.utils.Python;
 
 /**
  * Keywords related to Dataset of Robot Framework
@@ -26,7 +31,7 @@ public class DataSet extends RunOnFailureKeywordsAdapter {
 
 	@Autowired
 	Initialization init;
-	
+
 	/**
 	 * Instantiated OpenrationSysteam
 	 */
@@ -43,22 +48,91 @@ public class DataSet extends RunOnFailureKeywordsAdapter {
 	@Autowired
 	protected Logging logging;
 
+	@Autowired
+	protected Action action;
+
+	private String[] headers;
+
 	// ##############################
 	// Keywords
 	// ##############################
 
-	public static void main (String[] args){
+	public static void main(String[] args) throws ScriptException {
 		DataSet ds = new DataSet();
 		ds.getCurrentDirectory();
-		
-		System.out.println(ds.getContentOfTestCase("/Users/mac/git/anisapp/Tests/BVT/LO01 - Verify Login.robot", "Verify functionality of Login with valid values"));
-		System.out.println(ds.getDataSet("account").get(2)[0]);
-		System.out.println(ds.getDatasetBlock("/Users/mac/git/anisapp/Tests/BVT/LO01 - Verify Login.robot", "Verify functionality of Login with valid values"));
+		ds.useDataset("account", "valid");
 	}
+
 	@RobotKeyword
-	public void getCurrentDirectory(){
-		System.out.println(System.getProperty("user.dir"));
+	public void getCurrentDirectory() {
 	}
+
+	/**
+	 * Repeat sequence action lines with data rows from data set file.
+	 * 
+	 * @param name
+	 *            Name of data set file
+	 * @param filter
+	 *            Name of filter. Adding Filter column to data set file to
+	 *            filter data rows.
+	 * @throws ScriptException
+	 */
+	@RobotKeyword
+	@ArgumentNames({ "name", "filter=NONE" })
+	public void useDataset(String name, String filter) throws ScriptException {
+		// String suitePath = action.getVariable("suite source");
+		// String testcaseName = action.getVariable("test case");
+		String suitePath = "/Users/khoivo/git/AnibisApp/Test Suites/BVT - Galaxy S5.robot";
+		String testcaseName = "Suites";
+
+		List<String[]> dataset = getDataSet(name, filter);
+
+		List<String> actionBlock = getDatasetBlock(suitePath, testcaseName);
+		List<List<String>> keywords = new ArrayList<List<String>>();
+		for (String line : actionBlock) {
+			String temp = line.replace("\t", "").trim();
+			if (!temp.startsWith("#") && !temp.equals("")) {
+				List<String> keyword = new ArrayList<String>();
+				String[] keywordTemp = line.split("\t");
+				for (String att : keywordTemp) {
+					att = att.replace("\t", "").trim();
+					if (!att.equals("")) {
+						keyword.add(att);
+					}
+				}
+				if (keyword != null) {
+					keywords.add(keyword);
+				}
+			}
+		}
+
+		for (int i = 0; i < dataset.size(); i++) {
+
+			ScriptEngine engine1 = new ScriptEngineManager().getEngineByName("python");
+			engine1.eval("from robot.libraries.BuiltIn import BuiltIn");
+			if (i == 0) {
+				headers = dataset.get(0);
+			} else {
+				for (int n = 0; n < headers.length; n++) {
+					action.setVariable(headers[n], dataset.get(i)[n]);
+				}
+				if (i < dataset.size() - 1) {
+					for (List<String> keyword : keywords) {
+						String keywordName = keyword.get(0);
+						String arg = "'" + Python.join("','", keyword.subList(1, keyword.size())) + "'";
+						engine1.eval("BuiltIn().run_keyword('" + keywordName + "'," + arg + ")");
+					}
+				}
+			}
+		}
+
+	}
+
+	@RobotKeyword
+	public void repeatForDataset() {
+
+	}
+
 	@RobotKeywordOverload
 	public List<String[]> getDataSet(String dataSet) {
 		return excel.getExcelSheet(init.getDatasetDirectory() + "/" + dataSet + ".xlsx", "", 0, 0);
@@ -68,7 +142,8 @@ public class DataSet extends RunOnFailureKeywordsAdapter {
 	@ArgumentNames({ "dataSet", "filter=NONE" })
 	public List<String[]> getDataSet(String dataSet, String filter) {
 		List<String[]> filterDataset = new ArrayList<String[]>();
-		List<String[]> dataset = excel.getExcelSheet(init.getDatasetDirectory() + "/" + dataSet + ".xlsx", "", 0, 0);
+		List<String[]> dataset = excel.getExcelSheet("/Users/khoivo/git/AnibisApp/Dataset/" + dataSet + ".xlsx", "", 0,
+				0);
 		String[] headers = dataset.get(0);
 
 		// Get filter column index
@@ -102,7 +177,7 @@ public class DataSet extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeyword
-	@ArgumentNames({"suite","testcase"})
+	@ArgumentNames({ "suite", "testcase" })
 	public String parseBlockToKeyword(String suitePath, String testcaseName) {
 		List<String> blockKeywords = getDatasetBlock(suitePath, testcaseName);
 		String timeStamp = os.getTimeStamp();
@@ -114,12 +189,12 @@ public class DataSet extends RunOnFailureKeywordsAdapter {
 		}
 
 		os.createTextFile(tempDirectory + "/" + testcaseName + ".txt", content);
-		
+
 		return tempDirectory + "/" + testcaseName + ".txt";
 	}
 
 	@RobotKeyword
-	@ArgumentNames({"suite"})
+	@ArgumentNames({ "suite" })
 	public List<String> getTestCases(String suitePath) {
 		List<String> testCases = new ArrayList<String>();
 		List<String> lines = os.readFile(suitePath);
@@ -138,7 +213,7 @@ public class DataSet extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeyword
-	@ArgumentNames({"suite","testcase"})
+	@ArgumentNames({ "suite", "testcase" })
 	public List<String> getContentOfTestCase(String suitePath, String testcaseName) {
 		List<String> contentBlock = new ArrayList<String>();
 		List<String> lines = os.readFile(suitePath);
@@ -164,12 +239,11 @@ public class DataSet extends RunOnFailureKeywordsAdapter {
 				contentBlock.add(curLine);
 			}
 		}
-		System.out.println(contentBlock);
 		return contentBlock;
 	}
 
 	@RobotKeyword
-	@ArgumentNames({"suite","testcase"})
+	@ArgumentNames({ "suite", "testcase" })
 	public List<String> getDatasetBlock(String suitePath, String testcaseName) {
 		List<String> contentBlock = getContentOfTestCase(suitePath, testcaseName);
 		int indexOfUseDataSet = -1;
@@ -195,7 +269,6 @@ public class DataSet extends RunOnFailureKeywordsAdapter {
 			dataSetBlock = contentBlock.subList(indexOfUseDataSet + 1, indexOfEndDataSet);
 
 		}
-		System.out.println(dataSetBlock);
 		return dataSetBlock;
 
 	}

@@ -16,6 +16,11 @@ import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
+import com.applitools.eyes.EyesDriverOperationException;
+import com.applitools.eyes.EyesException;
+import com.applitools.eyes.Region;
+import com.applitools.eyes.TestResults;
+
 import abtlibrary.ABTLibraryNonFatalException;
 import abtlibrary.keywords.selenium2library.Element;
 import abtlibrary.keywords.selenium2library.Logging;
@@ -24,6 +29,8 @@ import io.appium.java_client.MobileBy;
 import io.appium.java_client.MobileDriver;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.AndroidElement;
+import io.appium.java_client.android.AndroidKeyCode;
 
 @RobotKeywords
 public class MobileElement {
@@ -538,7 +545,7 @@ public class MobileElement {
 		System.out.println("Result list size " + resultList.size());
 		return resultList;
 		// }
-	}
+	 }
 	
 	@RobotKeyword
 	@ArgumentNames({"appName", "testName"})
@@ -554,6 +561,14 @@ public class MobileElement {
 	}
 	
 	@RobotKeyword
+	@ArgumentNames({"locator", "matchTimeout", "windowName"})
+	public void checkRegionNew(String locator, int matchTimeout, String windowName){
+		List<WebElement> findElement = element.elementFind("",locator, true, true);
+		applicationManagement.eyes.checkRegion(findElement.get(0), matchTimeout, windowName, true);
+
+	}
+	
+	@RobotKeyword
 	@ArgumentNames({"message=NONE" })
 	public void checkResultWithBaseline(){
 		try{
@@ -565,7 +580,7 @@ public class MobileElement {
 //			}
 			applicationManagement.eyes.close();
 		}
-		catch (Exception e){
+		catch (EyesDriverOperationException e){
 			logging.info(String.format("Screen should be the same"));
 			throw new ABTLibraryNonFatalException(
 				String.format("Screen should be the same"));
@@ -575,37 +590,56 @@ public class MobileElement {
 		}
 
 	}
+	
+	public List<String> splitValue(String input,String condition){
+		List<String> list = new ArrayList<String>();
+		for (String string : input.split(condition)){
+			//System.out.println("PID: "+ string);
+			String output = string.replace(" ", "");
+			list.add(output);
+		}
+		return list;
+	}
+	
+	@RobotKeyword
+	@SuppressWarnings("unchecked")
+	public void useKeyCode(){
+			((AndroidDriver<WebElement>)applicationManagement.browserManagement.getCurrentWebDriver()).pressKeyCode(AndroidKeyCode.ENTER);
+	}
+	
+	@RobotKeyword
+	@ArgumentNames({"window", "control", "value"})
+	public void inputValue(String window, String control, String value){
+		List<String> list = new ArrayList<String>();
+		if(value.contains("/")){
+			list = splitValue(value, "/");
+			for(String temp : list){
+				element.click(window, control);
+				selectItemByText(temp);
+			}
+		}
+		element.click(window, control);
+		selectItemByText(value);
+	}
+		
 
 	/*public void testApplitool() throws InterruptedException{
 		AndroidDriver<WebElement> driver = (AndroidDriver<WebElement>) applicationManagement.browserManagement.getCurrentWebDriver();
 		WebDriver driver2 = applicationManagement.browserManagement.getCurrentWebDriver();
 //		applicationManagement.eyes.open(applicationManagement.browserManagement.getCurrentWebDriver(), "Immo24", "TestImmo");
 //		applicationManagement.eyes.checkWindow("Popup Screen");
-		startEyesTest("Immo24", "TestImmo");
-		checkWindow("Popup Screen");
-		element.clickElement("","android=text(\"English\")");
-		Thread.sleep(1000);
-		checkWindow("Popup Screen 2");
-//		applicationManagement.eyes.checkWindow("Popup Screen 2");
-//		try{
-//			TestResults testResults = applicationManagement.eyes.close(false);		
-//			//applicationManagement.eyes.close();
-//		}catch (EyesException e){
-//			
-//		}
-//		finally {
-//			applicationManagement.eyes.abortIfNotClosed();
-//		}
-//		
-		//endEyesTest();
-		startEyesTest("Immo24", "TestImmo 2");
-		element.clickElement("","android=text(\"Dismiss\")");
-		Thread.sleep(1000);
-		element.clickElement("","content_desc=Navigate up");
-		Thread.sleep(2000);
 		
-		checkWindow("Menu Screen");
-		//endEyesTest();
+		element.clickElement("android=text(\"English\")");
+		Thread.sleep(1000);
+
+	
+		element.clickElement("android=text(\"Dismiss\")");
+		Thread.sleep(1000);
+//		element.clickElement("content_desc=Navigate up");
+//		Thread.sleep(2000);
+		startEyesTest("Immo24", "TestImmo 2");
+		checkRegionNew("content_desc=Search_BtnMoreCriteria", 10, "Menu Screen");
+		checkResultWithBaseline();
 		
 //		applicationManagement.eyes.open(applicationManagement.browserManagement.getCurrentWebDriver(), "Immo24", "Test Element");
 //		WebElement test = (WebElement) driver2.findElement(By.className("android.widget.ImageButton"));
