@@ -37,8 +37,8 @@ public class Action extends RunOnFailureKeywordsAdapter {
 	// Keywords
 	// ##############################
 	@RobotKeywordOverload
-	public String parseAction() {
-		return parseAction("NONE");
+	public String importAction() throws ScriptException {
+		return importAction("NONE");
 	}
 
 	/**
@@ -47,10 +47,11 @@ public class Action extends RunOnFailureKeywordsAdapter {
 	 * @param folder
 	 *            Specified action folder
 	 * @return Action file path.
+	 * @throws ScriptException
 	 */
 	@RobotKeyword
 	@ArgumentNames({ "folder=NONE" })
-	public String parseAction(String folder) {
+	public String importAction(String folder) throws ScriptException {
 		if (folder.equals("NONE")) {
 			folder = "";
 		}
@@ -79,6 +80,10 @@ public class Action extends RunOnFailureKeywordsAdapter {
 		}
 		String content = "*** Keywords ***\n" + Python.join("\n", actions);
 		os.createTextFile(init.getTempActionDir() + "/Action.robot", content);
+
+		ScriptEngine engine = new ScriptEngineManager().getEngineByName("python");
+		engine.eval("from robot.libraries.BuiltIn import BuiltIn");
+		engine.eval("BuiltIn().import_resource('" + init.getTempActionDir() + "/Action.robot')");
 		return init.getTempActionDir() + "/Action.robot";
 	}
 
@@ -233,17 +238,36 @@ public class Action extends RunOnFailureKeywordsAdapter {
 				end.add(i + "");
 			}
 		}
-
+		int y = 0;
 		if (start.size() == end.size()) {
 			for (int n = 0; n < start.size(); n++) {
-				startIf = Integer.parseInt(start.get(n));
-				endIf = Integer.parseInt(end.get(n));
+				startIf = Integer.parseInt(start.get(n)) - y;
+				endIf = Integer.parseInt(end.get(n)) - y;
+
 				if (startIf < endIf) {
+					int count = 0;
+					int st = startIf + 1;
+					int en = endIf;
+					// Count total action lines in if and end if
+					for (int i = startIf + 1; i < endIf; i++) {
+						String temp = originalBlock.get(i).replaceAll("\t", "").trim();
+						if (!temp.startsWith("#") && !temp.startsWith("*") && !temp.equals("")) {
+							count++;
+						}
+					}
+					// Parse keyword
 					originalBlock.set(startIf,
 							originalBlock.get(startIf).toLowerCase().replace("if", "run keyword if"));
-					originalBlock.add(startIf + 1, "...\trun keywords");
+
+					if (count > 1) {
+						originalBlock.add(startIf + 1, "...\trun keywords");
+						st = startIf + 2;
+						en = endIf + 1;
+					} else {
+						y = y + 1;
+					}
 					Boolean first = false;
-					for (int i = startIf + 2; i < endIf + 1; i++) {
+					for (int i = st; i < en; i++) {
 						String temp = originalBlock.get(i).replaceAll("\t", "");
 						if (!temp.startsWith("#") && !temp.startsWith("*") && !temp.trim().equals("")) {
 							if (first == false) {
@@ -255,7 +279,7 @@ public class Action extends RunOnFailureKeywordsAdapter {
 						}
 
 					}
-					originalBlock.remove(endIf + 1);
+					originalBlock.remove(en);
 				}
 			}
 		} else {
