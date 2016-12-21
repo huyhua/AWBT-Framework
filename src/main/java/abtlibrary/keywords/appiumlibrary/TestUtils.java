@@ -1,10 +1,14 @@
 package abtlibrary.keywords.appiumlibrary;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,6 +19,13 @@ import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
 import abtlibrary.utils.HttpRequestUtils;
+import abtlibrary.utils.anibisApiClient.ApiClient;
+import abtlibrary.utils.anibisApiClient.ApiException;
+import abtlibrary.utils.anibisApiClient.api.FavoriteControllerApi;
+import abtlibrary.utils.anibisApiClient.api.SearchControllerApi;
+import abtlibrary.utils.anibisApiClient.model.AdvertDto;
+import abtlibrary.utils.anibisApiClient.model.SearchParameterDto;
+import abtlibrary.utils.anibisApiClient.model.SearchResultDto;
 import abtlibrary.utils.is24ApiClient.APIClient;
 import abtlibrary.utils.is24ApiClient.Model.Favorite.FavoriteResponse;
 import abtlibrary.utils.is24ApiClient.Model.Searchjob.Property;
@@ -27,16 +38,16 @@ import com.mifmif.common.regex.Generex;
 public class TestUtils {
 
 	protected interface Vertical {
-		List<String> getSearchIdFromWeb(String url);
+		List<String> getSearchIdFromWeb(String host);
 
-		List<String> getSearchIdFromApi(String url);
+		List<String> getSearchIdFromApi(String host, Map<String, ?> parameters);
 
 		List<String> getFavouriteIdsFromApi(String host, String username,
 				String password);
 
-		int getSearchHitsFromWeb(String url);
+		int getSearchHitsFromWeb(String host);
 
-		int getSearchHitsFromApi(String url);
+		int getSearchHitsFromApi(String host, Map<String, ?> parameters);
 	}
 
 	protected enum verticalEnum implements Vertical {
@@ -54,13 +65,13 @@ public class TestUtils {
 			}
 
 			@Override
-			public List<String> getSearchIdFromApi(String url) {
+			public List<String> getSearchIdFromApi(String url, Map parameters) {
 				// TODO Auto-generated method stub
 				return null;
 			}
 
 			@Override
-			public int getSearchHitsFromApi(String url) {
+			public int getSearchHitsFromApi(String url, Map parameters) {
 				// TODO Auto-generated method stub
 				return 0;
 			}
@@ -105,43 +116,43 @@ public class TestUtils {
 			}
 
 			@Override
-			public List<String> getSearchIdFromApi(String url) {
+			public List<String> getSearchIdFromApi(String url,
+					Map<String, ?> parameters) {
 				try {
-					UrlComponent targetURL = new UrlComponent(url);
-					if(client == null){
-						client = new APIClient(targetURL.getHost(), null,
-							null);
+					if (client == null) {
+						client = new APIClient(url, null, null);
 					}
 					List<String> results = new ArrayList<String>();
+					String query = "/v1/public/properties?"
+							+ urlEncodeUTF8(parameters);
 					SearchResponse document = jsonBuilder(
-							client.invokeHttpGet(targetURL.getQueryString()),
-							SearchResponse.class);
+							client.invokeHttpGet(query), SearchResponse.class);
 					for (Property item : document.getPropertiesList()
 							.getProperties()) {
 						results.add(item.getPropertyDetails().getPropertyID()
 								.toString());
 					}
 					return results;
-				} catch (IOException | URISyntaxException e) {
+				} catch (IOException e) {
 					e.printStackTrace();
 					return null;
 				}
 			}
 
 			@Override
-			public int getSearchHitsFromApi(String url) {
+			public int getSearchHitsFromApi(String url,
+					Map<String, ?> parameters) {
 				SearchResponse document;
 				try {
-					UrlComponent targetURL = new UrlComponent(url);
-					if(client == null){
-						client = new APIClient(targetURL.getHost(), null,
-							null);
+					if (client == null) {
+						client = new APIClient(url, null, null);
 					}
-					document = jsonBuilder(
-							client.invokeHttpGet(targetURL.getQueryString()),
+					String query = "/v1/public/properties?"
+							+ urlEncodeUTF8(parameters);
+					document = jsonBuilder(client.invokeHttpGet(query),
 							SearchResponse.class);
 					return document.getPropertiesList().getTotalMatches();
-				} catch (IOException | URISyntaxException e) {
+				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 					return 0;
@@ -152,11 +163,11 @@ public class TestUtils {
 			public List<String> getFavouriteIdsFromApi(String host,
 					String username, String password) {
 				try {
-					UrlComponent targetURL = new UrlComponent(host);
-					if(client == null | client.getUsername() != username | client.getPassword() != password){
-						client = new APIClient(targetURL.getHost(), username, password);
+					if (client == null | client.getUsername() != username
+							| client.getPassword() != password) {
+						client = new APIClient(host, username, password);
 					}
-					
+
 					List<String> results = new ArrayList<String>();
 					jsonBuilder(
 							client.invokeHttpGet("/v1/private/favourites?onlyActive=true"),
@@ -169,7 +180,7 @@ public class TestUtils {
 									item -> results.add(item.getPropertyID()
 											.toString()));
 					return results;
-				} catch (IOException | URISyntaxException e) {
+				} catch (IOException e) {
 					e.printStackTrace();
 					return null;
 				}
@@ -207,13 +218,15 @@ public class TestUtils {
 			}
 
 			@Override
-			public List<String> getSearchIdFromApi(String url) {
+			public List<String> getSearchIdFromApi(String url,
+					Map<String, ?> parameters) {
 				// TODO Auto-generated method stub
 				return null;
 			}
 
 			@Override
-			public int getSearchHitsFromApi(String url) {
+			public int getSearchHitsFromApi(String url,
+					Map<String, ?> parameters) {
 				// TODO Auto-generated method stub
 				return 0;
 			}
@@ -226,6 +239,7 @@ public class TestUtils {
 			}
 		},
 		anibis {
+			ApiClient client;
 
 			@Override
 			public List<String> getSearchIdFromWeb(String url) {
@@ -256,22 +270,78 @@ public class TestUtils {
 			}
 
 			@Override
-			public List<String> getSearchIdFromApi(String url) {
-				// TODO Auto-generated method stub
-				return null;
+			public List<String> getSearchIdFromApi(String url,
+					Map<String, ?> parameters) {
+				if (client == null) {
+					client = new ApiClient();
+					client.setBasePath(url);
+				}
+
+				SearchControllerApi searchApi = new SearchControllerApi(client);
+				SearchParameterDto parms = populateParameterFromMap(parameters);
+				SearchResultDto resultDto = null;
+				List<Integer> objectIds = new ArrayList<>();
+				try {
+					resultDto = searchApi.searchControllerPost(parms);
+					objectIds = resultDto.getObjectIds();
+				} catch (ApiException e) {
+					e.printStackTrace();
+				}
+				List<String> stringList = new ArrayList<String>(objectIds.size());
+				for (Integer myInt : objectIds) {
+					stringList.add(String.valueOf(myInt));
+				}
+				return stringList;
 			}
 
 			@Override
-			public int getSearchHitsFromApi(String url) {
-				// TODO Auto-generated method stub
-				return 0;
+			public int getSearchHitsFromApi(String url,
+					Map<String, ?> parameters) {
+				if (client == null) {
+					client = new ApiClient();
+					client.setBasePath(url);
+				}
+
+				SearchControllerApi searchApi = new SearchControllerApi(client);
+				SearchParameterDto parms = populateParameterFromMap(parameters);
+				SearchResultDto resultDto = null;
+				try {
+					resultDto = searchApi.searchControllerPost(parms);
+				} catch (ApiException e) {
+					e.printStackTrace();
+				}
+
+				return resultDto.getTotalCount();
 			}
 
 			@Override
 			public List<String> getFavouriteIdsFromApi(String host,
 					String username, String password) {
-				// TODO Auto-generated method stub
-				return null;
+				if (client == null) {
+					client = new ApiClient();
+					client.setBasePath(host);
+				}
+
+				List<Integer> favoriteAdvertIds = new ArrayList<Integer>();
+				FavoriteControllerApi favoriteApi = new FavoriteControllerApi(
+						client, username, password);
+				List<AdvertDto> favoriteAdverts;
+				try {
+					favoriteAdverts = favoriteApi.favoriteControllerGet();
+					for (AdvertDto advert : favoriteAdverts) {
+						favoriteAdvertIds.add(advert.getId());
+					}
+				} catch (ApiException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				System.out.println("Number of favorites on server: "
+						+ favoriteAdvertIds.size());
+				List<String> stringList = new ArrayList<String>(favoriteAdvertIds.size());
+				for (Integer myInt : favoriteAdvertIds) {
+					stringList.add(String.valueOf(myInt));
+				}
+				return stringList;
 			}
 
 		}
@@ -304,7 +374,7 @@ public class TestUtils {
 		return randomName;
 	}
 
-	protected Vertical parseURL(String url) {
+	protected static Vertical parseURL(String url) {
 		URI targetURL;
 		try {
 			targetURL = new URI(url);
@@ -325,6 +395,57 @@ public class TestUtils {
 		return new GsonBuilder().create().fromJson(text, buildClass);
 	}
 
+	protected static String urlEncodeUTF8(String s) {
+		try {
+			return URLEncoder.encode(s, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new UnsupportedOperationException(e);
+		}
+	}
+
+	protected static String urlEncodeUTF8(Map<?, ?> map) {
+		StringBuilder sb = new StringBuilder();
+		for (Map.Entry<?, ?> entry : map.entrySet()) {
+			if (sb.length() > 0) {
+				sb.append("&");
+			}
+			sb.append(String.format("%s=%s", urlEncodeUTF8(entry.getKey()
+					.toString()), urlEncodeUTF8(entry.getValue().toString())));
+		}
+		return sb.toString();
+	}
+
+	protected static SearchParameterDto populateParameterFromMap(
+			Map<String, ?> params) {
+		SearchParameterDto paramDto = new SearchParameterDto();
+		try {
+		paramDto.setCategoryId(convert(params.get("CategoryId"), Integer.class));
+		paramDto.setSearchText(convert(params.get("SearchText"),String.class));
+		paramDto.setSearchDistance(convert(params.get("SearchDistance"), Integer.class));
+		paramDto.setSearchLocation(convert(params.get("SearchLocation"), String.class));
+		paramDto.setLanguage(convert(params.get("Language"), String.class));
+		paramDto.setMemberId(convert(params.get("MemberId"), Integer.class));
+		paramDto.setSortField(convert(params.get("SortField"), String.class));
+		paramDto.setResultRows(convert(params.get("ResultRows"), Integer.class));
+		if(paramDto.getResultRows() == null){
+			paramDto.setResultRows(1000);
+		}
+		paramDto.setResultStart(convert(params.get("ResultStart"), Integer.class));
+		paramDto.setWithImagesOnly(convert(params.get("WithImagesOnly"), Boolean.class));
+		paramDto.setSortOrder(convert(params.get("SortOrder"), Boolean.class));
+		paramDto.setStateCode(convert(params.get("StateCode"), String.class));
+		paramDto.setUsername(convert(params.get("Username"), String.class));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return paramDto;
+	}
+	
+	protected static <I, O> O convert(I input, Class<O> outputClass) throws Exception {
+	    return input == null ? null : outputClass.getConstructor(String.class).newInstance(input.toString());
+	}
+
 	@RobotKeywordOverload
 	public List<String> retrieveResultIdsFromUrl(String url) {
 		return retrieveResultIdsFromUrl(url, -1);
@@ -341,10 +462,10 @@ public class TestUtils {
 	 *            Optional: only get the limit number of results
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "url", "limit=-1" })
-	public List<String> retrieveResultIdsFromUrl(String url, int limit) {
-		Vertical vertical = parseURL(url);
-		List<String> results = vertical.getSearchIdFromWeb(url);
+	@ArgumentNames({ "host", "limit=-1" })
+	public List<String> retrieveResultIdsFromUrl(String host, int limit) {
+		Vertical vertical = parseURL(host);
+		List<String> results = vertical.getSearchIdFromWeb(host);
 		if (limit != -1) {
 			return results.subList(0, limit);
 		}
@@ -352,56 +473,47 @@ public class TestUtils {
 	}
 
 	@RobotKeyword
-	@ArgumentNames({ "url" })
-	public int retrieveHitsFromUrl(String url) {
-		Vertical vertical = parseURL(url);
-		return vertical.getSearchHitsFromWeb(url);
+	@ArgumentNames({ "host" })
+	public int retrieveHitsFromUrl(String host) {
+		Vertical vertical = parseURL(host);
+		return vertical.getSearchHitsFromWeb(host);
 	}
-	
+
 	@RobotKeyword
-	@ArgumentNames({ "url" })
-	public List<String> retrieveResultIdsFromApi(String url) {
-		Vertical vertical = parseURL(url);
-		return vertical.getSearchIdFromApi(url);
+	@ArgumentNames({ "host" })
+	public List<String> retrieveResultIdsFromApi(String host, List<String> parameters) {
+		Map<String, String> params = new HashMap<>();
+		for (String item : parameters) {
+			String[] stringFragment = item.split("=");
+			params.put(stringFragment[0], stringFragment[1]);
+		}
+		Vertical vertical = parseURL(host);
+		return vertical.getSearchIdFromApi(host, params);
 	}
-	
+
 	@RobotKeyword
-	@ArgumentNames({ "host","username","password" })
-	public List<String> retrieveFavoriteIdsFromApi(String host, String user, String password){
+	@ArgumentNames({ "host", "username", "password" })
+	public List<String> retrieveFavoriteIdsFromApi(String host, String user,
+			String password) {
 		Vertical vertical = parseURL(host);
 		return vertical.getFavouriteIdsFromApi(host, user, password);
 	}
-	
+
 	@RobotKeyword
-	@ArgumentNames({ "url" })
-	public int retrieveHitsFromApi(String url) {
-		Vertical vertical = parseURL(url);
-		return vertical.getSearchHitsFromApi(url);
+	@ArgumentNames({ "host" })
+	public int retrieveHitsFromApi(String host, List<String> parameters) {
+		Map<String, String> params = new HashMap<>();
+		for (String item : parameters) {
+			String[] stringFragment = item.split("=");
+			params.put(stringFragment[0], stringFragment[1]);
+		}
+		Vertical vertical = parseURL(host);
+		return vertical.getSearchHitsFromApi(host, params);
 	}
-
-	protected static class UrlComponent {
-		String url;
-		String host;
-		String queryString;
-
-		public UrlComponent(String url) throws URISyntaxException {
-			URI targetURL = new URI(url);
-			this.host = targetURL.getScheme() + "://" + targetURL.getHost();
-			this.url = url;
-			this.queryString = String.format("%1s?%2s", targetURL.getPath(),
-					targetURL.getQuery());
-		}
-
-		public String getUrl() {
-			return url;
-		}
-
-		public String getHost() {
-			return host;
-		}
-
-		public String getQueryString() {
-			return queryString;
-		}
-	}
+	
+//	public static void main(String[] args) throws ApiException {
+//		List<String> params = new ArrayList<>();
+//		params.add("CategoryId=2788");
+//		System.out.println(retrieveResultIdsFromApi("https://xbapi-stage.anibis.ch",params).toString());
+//	}
 }
