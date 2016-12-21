@@ -80,11 +80,10 @@ public class DataSet extends RunOnFailureKeywordsAdapter {
 	@RobotKeyword
 	@ArgumentNames({ "name", "filter=NONE" })
 	public void useDataset(String name, String filter) throws ScriptException {
-		// String suitePath = action.getVariable("suite source");
-		// String testcaseName = action.getVariable("test case");
-		String suitePath = "/Users/khoivo/git/AnibisApp/Test Suites/BVT - Galaxy S5.robot";
-		String testcaseName = "Suites";
-
+		ScriptEngine engine1 = new ScriptEngineManager().getEngineByName("python");
+		engine1.eval("from robot.libraries.BuiltIn import BuiltIn");
+		String suitePath = action.getVariable("SUITE SOURCE");
+		String testcaseName = action.getVariable("TEST NAME");
 		List<String[]> dataset = getDataSet(name, filter);
 
 		List<String> actionBlock = getDatasetBlock(suitePath, testcaseName);
@@ -106,10 +105,8 @@ public class DataSet extends RunOnFailureKeywordsAdapter {
 			}
 		}
 
+		
 		for (int i = 0; i < dataset.size(); i++) {
-
-			ScriptEngine engine1 = new ScriptEngineManager().getEngineByName("python");
-			engine1.eval("from robot.libraries.BuiltIn import BuiltIn");
 			if (i == 0) {
 				headers = dataset.get(0);
 			} else {
@@ -119,8 +116,12 @@ public class DataSet extends RunOnFailureKeywordsAdapter {
 				if (i < dataset.size() - 1) {
 					for (List<String> keyword : keywords) {
 						String keywordName = keyword.get(0);
+						if(keyword.size()>1){
 						String arg = "'" + Python.join("','", keyword.subList(1, keyword.size())) + "'";
 						engine1.eval("BuiltIn().run_keyword('" + keywordName + "'," + arg + ")");
+						} else {
+							engine1.eval("BuiltIn().run_keyword('" + keywordName + "')");
+						}
 					}
 				}
 			}
@@ -142,8 +143,7 @@ public class DataSet extends RunOnFailureKeywordsAdapter {
 	@ArgumentNames({ "dataSet", "filter=NONE" })
 	public List<String[]> getDataSet(String dataSet, String filter) {
 		List<String[]> filterDataset = new ArrayList<String[]>();
-		List<String[]> dataset = excel.getExcelSheet("/Users/khoivo/git/AnibisApp/Dataset/" + dataSet + ".xlsx", "", 0,
-				0);
+		List<String[]> dataset = excel.getExcelSheet(init.getDatasetDirectory() + "/" + dataSet + ".xlsx", "", 0, 0);
 		String[] headers = dataset.get(0);
 
 		// Get filter column index
@@ -259,12 +259,12 @@ public class DataSet extends RunOnFailureKeywordsAdapter {
 			}
 		}
 		if (indexOfUseDataSet == -1) {
-			logging.warn("Could not find keyword 'use data set' in testcase.");
+			logging.warn("Could not find action 'use data set' in testcase.");
 		} else {
 			if (indexOfEndDataSet == -1) {
 				indexOfEndDataSet = contentBlock.size();
 				logging.warn(
-						"Could not find keyword 'repeat for data set' in testcase. All keywords under 'use data set' keyword will be looped.");
+						"Could not find action 'repeat for data set' in testcase. All keywords under 'use data set' keyword will be looped.");
 			}
 			dataSetBlock = contentBlock.subList(indexOfUseDataSet + 1, indexOfEndDataSet);
 

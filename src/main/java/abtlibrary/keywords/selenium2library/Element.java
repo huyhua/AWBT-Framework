@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.script.ScriptException;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
@@ -19,6 +21,7 @@ import org.robotframework.javalib.annotation.RobotKeywords;
 
 import abtlibrary.ABTLibraryNonFatalException;
 import abtlibrary.RunOnFailureKeywordsAdapter;
+import abtlibrary.keywords.frameworklibrary.Action;
 import abtlibrary.keywords.frameworklibrary.UserInterface;
 import abtlibrary.locators.ElementFinder;
 import abtlibrary.utils.Python;
@@ -50,6 +53,11 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	@Autowired
 	protected Logging logging;
 
+	/**
+	 * Instantiated Action keyword bean
+	 */
+	@Autowired
+	protected Action action;
 	// ##############################
 	// Keywords - Element Lookups
 	// ##############################
@@ -938,21 +946,30 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 *            been defined, using <b>*</b> for window.
 	 * @param control
 	 *            The name or locator of select control.
+	 * @param returns
+	 *            The returned variable.
 	 * @return The value attribute of the element.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "window", "control" })
-	public String getValue(String window, String control) {
-		return getValue(window, control, null);
+	@ArgumentNames({ "window", "control", "returns=NONE" })
+	public String getValue(String window, String control, String returns) {
+		return getValue(window, control, null, returns);
 	}
 
-	protected String getValue(String window, String control, String tag) {
+	protected String getValue(String window, String control, String tag, String returns) {
 		List<WebElement> elements = elementFind(window, control, true, false, tag);
 
 		if (elements.size() == 0) {
 			return null;
 		}
-
+		try {
+			if (!returns.equalsIgnoreCase("none")) {
+				action.setVariable(returns, elements.get(0).getText());
+			}
+		} catch (ScriptException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return elements.get(0).getAttribute("value");
 	}
 
@@ -966,17 +983,32 @@ public class Element extends RunOnFailureKeywordsAdapter {
 	 *            been defined, using <b>*</b> for window.
 	 * @param control
 	 *            The name or locator of select control.
+	 * @param returns
+	 *            Returned variable.
 	 * @return The text of the element.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "window", "control" })
-	public String getText(String window, String control) {
+	@ArgumentNames({ "window", "control", "returns=NONE" })
+	public String getText(String window, String control, String returns) {
 		List<WebElement> elements = elementFind(window, control, true, true);
 
 		if (elements.size() == 0) {
 			return null;
 		}
+		try {
+			if (!returns.equalsIgnoreCase("none")) {
+				action.setVariable(returns, elements.get(0).getText());
+			}
+		} catch (ScriptException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return elements.get(0).getText();
+	}
+
+	@RobotKeywordOverload
+	public String getText(String window, String control) {
+		return getText(window, control, "NONE");
 	}
 
 	/**
@@ -1707,7 +1739,7 @@ public class Element extends RunOnFailureKeywordsAdapter {
 			elements.addAll(ElementFinder.find(browserManagement, control, tag));
 		}
 		if (required && elements.size() == 0) {
-			if(!window.equals("") && !window.equals("*")){
+			if (!window.equals("") && !window.equals("*")) {
 				throw new ABTLibraryNonFatalException(
 						String.format("Element control '%s - %s' did not match any elements.", window, control));
 			}
@@ -1838,8 +1870,6 @@ public class Element extends RunOnFailureKeywordsAdapter {
 
 		return false;
 	}
-
-	
 
 	public static String escapeXpathValue(String value) {
 		if (value.contains("\"") && value.contains("'")) {

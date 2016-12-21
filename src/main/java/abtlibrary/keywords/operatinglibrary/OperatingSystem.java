@@ -35,10 +35,10 @@ import abtlibrary.keywords.frameworklibrary.Action;
 
 @RobotKeywords
 public class OperatingSystem extends RunOnFailureKeywordsAdapter {
-	
+
 	@Autowired
 	protected Action action;
-	
+
 	/**
 	 * For Testing
 	 * 
@@ -62,10 +62,10 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	 * @param returns
 	 *            The return variable.
 	 * @return : returned value.
-	 * @throws ScriptException 
+	 * @throws ScriptException
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "filename", "key", "returns=NONE"})
+	@ArgumentNames({ "filename", "key", "returns=NONE" })
 	public String getPropertyFromFile(String filename, String key, String returns) throws ScriptException {
 		Properties prop = new Properties();
 		InputStream input = null;
@@ -90,14 +90,14 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 				}
 			}
 		}
-		if(!returns.equalsIgnoreCase("NONE")){
+		if (!returns.equalsIgnoreCase("NONE")) {
 			action.setVariable(returns, value);
 		}
 		return value;
 	}
 
 	@RobotKeywordOverload
-	public String getConfiguration(String key){
+	public String getConfiguration(String key) {
 		String property = "";
 		try {
 			property = getConfiguration(key, "NONE");
@@ -107,6 +107,7 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 		}
 		return property;
 	}
+
 	/**
 	 * Returns value of key from configuration file (configuration.properties)
 	 * <br>
@@ -120,10 +121,10 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	 * @param returns
 	 *            Variable to store returned property.
 	 * @return return value of keyword.
-	 * @throws ScriptException 
+	 * @throws ScriptException
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "key", "returns=NONE"})
+	@ArgumentNames({ "key", "returns=NONE" })
 	public String getConfiguration(String key, String returns) throws ScriptException {
 		String filename = "";
 		if (System.getProperty("os.name").contains("Mac")) {
@@ -201,7 +202,7 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	 * @return List of sub strings separated from specified text by delimiter.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "orginalText", "delimiter" })
+	@ArgumentNames({ "orginalText", "delimiter"})
 	public String[] splitText(String orginalText, String delimiter) {
 		String[] temp = orginalText.split(delimiter);
 		String[] items = new String[temp.length];
