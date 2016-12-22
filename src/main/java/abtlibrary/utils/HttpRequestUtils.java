@@ -2,6 +2,7 @@ package abtlibrary.utils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
@@ -14,7 +15,7 @@ import abtlibrary.ABTLibraryFatalException;
 
 public class HttpRequestUtils {
 	public static String getResponse(String url, String method,
-			Map<String, String> headers) {
+			Map<String, String> headers, String body) {
 		StringBuffer response = new StringBuffer();
 
 		try {
@@ -31,6 +32,13 @@ public class HttpRequestUtils {
 					con.setRequestProperty(cursor.getKey(), cursor.getValue());
 				}
 			}
+			
+			if(body != null){
+				con.setDoOutput(true);
+				OutputStream os = con.getOutputStream();
+		        os.write(body.getBytes());
+		        os.flush();
+			}
 
 			int responseCode = con.getResponseCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -44,7 +52,7 @@ public class HttpRequestUtils {
 				in.close();
 			} else {
 				throw new ABTLibraryFatalException("Request to:" + url
-						+ " failed with message " + con.getResponseMessage());
+						+ " failed with message " + con.getResponseMessage() + con.getResponseCode());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

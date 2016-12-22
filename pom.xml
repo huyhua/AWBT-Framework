@@ -32,6 +32,7 @@
 		<robotframework.version>3.0</robotframework.version>
 		<selenium.version>2.52.0</selenium.version>
 		<keywords.class>ABTLibrary</keywords.class>
+		<okhttp-version>2.7.5</okhttp-version>
 	</properties>
 
 	<dependencies>
@@ -221,6 +222,16 @@
 			<artifactId>joda-time</artifactId>
 			<version>2.9</version>
 		</dependency>
+		<dependency>
+      <groupId>com.squareup.okhttp</groupId>
+      <artifactId>okhttp</artifactId>
+      <version>${okhttp-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.okhttp</groupId>
+      <artifactId>logging-interceptor</artifactId>
+      <version>${okhttp-version}</version>
+    </dependency>
 	</dependencies>
 
 	<build>
