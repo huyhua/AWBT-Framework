@@ -19,6 +19,7 @@ import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywordOverload;
 import org.robotframework.javalib.annotation.RobotKeywords;
 
+import abtlibrary.ABTLibraryFatalException;
 import abtlibrary.utils.HttpRequestUtils;
 import abtlibrary.utils.anibisApiClient.ApiClient;
 import abtlibrary.utils.anibisApiClient.ApiException;
@@ -31,6 +32,7 @@ import abtlibrary.utils.as24ApiClient.api.FavoriteVehiclesApi;
 import abtlibrary.utils.as24ApiClient.api.UsersApi;
 import abtlibrary.utils.as24ApiClient.api.VehiclesApi;
 import abtlibrary.utils.as24ApiClient.model.Ad;
+import abtlibrary.utils.as24ApiClient.model.FavoriteVehicle;
 import abtlibrary.utils.is24ApiClient.APIClient;
 import abtlibrary.utils.is24ApiClient.Model.Favorite.FavoriteResponse;
 import abtlibrary.utils.is24ApiClient.Model.Searchjob.Property;
@@ -60,32 +62,28 @@ public class TestUtils {
 
 			@Override
 			public List<String> getSearchIdFromWeb(String url) {
-				// TODO Auto-generated method stub
-				return null;
+				throw new ABTLibraryFatalException("Domain not correct. Or not yet implemented!");
 			}
 
 			@Override
 			public int getSearchHitsFromWeb(String url) {
-				return 0;
+				throw new ABTLibraryFatalException("Domain not correct. Or not yet implemented!");
 			}
 
 			@Override
 			public List<String> getSearchIdFromApi(String url, Map parameters) {
-				// TODO Auto-generated method stub
-				return null;
+				throw new ABTLibraryFatalException("Domain not correct. Or not yet implemented!");
 			}
 
 			@Override
 			public int getSearchHitsFromApi(String url, Map parameters) {
-				// TODO Auto-generated method stub
-				return 0;
+				throw new ABTLibraryFatalException("Domain not correct. Or not yet implemented!");
 			}
 
 			@Override
 			public List<String> getFavouriteIdsFromApi(String host,
 					String username, String password) {
-				// TODO Auto-generated method stub
-				return null;
+				throw new ABTLibraryFatalException("Domain not correct. Or not yet implemented!");
 			}
 
 		},
@@ -139,8 +137,7 @@ public class TestUtils {
 					}
 					return results;
 				} catch (IOException e) {
-					e.printStackTrace();
-					return null;
+					throw new ABTLibraryFatalException(e.getMessage());
 				}
 			}
 
@@ -158,9 +155,7 @@ public class TestUtils {
 							SearchResponse.class);
 					return document.getPropertiesList().getTotalMatches();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					return 0;
+					throw new ABTLibraryFatalException(e.getMessage());
 				}
 			}
 
@@ -186,10 +181,8 @@ public class TestUtils {
 											.toString()));
 					return results;
 				} catch (IOException e) {
-					e.printStackTrace();
-					return null;
+					throw new ABTLibraryFatalException(e.getMessage());
 				}
-
 			}
 
 		},
@@ -242,9 +235,7 @@ public class TestUtils {
 					}
 					return resultIds;
 				} catch (abtlibrary.utils.as24ApiClient.ApiException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					return null;
+					throw new ABTLibraryFatalException(e.getMessage());
 				}
 			}
 
@@ -257,10 +248,8 @@ public class TestUtils {
 				try {
 					return api.gETpublicV41VehiclesCount(filter).getMatches();
 				} catch (abtlibrary.utils.as24ApiClient.ApiException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new ABTLibraryFatalException(e.getMessage());
 				}	
-				return 0;
 			}
 
 			@Override
@@ -269,14 +258,17 @@ public class TestUtils {
 				setApiClient(host, username, password);
 				UsersApi user = new UsersApi(client);
 				try {
+					List<String> results = new ArrayList<>();
 					int userId = user.gETpublicV41UsersAuthorizedWithHttpInfo().getData().getResult().getId();
 					FavoriteVehiclesApi api = new FavoriteVehiclesApi(client);
-					api.gETpublicV41UsersUseridFavoritevehicles(userId, 0, 200, null);
+					List<FavoriteVehicle> favList = api.gETpublicV41UsersUseridFavoritevehicles(userId, 0, 200, null).getResults();
+					for(FavoriteVehicle fav : favList){
+						results.add(fav.getVehicle().getId().toString());
+					}
+					return results;
 				} catch (abtlibrary.utils.as24ApiClient.ApiException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new ABTLibraryFatalException(e.getMessage());
 				}
-				return null;
 			}
 			
 			private abtlibrary.utils.as24ApiClient.ApiClient setApiClient(String host, String username, String password){
@@ -352,7 +344,7 @@ public class TestUtils {
 					resultDto = searchApi.searchControllerPost(parms);
 					objectIds = resultDto.getObjectIds();
 				} catch (ApiException e) {
-					e.printStackTrace();
+					throw new ABTLibraryFatalException(e.getMessage());
 				}
 				List<String> stringList = new ArrayList<String>(objectIds.size());
 				for (Integer myInt : objectIds) {
@@ -375,7 +367,7 @@ public class TestUtils {
 				try {
 					resultDto = searchApi.searchControllerPost(parms);
 				} catch (ApiException e) {
-					e.printStackTrace();
+					throw new ABTLibraryFatalException(e.getMessage());
 				}
 
 				return resultDto.getTotalCount();
@@ -399,8 +391,7 @@ public class TestUtils {
 						favoriteAdvertIds.add(advert.getId());
 					}
 				} catch (ApiException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new ABTLibraryFatalException(e.getMessage());
 				}
 				System.out.println("Number of favorites on server: "
 						+ favoriteAdvertIds.size());
@@ -457,7 +448,7 @@ public class TestUtils {
 		try {
 			targetURL = new URI(url);
 		} catch (URISyntaxException e) {
-			targetURL = null;
+			throw new ABTLibraryFatalException(e.getMessage());
 		}
 		String host = targetURL.getHost();
 		String vertical = host.substring(host.indexOf(".") + 1,
@@ -483,7 +474,7 @@ public class TestUtils {
 			return new String(Base64.getEncoder().encode(String.format("%s:%s",
 					username, password).getBytes("UTF-8")));
 		} catch (UnsupportedEncodingException e) {
-			return null;
+			throw new ABTLibraryFatalException(e.getMessage());
 		}
 	}
 	
@@ -492,7 +483,7 @@ public class TestUtils {
 		try {
 			targetURL = new URI(url);
 		} catch (URISyntaxException e) {
-			targetURL = null;
+			throw new ABTLibraryFatalException(e.getMessage());
 		}
 		String domain = targetURL.getHost();
 		domain = domain.substring(domain.indexOf(".") + 1,
@@ -549,8 +540,7 @@ public class TestUtils {
 		paramDto.setStateCode(convert(params.get("StateCode"), String.class));
 		paramDto.setUsername(convert(params.get("Username"), String.class));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ABTLibraryFatalException(e.getMessage());
 		}
 		return paramDto;
 	}
