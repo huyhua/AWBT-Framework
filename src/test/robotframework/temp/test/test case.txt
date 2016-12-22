@@ -1,10 +1,28 @@
 *** Settings ***
 Library		ABTLibrary
+Library		Collections
 
 *** Test Cases ***
 Verify android
 	
-	download from hockeyapp	6ef82c7cc9e40b99383f18d0c7bc38ce	path
+	${dictionary}=  Create Dictionary   COUNTRY=US  CURRENCY_CODE=USD
 	
-	log to console		${path}
+	#							dictionary				key					value
+	set to dictionary			${dictionary}			COUNTRY				US
+	set to dictionary			${dictionary}			CURRENCY_CODE		USD
+
+	set variable	mydict	${dictionary}	
 	
+	${country1}=	Get From Dictionary		${mydict}		COUNTRY
+	
+	log to console		MyDict: ${country1}
+	
+	
+	set variable	name	khoi
+	log to console	${name}
+
+	${names} =	Create List	First Name	Family Name	Email
+	
+	set variable	mylist	${names}
+	
+	log to console	@{mylist}[1]

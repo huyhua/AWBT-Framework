@@ -84,6 +84,10 @@ public class Action extends RunOnFailureKeywordsAdapter {
 		ScriptEngine engine = new ScriptEngineManager().getEngineByName("python");
 		engine.eval("from robot.libraries.BuiltIn import BuiltIn");
 		engine.eval("BuiltIn().import_resource('" + init.getTempActionDir() + "/Action.robot')");
+
+		// Set default library
+		setLibraryOrder("ABTLibrary");
+
 		return init.getTempActionDir() + "/Action.robot";
 	}
 
@@ -112,17 +116,30 @@ public class Action extends RunOnFailureKeywordsAdapter {
 	 *            Value of variable
 	 * @throws ScriptException
 	 */
-	@RobotKeywordOverload
+	@RobotKeyword
 	@ArgumentNames({ "name", "value" })
 	public void setVariable(String name, String value) throws ScriptException {
 		ScriptEngine engine = new ScriptEngineManager().getEngineByName("python");
+		System.out.println("Test: " + value);
+		if (value.startsWith("{u") | value.startsWith("[u")) {
+			engine.eval("var=" + value);
+		}
+		else {
+			engine.eval("var='" + value + "'");
+		}
 		engine.eval("from robot.libraries.BuiltIn import BuiltIn");
-		engine.eval("BuiltIn().set_global_variable('${" + name + "}', '" + value + "')");
+		engine.eval("BuiltIn().set_global_variable('${" + name + "}',var)");
 	}
-
 	// ##############################
 	// Internal Methods
 	// ##############################
+
+	public static void setLibraryOrder(String name) throws ScriptException {
+		ScriptEngine engine = new ScriptEngineManager().getEngineByName("python");
+		engine.eval("from robot.libraries.BuiltIn import BuiltIn");
+		engine.eval("BuiltIn().set_library_search_order('" + name + "')");
+	}
+
 	public String getVariable(String name) throws ScriptException {
 		ScriptEngine engine = new ScriptEngineManager().getEngineByName("python");
 		engine.eval("from robot.libraries.BuiltIn import BuiltIn");
