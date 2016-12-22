@@ -624,6 +624,6 @@ public class TestUtils {
 //	public static void main(String[] args) throws ApiException {
 //		List<String> params = new ArrayList<>();
 //		params.add("take=25");
-//		System.out.println(retrieveResultIdsFromApi("https://int-newapi.autoscout24.ch",params).toString());
+//		System.out.println(retrieveFavoriteIdsFromApi("https://int-newapi.autoscout24.ch", "60601-romsup", "autoscout24").toString());
 //	}
 }

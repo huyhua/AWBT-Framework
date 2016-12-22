@@ -17,7 +17,6 @@ public class HttpRequestUtils {
 	public static String getResponse(String url, String method,
 			Map<String, String> headers, String body) {
 		StringBuffer response = new StringBuffer();
-
 		try {
 			
 			URL obj;
@@ -54,11 +53,10 @@ public class HttpRequestUtils {
 				throw new ABTLibraryFatalException("Request to:" + url
 						+ " failed with message " + con.getResponseMessage() + con.getResponseCode());
 			}
+			return response.toString();
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new ABTLibraryFatalException(e.getMessage());
 		}
-
-		return response.toString();
 	}
 
 	public static JSONObject parseStringIntoJson(String content) {
@@ -66,10 +64,8 @@ public class HttpRequestUtils {
 		try {
 			return (JSONObject) parser.parse(content);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ABTLibraryFatalException(e.getMessage());
 		}
-		return null;
 	}
 	
 	
