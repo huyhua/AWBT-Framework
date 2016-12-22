@@ -367,7 +367,7 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("X-HockeyAppToken", apiToken);
 
-		String jsonResponse = HttpRequestUtils.getResponse(request, "GET", headers);
+		String jsonResponse = HttpRequestUtils.getResponse(request, "GET", headers ,null);
 		JSONObject doc = HttpRequestUtils.parseStringIntoJson(jsonResponse);
 		JSONArray arr = (JSONArray) doc.get("app_versions");
 
