@@ -202,7 +202,7 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	 * @return List of sub strings separated from specified text by delimiter.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "orginalText", "delimiter"})
+	@ArgumentNames({ "orginalText", "delimiter" })
 	public String[] splitText(String orginalText, String delimiter) {
 		String[] temp = orginalText.split(delimiter);
 		String[] items = new String[temp.length];
@@ -247,12 +247,29 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	/**
 	 * Gets time stamp in millisecond.
 	 * 
+	 * @param returns
+	 *            The returned variable
 	 * @return the timstamp string in milliseconds.
 	 */
 	@RobotKeyword
-	public String getTimeStamp() {
+	@ArgumentNames({ "returns=NONE" })
+	public String getTimeStamp(String returns) {
 		Calendar calendar = Calendar.getInstance();
-		return calendar.getTimeInMillis() + "";
+		String timeStamp = calendar.getTimeInMillis() + "";
+		try {
+			if (!returns.equalsIgnoreCase("none")) {
+				action.setVariable(returns, timeStamp);
+			}
+		} catch (ScriptException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return timeStamp;
+	}
+
+	@RobotKeywordOverload
+	public String getTimeStamp() {
+		return getTimeStamp("NONE");
 	}
 
 	/**
@@ -273,9 +290,13 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	 *            Start Text.
 	 * @param endText
 	 *            End Text.
+	 * @param returns
+	 *            The returned variable.
 	 * @return List of text between start and end text.
 	 */
-	public List<String> getMidText(String originalText, String startText, String endText) {
+	@RobotKeyword
+	@ArgumentNames({ "originalText", "startText", "endText", "returns=NONE" })
+	public List<String> getMidText(String originalText, String startText, String endText, String returns) {
 		List<String> midTextList = new ArrayList<String>();
 		String[] tempList = originalText.split(startText);
 		if (endText.equals("")) {
@@ -293,7 +314,21 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 				midTextList.add(tempList[0].substring(0, tempList[0].indexOf(endText)));
 			}
 		}
+
+		try {
+			if (!returns.equalsIgnoreCase("none")) {
+				action.setVariable(returns, midTextList.toString());
+			}
+		} catch (ScriptException e) {
+			e.printStackTrace();
+		}
+
 		return midTextList;
+	}
+
+	@RobotKeywordOverload
+	public List<String> getMidText(String originalText, String startText, String endText) {
+		return getMidText(originalText, startText, endText, "NONE");
 	}
 
 	/**
@@ -348,14 +383,25 @@ public class OperatingSystem extends RunOnFailureKeywordsAdapter {
 	 * 
 	 * @param originalText
 	 *            The original text.
+	 * @param returns
+	 *            The returned variable.
 	 * @return the unique text
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "originalText" })
-	public String generateUniqueString(String originalText) {
+	@ArgumentNames({ "originalText" , "returns=NONE"})
+	public String generateUniqueString(String originalText, String returns) {
 		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 		Calendar calendar = Calendar.getInstance();
-		return originalText + " - " + dateFormat.format(calendar.getTime());
+		String uniqueString = originalText + " - " + dateFormat.format(calendar.getTime());
+		try {
+			if (!returns.equalsIgnoreCase("none")) {
+				action.setVariable(returns, uniqueString);
+			}
+		} catch (ScriptException e) {
+			e.printStackTrace();
+		}
+		
+		return uniqueString;
 	}
 
 	public NodeList getXMLNodes(String xmlFile) {
