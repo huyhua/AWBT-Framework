@@ -9,13 +9,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-import java.util.logging.Logger;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -40,7 +38,6 @@ public class APIClient {
 
 	private HttpClient httpClient;
 	private String url;
-	private Logger logger = Logger.getLogger(APIClient.class.getName());
 	private String username = null;
 	private String password = null;
 
@@ -86,21 +83,18 @@ public class APIClient {
 				this.url = url;
 			}
 
-			logger.fine("API client created for " + url);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	public String invokeHttpGet(String uriSuffix) throws IOException {
-		logger.fine("Invoking " + uriSuffix);
 		HttpGet httpGet = new HttpGet(url + uriSuffix);
 		return consumeResponse(httpClient.execute(httpGet));
 	}
 
 	public String invokeHttpPost(String uriSuffix, String jsonData)
 			throws IOException {
-		logger.fine("Invoking " + uriSuffix + " with jsonData " + jsonData);
 		HttpPost httpPost = new HttpPost(url + uriSuffix);
 		StringEntity reqEntity = new StringEntity(jsonData);
 		httpPost.setEntity(reqEntity);
@@ -114,11 +108,6 @@ public class APIClient {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		entity.writeTo(os);
 		String content = os.toString("UTF-8");
-
-		logger.fine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-		logger.fine(response.getStatusLine().toString());
-		logger.fine(content);
-		logger.fine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
 		if (status != 200) {
 			throw new HttpResponseException(status, content);

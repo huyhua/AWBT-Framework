@@ -18,11 +18,21 @@
 		</license>
 	</licenses>
 
+	<distributionManagement>
+		<repository>
+			<id>internal.repo</id>
+			<name>Temporary Staging Repository</name>
+			<url>file://${project.build.directory}/mvn-repo</url>
+		</repository>
+	</distributionManagement>
+
 	<scm>
 		<url>https://github.xmedia.ch/QANVG/ABTLibrary</url>
 	</scm>
 
 	<properties>
+		<github.site.host>github.xmedia.ch</github.site.host>
+		<github.global.server>github</github.global.server>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<downloadSources>true</downloadSources>
 		<downloadJavadocs>true</downloadJavadocs>
@@ -182,12 +192,12 @@
 			<artifactId>jsoup</artifactId>
 			<version>1.10.1</version>
 		</dependency>
-				<dependency>
+		<dependency>
 			<groupId>io.swagger</groupId>
 			<artifactId>swagger-annotations</artifactId>
 			<version>1.5.4</version>
 		</dependency>
-				<dependency>
+		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-client</artifactId>
 			<version>1.19</version>
@@ -196,13 +206,13 @@
 			<groupId>com.sun.jersey.contribs</groupId>
 			<artifactId>jersey-multipart</artifactId>
 			<version>1.19</version>
-				</dependency>
+		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
 			<version>2.6.3</version>
 		</dependency>
-			<dependency>
+		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
 			<version>2.6.3</version>
@@ -223,15 +233,15 @@
 			<version>2.9</version>
 		</dependency>
 		<dependency>
-      <groupId>com.squareup.okhttp</groupId>
-      <artifactId>okhttp</artifactId>
-      <version>${okhttp-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.squareup.okhttp</groupId>
-      <artifactId>logging-interceptor</artifactId>
-      <version>${okhttp-version}</version>
-    </dependency>
+			<groupId>com.squareup.okhttp</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>${okhttp-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.okhttp</groupId>
+			<artifactId>logging-interceptor</artifactId>
+			<version>${okhttp-version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -255,6 +265,40 @@
 		</resources>
 
 		<plugins>
+			<plugin>
+				<groupId>com.github.github</groupId>
+				<artifactId>site-maven-plugin</artifactId>
+				<version>0.11</version>
+				<configuration>
+					<host>${github.site.host}</host>
+					<message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
+					<noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
+					<outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
+					<branch>refs/heads/mvn-repo</branch>                       <!-- remote branch name -->
+					<includes>
+						<include>**/*</include>
+					</includes>
+					<repositoryName>ABTLibrary</repositoryName>      <!-- github repo name -->
+					<repositoryOwner>QANVG</repositoryOwner>    <!-- github username -->
+				</configuration>
+				<executions>
+					<!-- run site-maven-plugin's 'site' target as part of the build's normal 
+						'deploy' phase -->
+					<execution>
+						<goals>
+							<goal>site</goal>
+						</goals>
+						<phase>deploy</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.1</version>
+				<configuration>
+					<altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
+				</configuration>
+			</plugin>
 			<plugin>
 				<!-- Weave the failure handler into the code -->
 				<groupId>org.codehaus.mojo</groupId>
@@ -291,17 +335,9 @@
 					<testCasesDirectory>${project.basedir}/src/test/robotframework/temp</testCasesDirectory>
 				</configuration>
 				<executions>
-					<execution>
-						<id>test</id>
-						<phase>integration-test</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<logLevel>debug</logLevel>
-							<testCasesDirectory>${project.basedir}/src/test/robotframework/testsuites</testCasesDirectory>
-						</configuration>
-					</execution>
+					<!-- <execution> <id>test</id> <phase>integration-test</phase> <goals> 
+						<goal>run</goal> </goals> <configuration> <logLevel>debug</logLevel> <testCasesDirectory>${project.basedir}/src/test/robotframework/testsuites</testCasesDirectory> 
+						</configuration> </execution> -->
 					<execution>
 						<id>html</id>
 						<phase>package</phase>
@@ -455,7 +491,6 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-
 	<profiles>
 		<profile>
 			<id>sonatype-oss-release</id>

@@ -9,6 +9,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.script.ScriptException;
@@ -141,8 +142,8 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	 * @return Application session id.
 	 */
 	@RobotKeyword
-	@ArgumentNames({ "device", "version", "filePath", "alias=NONE", "appiumServer=NONE" })
-	public String openApplication(String device, String version, String filePath, String alias, String appiumServer) {
+	@ArgumentNames({ "device", "version", "filePath", "caps=NONE", "appiumServer=NONE", "alias=NONE" })
+	public String openApplication(String device, String version, String filePath, List<String> caps, String appiumServer, String alias) {
 		WebDriver driver;
 		String platform = filePath.contains(".apk") ? "Android" : "iOS";
 
@@ -173,13 +174,19 @@ public class ApplicationManagement extends RunOnFailureKeywordsAdapter {
 	}
 
 	@RobotKeywordOverload
-	public String openApplication(String device, String version, String filePath, String alias) {
-		return openApplication(device, version, filePath, alias, "http://localhost:4723/wd/hub");
+	public String openApplication(String device, String version, String filePath, List<String> caps, String appiumServer) {
+		return openApplication(device, version, filePath, caps, appiumServer, "");
 	}
+	
+	@RobotKeywordOverload
+	public String openApplication(String device, String version, String filePath, List<String> caps) {
+		return openApplication(device, version, filePath, caps, "http://localhost:4723/wd/hub");
+	}
+	
 
 	@RobotKeywordOverload
 	public String openApplication(String device, String version, String filePath) {
-		return openApplication(device, version, filePath, "");
+		return openApplication(device, version, filePath, null);
 	}
 
 	/**
