@@ -27,11 +27,10 @@
 	</distributionManagement>
 
 	<scm>
-		<url>https://github.xmedia.ch/QANVG/ABTLibrary</url>
+		<url>https://github.com/huyhua/AWBT-Framework</url>
 	</scm>
 
 	<properties>
-		<github.site.host>github.xmedia.ch</github.site.host>
 		<github.global.server>github</github.global.server>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<downloadSources>true</downloadSources>
@@ -270,7 +269,6 @@
 				<artifactId>site-maven-plugin</artifactId>
 				<version>0.11</version>
 				<configuration>
-					<host>${github.site.host}</host>
 					<message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
 					<noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
 					<outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
@@ -278,8 +276,8 @@
 					<includes>
 						<include>**/*</include>
 					</includes>
-					<repositoryName>ABTLibrary</repositoryName>      <!-- github repo name -->
-					<repositoryOwner>QANVG</repositoryOwner>    <!-- github username -->
+					<repositoryName>AWBT-Framework</repositoryName>      <!-- github repo name -->
+					<repositoryOwner>huyhua</repositoryOwner>    <!-- github username -->
 				</configuration>
 				<executions>
 					<!-- run site-maven-plugin's 'site' target as part of the build's normal 
@@ -389,8 +387,8 @@
 					<compilerId>javac</compilerId>
 				</configuration>
 			</plugin>
-			<plugin>
-				<!-- Build the fat jar with all dependencies -->
+<!-- 			<plugin>
+				Build the fat jar with all dependencies
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.6</version>
@@ -413,7 +411,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin> -->
 			<plugin>
 				<!-- extract documentation for libdoc -->
 				<groupId>org.apache.maven.plugins</groupId>
