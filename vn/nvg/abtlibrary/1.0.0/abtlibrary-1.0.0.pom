@@ -44,6 +44,14 @@
 		<okhttp-version>2.7.5</okhttp-version>
 	</properties>
 
+	<repositories>
+		<repository>
+		<id>jcenter</id>
+		<name>jcenter</name>
+		<url>http://jcenter.bintray.com</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<!-- For Excel -->
 		<dependency>
@@ -241,6 +249,11 @@
 			<artifactId>logging-interceptor</artifactId>
 			<version>${okhttp-version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.jfrog.bintray.client</groupId>
+			<artifactId>bintray-client-java-api</artifactId>
+			<version>0.9.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -387,31 +400,12 @@
 					<compilerId>javac</compilerId>
 				</configuration>
 			</plugin>
-<!-- 			<plugin>
-				Build the fat jar with all dependencies
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-					<archive>
-						<manifest>
-							<mainClass>ABTLibrary</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin> -->
+			<!-- <plugin> Build the fat jar with all dependencies <groupId>org.apache.maven.plugins</groupId> 
+				<artifactId>maven-assembly-plugin</artifactId> <version>2.6</version> <configuration> 
+				<descriptorRefs> <descriptorRef>jar-with-dependencies</descriptorRef> </descriptorRefs> 
+				<archive> <manifest> <mainClass>ABTLibrary</mainClass> </manifest> </archive> 
+				</configuration> <executions> <execution> <id>make-assembly</id> <phase>package</phase> 
+				<goals> <goal>single</goal> </goals> </execution> </executions> </plugin> -->
 			<plugin>
 				<!-- extract documentation for libdoc -->
 				<groupId>org.apache.maven.plugins</groupId>
@@ -546,4 +540,13 @@
 		</profile>
 	</profiles>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging</artifactId>
+				<version>1.2</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>
