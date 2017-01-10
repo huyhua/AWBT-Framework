@@ -259,6 +259,18 @@
 			<artifactId>org.eclipse.egit.github.core</artifactId>
 			<version>3.1.0.201310021548-r</version>
 		</dependency>
+		
+		<dependency>
+    		<groupId>javax.mail</groupId>
+    		<artifactId>mail</artifactId>
+    		<version>1.5.0-b01</version>
+		</dependency>
+		
+		<dependency>
+    		<groupId>javax.mail</groupId>
+   			<artifactId>javax.mail-api</artifactId>
+    		<version>1.5.6</version>
+		</dependency>
 	</dependencies>
 
 	<build>
