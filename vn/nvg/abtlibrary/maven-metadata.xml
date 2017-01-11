@@ -3,12 +3,13 @@
   <groupId>vn.nvg</groupId>
   <artifactId>abtlibrary</artifactId>
   <versioning>
-    <release>1.0.17</release>
+    <release>1.0.18</release>
     <versions>
       <version>1.0.15</version>
       <version>1.0.16</version>
       <version>1.0.17</version>
+      <version>1.0.18</version>
     </versions>
-    <lastUpdated>20170111043738</lastUpdated>
+    <lastUpdated>20170111082712</lastUpdated>
   </versioning>
 </metadata>
