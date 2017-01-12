@@ -5,11 +5,9 @@
 	<artifactId>abtlibrary</artifactId>
 	<version>1.0.22</version>
 	<packaging>jar</packaging>
-
 	<name>Action Based Testing Library</name>
 	<description>Replace all automation scripts—that often require days to code—with keyword-driven preprogrammed actions</description>
 	<url>http://nvg.vn/</url>
-
 	<licenses>
 		<license>
 			<name>Apache License, Version 2.0</name>
@@ -17,21 +15,10 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-
-	<distributionManagement>
-		<repository>
-			<id>internal.repo</id>
-			<name>Temporary Staging Repository</name>
-			<url>file://${project.build.directory}/mvn-repo</url>
-		</repository>
-	</distributionManagement>
-
 	<scm>
 		<url>https://github.com/huyhua/AWBT-Framework</url>
 	</scm>
-
 	<properties>
-		<github.global.server>github</github.global.server>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<downloadSources>true</downloadSources>
 		<downloadJavadocs>true</downloadJavadocs>
@@ -43,7 +30,6 @@
 		<keywords.class>ABTLibrary</keywords.class>
 		<okhttp-version>2.7.5</okhttp-version>
 	</properties>
-
 	<repositories>
 		<repository>
 			<id>jcenter</id>
@@ -51,7 +37,6 @@
 			<url>http://jcenter.bintray.com</url>
 		</repository>
 	</repositories>
-
 	<dependencies>
 		<!-- For Excel -->
 		<dependency>
@@ -192,8 +177,6 @@
 			<artifactId>eyes-selenium-java</artifactId>
 			<version>2.54</version>
 		</dependency>
-		<!-- <dependency> <groupId>com.applitools</groupId> <artifactId>eyes-selenium-java</artifactId> 
-			<version>RELEASE</version> </dependency> -->
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
@@ -255,23 +238,16 @@
 			<version>0.9.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.eclipse.mylyn.github</groupId>
-			<artifactId>org.eclipse.egit.github.core</artifactId>
-			<version>3.1.0.201310021548-r</version>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.5.0-b01</version>
 		</dependency>
 		<dependency>
-		<groupId>javax.mail</groupId>
-		<artifactId>mail</artifactId>
-		<version>1.5.0-b01</version>
-	</dependency>
-
-	<dependency>
-		<groupId>javax.mail</groupId>
-		<artifactId>javax.mail-api</artifactId>
-		<version>1.5.6</version>
-	</dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>javax.mail-api</artifactId>
+			<version>1.5.6</version>
+		</dependency>
 	</dependencies>
-
 	<build>
 		<resources>
 			<resource>
@@ -291,42 +267,10 @@
 				</excludes>
 			</resource>
 		</resources>
-
 		<plugins>
-			<plugin>
-				<groupId>com.github.github</groupId>
-				<artifactId>site-maven-plugin</artifactId>
-				<version>0.11</version>
-				<configuration>
-					<merge>true</merge>
-					<message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
-					<noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
-					<outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
-					<branch>refs/heads/mvn-repo</branch>                       <!-- remote branch name -->
-					<includes>
-						<include>**/*</include>
-					</includes>
-					<repositoryName>AWBT-Framework</repositoryName>      <!-- github repo name -->
-					<repositoryOwner>huyhua</repositoryOwner>    <!-- github username -->
-				</configuration>
-				<executions>
-					<!-- run site-maven-plugin's 'site' target as part of the build's normal 
-						'deploy' phase -->
-					<execution>
-						<goals>
-							<goal>site</goal>
-						</goals>
-						<phase>deploy</phase>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.8.1</version>
-				<configuration>
-					<altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
-				</configuration>
-			</plugin>
+			<!-- <plugin> <artifactId>maven-deploy-plugin</artifactId> <version>2.8.1</version> 
+				<configuration> <skip>true</skip> </configuration> </plugin> -->
+
 			<plugin>
 				<!-- Weave the failure handler into the code -->
 				<groupId>org.codehaus.mojo</groupId>
@@ -417,12 +361,6 @@
 					<compilerId>javac</compilerId>
 				</configuration>
 			</plugin>
-			<!-- <plugin> Build the fat jar with all dependencies <groupId>org.apache.maven.plugins</groupId> 
-				<artifactId>maven-assembly-plugin</artifactId> <version>2.6</version> <configuration> 
-				<descriptorRefs> <descriptorRef>jar-with-dependencies</descriptorRef> </descriptorRefs> 
-				<archive> <manifest> <mainClass>ABTLibrary</mainClass> </manifest> </archive> 
-				</configuration> <executions> <execution> <id>make-assembly</id> <phase>package</phase> 
-				<goals> <goal>single</goal> </goals> </execution> </executions> </plugin> -->
 			<plugin>
 				<!-- extract documentation for libdoc -->
 				<groupId>org.apache.maven.plugins</groupId>
@@ -454,7 +392,34 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin><plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>1.9.1</version>
+						<executions>
+							<execution>
+								<id>attach-artifacts</id>
+								<phase>package</phase>
+								<goals>
+									<goal>attach-artifact</goal>
+								</goals>
+								<configuration>
+									<artifacts>
+										<artifact>
+											<file>${project.build.directory}/${keywords.class}.html</file>
+											<type>html</type>
+											<classifier>libdoc</classifier>
+										</artifact>
+										<artifact>
+											<file>${project.build.directory}/${keywords.class}.xml</file>
+											<type>xml</type>
+											<classifier>libdoc</classifier>
+										</artifact>
+									</artifacts>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -503,60 +468,92 @@
 	<profiles>
 		<profile>
 			<id>sonatype-oss-release</id>
+			<distributionManagement>
+				<repository>
+					<id>nexus-snapshots</id>
+					<name>Nexus Repository</name>
+					<url>http://192.168.1.181:8081/nexus/content/repositories/releases/</url>
+				</repository>
+			</distributionManagement>
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>2.10.3</version>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+						<version>1.5.1</version>
 						<executions>
 							<execution>
-								<id>attach-javadocs</id>
+								<id>default-deploy</id>
+								<phase>deploy</phase>
 								<goals>
-									<goal>jar</goal>
+									<goal>deploy</goal>
 								</goals>
-								<configuration>
-									<use>false</use>
-									<links>
-										<link>http://java.sun.com/javase/7/docs/api/</link>
-									</links>
-								</configuration>
+							</execution>
+						</executions>
+						<configuration>
+							<serverId>nexus</serverId>
+							<nexusUrl>http://192.168.1.181:8081/nexus/</nexusUrl>
+							<skipStaging>true</skipStaging>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>github-release</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<distributionManagement>
+				<repository>
+					<id>internal.repo</id>
+					<name>Temporary Staging Repository</name>
+					<url>file://${project.build.directory}/mvn-repo</url>
+				</repository>
+			</distributionManagement>
+			<properties>
+				<github.global.server>github</github.global.server>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.github.github</groupId>
+						<artifactId>site-maven-plugin</artifactId>
+						<version>0.11</version>
+						<configuration>
+							<merge>true</merge>
+							<message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
+							<noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
+							<outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
+							<branch>refs/heads/mvn-repo</branch>                       <!-- remote branch name -->
+							<includes>
+								<include>**/*</include>
+							</includes>
+							<repositoryName>AWBT-Framework</repositoryName>      <!-- github repo name -->
+							<repositoryOwner>huyhua</repositoryOwner>    <!-- github username -->
+						</configuration>
+						<executions>
+							<!-- run site-maven-plugin's 'site' target as part of the build's 
+								normal 'deploy' phase -->
+							<execution>
+								<goals>
+									<goal>site</goal>
+								</goals>
+								<phase>deploy</phase>
 							</execution>
 						</executions>
 					</plugin>
 					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>build-helper-maven-plugin</artifactId>
-						<version>1.9.1</version>
-						<executions>
-							<execution>
-								<id>attach-artifacts</id>
-								<phase>package</phase>
-								<goals>
-									<goal>attach-artifact</goal>
-								</goals>
-								<configuration>
-									<artifacts>
-										<artifact>
-											<file>${project.build.directory}/${keywords.class}.html</file>
-											<type>html</type>
-											<classifier>libdoc</classifier>
-										</artifact>
-										<artifact>
-											<file>${project.build.directory}/${keywords.class}.xml</file>
-											<type>xml</type>
-											<classifier>libdoc</classifier>
-										</artifact>
-									</artifacts>
-								</configuration>
-							</execution>
-						</executions>
+						<artifactId>maven-deploy-plugin</artifactId>
+						<version>2.8.1</version>
+						<configuration>
+							<altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>
 		</profile>
 	</profiles>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
